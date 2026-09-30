@@ -46,6 +46,13 @@ RUN apt-get update \
 # Generate English locale
 RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen en_US.UTF-8
 
+# Install neofetch and fastfetch
+RUN curl -fsSL https://raw.githubusercontent.com/dylanaraps/neofetch/master/neofetch -o /usr/local/bin/neofetch \
+    && chmod +x /usr/local/bin/neofetch \
+    && (curl -fsSL https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.deb -o /tmp/fastfetch.deb \
+        && dpkg -i /tmp/fastfetch.deb \
+        && rm -f /tmp/fastfetch.deb || true)
+
 # Welcome banner shown on interactive SSH login
 COPY ara-welcome.sh /etc/profile.d/ara-welcome.sh
 RUN chmod +x /etc/profile.d/ara-welcome.sh
