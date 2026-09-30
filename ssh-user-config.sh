@@ -69,6 +69,7 @@ mkdir -p /var/lib/ara
 : ${SSH_USERNAME:=""}
 : ${SSH_PASSWORD:=""}
 
+touch /root/.hushlogin
 if [ -n "$SSH_USERNAME" ] && [ -n "$SSH_PASSWORD" ]; then
     if id "$SSH_USERNAME" &>/dev/null; then
         msg "User $SSH_USERNAME already exists" "کاربر $SSH_USERNAME از قبل وجود دارد"
@@ -80,6 +81,8 @@ if [ -n "$SSH_USERNAME" ] && [ -n "$SSH_PASSWORD" ]; then
         msg "User $SSH_USERNAME created with the provided password and added to sudo group" \
             "کاربر $SSH_USERNAME با رمز عبور داده‌شده ایجاد و به گروه sudo اضافه شد"
     fi
+    touch "/home/$SSH_USERNAME/.hushlogin" 2>/dev/null || true
+    chown "$SSH_USERNAME:$SSH_USERNAME" "/home/$SSH_USERNAME/.hushlogin" 2>/dev/null || true
 elif [ -n "$SSH_USERNAME" ] || [ -n "$SSH_PASSWORD" ]; then
     # Only one of the pair was provided — ignore and warn / فقط یکی ست شده — نادیده گرفته و هشدار
     msg "SSH_USERNAME and SSH_PASSWORD must be set together; skipping extra user creation" \

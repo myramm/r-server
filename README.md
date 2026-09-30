@@ -2,24 +2,18 @@
   <img src="assets/aratm.png" alt="ARA TM" width="1000"/>
 </p>
 
-<h1 align="center">ARA TM — Railway Ubuntu SSH Server 🚂</h1>
+<h1 align="center">R-SERVER — Railway Debian 12 SSH Server 🚂</h1>
 
 <p align="center">
-  <b>Your own cloud workstation on Railway</b> — SSH in as <b>root</b>, with <b>Claude Code</b> pre-installed and ready to go.
-  <br/>
-  <b>ایستگاه کاری ابری مخصوص خودت روی Railway</b> — با دسترسی root از طریق SSH و Claude Code از پیش نصب‌شده.
-</p>
-
-<p align="center">
-  🇬🇧 English &nbsp;·&nbsp; 🇮🇷 <a href="README.fa.md">فارسی</a>
+  <b>Your own cloud workstation on Railway</b> — SSH in as <b>root</b>, with <b>Claude Code</b> & <b>Antigravity CLI</b> pre-installed and ready to go.
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/platform-Railway-blue" alt="Platform">
-  <img src="https://img.shields.io/badge/Ubuntu-24.04-orange" alt="Ubuntu">
+  <img src="https://img.shields.io/badge/Debian-12-red" alt="Debian">
   <img src="https://img.shields.io/badge/SSH-OpenSSH-green" alt="SSH">
   <img src="https://img.shields.io/badge/Claude_Code-included-purple" alt="Claude Code">
-  <img src="https://img.shields.io/badge/languages-English%20%2F%20Persian-important" alt="Languages">
+  <img src="https://img.shields.io/badge/Antigravity-included-blue" alt="Antigravity">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
 </p>
 

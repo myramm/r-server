@@ -32,34 +32,41 @@ if command -v claude >/dev/null 2>&1; then
 else
   _claude="${C_RED}● not installed${C_RESET}"
 fi
+if command -v agy >/dev/null 2>&1 || command -v antigravity >/dev/null 2>&1; then
+  _antigravity="${C_GREEN}● ready${C_RESET}"
+else
+  _antigravity="${C_RED}● not installed${C_RESET}"
+fi
 
 # ---- Render / نمایش ----
 printf '\n'
-printf '%s\n' "${C_CYAN}${C_BOLD}   █████╗ ██████╗  █████╗     ████████╗███╗   ███╗${C_RESET}"
-printf '%s\n' "${C_CYAN}${C_BOLD}  ██╔══██╗██╔══██╗██╔══██╗    ╚══██╔══╝████╗ ████║${C_RESET}"
-printf '%s\n' "${C_BLUE}${C_BOLD}  ███████║██████╔╝███████║       ██║   ██╔████╔██║${C_RESET}"
-printf '%s\n' "${C_BLUE}${C_BOLD}  ██╔══██║██╔══██╗██╔══██║       ██║   ██║╚██╔╝██║${C_RESET}"
-printf '%s\n' "${C_PURPLE}${C_BOLD}  ██║  ██║██║  ██║██║  ██║       ██║   ██║ ╚═╝ ██║${C_RESET}"
-printf '%s\n' "${C_PURPLE}${C_BOLD}  ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝       ╚═╝   ╚═╝     ╚═╝${C_RESET}"
+printf '%s\n' "${C_CYAN}${C_BOLD}  ██████╗       ███████╗███████╗██████╗ ██╗   ██╗███████╗██████╗ ${C_RESET}"
+printf '%s\n' "${C_CYAN}${C_BOLD}  ██╔══██╗      ██╔════╝██╔════╝██╔══██╗██║   ██║██╔════╝██╔══██╗${C_RESET}"
+printf '%s\n' "${C_BLUE}${C_BOLD}  ██████╔╝█████╗███████╗█████╗  ██████╔╝██║   ██║█████╗  ██████╔╝${C_RESET}"
+printf '%s\n' "${C_BLUE}${C_BOLD}  ██╔══██╗╚════╝╚════██║██╔══╝  ██╔══██╗╚██╗ ██╔╝██╔══╝  ██╔══██╗${C_RESET}"
+printf '%s\n' "${C_PURPLE}${C_BOLD}  ██║  ██║      ███████║███████╗██║  ██║ ╚████╔╝ ███████╗██║  ██║${C_RESET}"
+printf '%s\n' "${C_PURPLE}${C_BOLD}  ╚═╝  ╚═╝      ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝${C_RESET}"
 printf '\n'
-printf '%s\n' "${C_WHITE}${C_BOLD}          ☁  Cloud Shell · Railway Ubuntu  🚂${C_RESET}"
-printf '%s\n' "${C_YELLOW}${C_BOLD}               Developer · Parham_7991${C_RESET}"
+printf '%s\n' "${C_WHITE}${C_BOLD}                ☁  Cloud Shell · Railway Debian 12  🚂${C_RESET}"
 printf '\n'
 
 # Divider / خط‌جدا‌کننده
-line="${C_GREY}  ────────────────────────────────────────────────${C_RESET}"
+line="${C_GREY}  ───────────────────────────────────────────────────────────────${C_RESET}"
 printf '%s\n' "$line"
 
-row() { printf "  ${C_CYAN}%s${C_RESET} ${C_DIM}%s${C_RESET} %b\n" "$1" "$2" "$3"; }
-row " User    " "│" "${C_WHITE}${_user}${C_RESET}${C_GREY} @ ${C_WHITE}${_host}${C_RESET}"
-row " OS      " "│" "${C_WHITE}${_os}${C_RESET}"
-row " Kernel  " "│" "${C_WHITE}${_kernel}${C_RESET}"
-row " Uptime  " "│" "${C_WHITE}${_uptime}${C_RESET}"
-row " CPU     " "│" "${C_WHITE}${_cpu} ${C_GREY}(${_cores} cores)${C_RESET}"
-row " Memory  " "│" "${C_WHITE}${_mem}${C_RESET}"
-row " Disk    " "│" "${C_WHITE}${_disk}${C_RESET}"
-row " IP      " "│" "${C_WHITE}${_ip}${C_RESET}"
-row " Claude  " "│" "${_claude}"
+row() { printf "  ${C_CYAN}%-8s${C_RESET} ${C_DIM}%s${C_RESET} %b\n" "$1" "$2" "$3"; }
+row "User" "│" "${C_WHITE}${_user}${C_RESET}${C_GREY} @ ${C_WHITE}${_host}${C_RESET}"
+row "OS" "│" "${C_WHITE}${_os}${C_RESET}"
+row "Kernel" "│" "${C_WHITE}${_kernel}${C_RESET}"
+row "Uptime" "│" "${C_WHITE}${_uptime}${C_RESET}"
+row "CPU" "│" "${C_WHITE}${_cpu} ${C_GREY}(${_cores} cores)${C_RESET}"
+row "Memory" "│" "${C_WHITE}${_mem}${C_RESET}"
+row "Disk" "│" "${C_WHITE}${_disk}${C_RESET}"
+row "IP" "│" "${C_WHITE}${_ip}${C_RESET}"
+row "Claude" "│" "${_claude}"
+if command -v agy >/dev/null 2>&1 || command -v antigravity >/dev/null 2>&1; then
+  row "AGY" "│" "${_antigravity}"
+fi
 
 # src ⇄ GitHub sync status (reads the local repo mark; no network call)
 # وضعیت همگام‌سازی src با GitHub (نشانگر محلی مخزن را می‌خواند؛ بدون فراخوانی شبکه)
@@ -69,10 +76,11 @@ if [ -n "${GITHUB_TOKEN:-}" ] && [ -f /var/lib/ara/src-repo ]; then
 else
   _src="${C_GREY}● off — set GITHUB_TOKEN to backup${C_RESET}"
 fi
-row " src     " "│" "${_src}"
+row "src" "│" "${_src}"
 
 printf '%s\n' "$line"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}cl${C_RESET} ${C_DIM}(or ${C_RESET}${C_YELLOW}${C_BOLD}زم${C_RESET}${C_DIM}) to launch Claude Code in tmux${C_RESET}\n"
+printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}agy${C_RESET} ${C_DIM}(or ${C_RESET}${C_YELLOW}${C_BOLD}ag${C_RESET}${C_DIM}) to launch Antigravity CLI${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}usage${C_RESET} ${C_DIM}to check Railway trial credit & uptime left${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}src-sync --status${C_RESET} ${C_DIM}to see your private backup repo${C_RESET}\n"
 printf '\n'
