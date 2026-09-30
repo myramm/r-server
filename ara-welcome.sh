@@ -47,7 +47,7 @@ printf '%s\n' "${C_BLUE}${C_BOLD}  ██╔══██╗╚════╝╚
 printf '%s\n' "${C_PURPLE}${C_BOLD}  ██║  ██║      ███████║███████╗██║  ██║ ╚████╔╝ ███████╗██║  ██║${C_RESET}"
 printf '%s\n' "${C_PURPLE}${C_BOLD}  ╚═╝  ╚═╝      ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝${C_RESET}"
 printf '\n'
-printf '%s\n' "${C_WHITE}${C_BOLD}                ☁  Cloud Shell · Railway Debian 12  🚂${C_RESET}"
+printf '%s\n' "${C_WHITE}${C_BOLD}                ☁  Cloud Shell · Debian 12 (Bookworm)  ⚡${C_RESET}"
 printf '\n'
 
 # Divider / خط‌جدا‌کننده
@@ -83,6 +83,6 @@ printf '%s\n' "$line"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Web Dashboard:${C_RESET} ${C_CYAN}${C_BOLD}https://r-server-production-3b83.up.railway.app${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}cl${C_RESET} ${C_DIM}(or ${C_RESET}${C_YELLOW}${C_BOLD}زم${C_RESET}${C_DIM}) to launch Claude Code in tmux${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}agy${C_RESET} ${C_DIM}(or ${C_RESET}${C_YELLOW}${C_BOLD}ag${C_RESET}${C_DIM}) to launch Antigravity CLI${C_RESET}\n"
-printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}usage${C_RESET} ${C_DIM}to check Railway trial credit & uptime left${C_RESET}\n"
+printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}usage${C_RESET} ${C_DIM}to check resource & uptime stats${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}src-sync --status${C_RESET} ${C_DIM}to see your private backup repo${C_RESET}\n"
 printf '\n'

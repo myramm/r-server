@@ -99,7 +99,7 @@ PCT=$(awk -v u="$USED" -v t="$TRIAL" 'BEGIN{printf "%d", (t>0? u/t*100 : 100)}')
 TRIAL_DAYS=$(awk -v t="$TRIAL" -v b="$BURN_H" 'BEGIN{printf "%.1f", (b>0? t/b/24 : 0)}')
 
 # ---- live API (if token) / کوئری زنده ----
-MODE="${C_YL}ESTIMATE${R} (no RAILWAY_TOKEN)"
+MODE="${C_YL}SYSTEM ESTIMATE${R}"
 LIVE_AC=""
 if [ -n "$RAILWAY_TOKEN" ]; then
   resp=$(curl -s --max-time 12 -X POST "$API" \
@@ -109,7 +109,7 @@ if [ -n "$RAILWAY_TOKEN" ]; then
   LIVE_AC=$(printf '%s' "$resp" | jq -r '.data.me.billingDetails.availableCredits // empty' 2>/dev/null)
   LIVE_BAL=$(printf '%s' "$resp" | jq -r '.data.me.billingDetails.currentBalance // empty' 2>/dev/null)
   if [ -n "$LIVE_AC" ] && [ "$LIVE_AC" != "null" ]; then
-    MODE="${C_GN}LIVE${R} (Railway API)"
+    MODE="${C_GN}LIVE API${R}"
   fi
 fi
 
@@ -133,7 +133,7 @@ bar() { # percent -> colored progress bar (no leading spaces)
 
 # ---- render / نمایش ----
 printf '\n'
-printf "  ${C_CY}${B}R-SERVER${R} ${C_GR}·${R} ${C_WH}${B}Railway Usage Monitor${R}\n"
+printf "  ${C_CY}${B}R-SERVER${R} ${C_GR}·${R} ${C_WH}${B}System Usage Monitor${R}\n"
 printf "  ${C_GR}────────────────────────────────────────────────\n${R}"
 printf "  ${C_BL}Mode${R}        ${C_GR}│${R} ${MODE}\n"
 printf "  ${C_BL}Trial credit${R} ${C_GR}│${R} ${C_WH}${B}\$%.2f${R}\n" "$TRIAL"
@@ -158,6 +158,5 @@ if [ -n "$LIVE_AC" ] && [ "$LIVE_AC" != "null" ]; then
 fi
 printf "  ${C_BL}Uptime left${R} ${C_GR}│${R} ${C_CY}${B}%s${R} ${C_GR}(at current burn)${R}\n" "$(fmt_dur "$(awk -v h="$REMAIN_UP_H" 'BEGIN{printf "%d", h*3600}')")"
 printf "  ${C_GR}────────────────────────────────────────────────\n${R}"
-printf "  ${C_GR}Tip:${R} ${C_WH}export RAILWAY_TOKEN=<account_token>${R} ${C_GR}for exact live credit.${R}\n"
-printf "       ${C_WH}export USAGE_CPU / USAGE_MEM_GB${R} ${C_GR}to override allocation.${R}\n"
+printf "  ${C_GR}Tip:${R} ${C_WH}export USAGE_CPU / USAGE_MEM_GB${R} ${C_GR}to customize resource allocation.${R}\n"
 printf '\n'
