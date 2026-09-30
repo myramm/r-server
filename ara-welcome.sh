@@ -19,7 +19,7 @@ C_RED=$'\e[38;5;196m'; C_WHITE=$'\e[38;5;231m'
 # ---- Gather system info / جمع‌آوری اطلاعات سیستم ----
 _os="$( . /etc/os-release 2>/dev/null; echo "${PRETTY_NAME:-Linux}" )"
 _kernel="$(uname -r 2>/dev/null)"
-_host="$(hostname 2>/dev/null)"
+_host="server"
 _user="$(whoami 2>/dev/null)"
 _uptime="$(uptime -p 2>/dev/null | sed 's/^up //')"; : "${_uptime:=just now}"
 _cpu="$(grep -m1 'model name' /proc/cpuinfo 2>/dev/null | cut -d: -f2 | sed 's/^ *//; s/  */ /g')"

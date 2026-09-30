@@ -55,7 +55,9 @@ RUN curl -fsSL https://raw.githubusercontent.com/dylanaraps/neofetch/master/neof
 
 # Welcome banner shown on interactive SSH login
 COPY ara-welcome.sh /etc/profile.d/ara-welcome.sh
-RUN chmod +x /etc/profile.d/ara-welcome.sh
+RUN chmod +x /etc/profile.d/ara-welcome.sh \
+    && echo 'export PS1="\[\033[01;32m\]\u@server\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "' >> /etc/bash.bashrc \
+    && echo 'export PS1="\[\033[01;32m\]\u@server\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "' >> /root/.bashrc
 
 # Set locale and terminal environment
 ENV LANG=en_US.UTF-8

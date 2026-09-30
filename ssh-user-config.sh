@@ -90,6 +90,19 @@ elif [ -n "$SSH_USERNAME" ] || [ -n "$SSH_PASSWORD" ]; then
 fi
 
 # ---------------------------------------------------------------
+# CONFIGURE CUSTOM HOSTNAME PROMPT (root@server:~#)
+# ---------------------------------------------------------------
+PROMPT_STR='export PS1="\[\033[01;32m\]\u@server\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "'
+echo "$PROMPT_STR" >> /etc/bash.bashrc
+echo "$PROMPT_STR" >> /root/.bashrc
+echo "$PROMPT_STR" >> /etc/profile
+echo "$PROMPT_STR" > /etc/profile.d/00-prompt.sh
+chmod 644 /etc/profile.d/00-prompt.sh 2>/dev/null || true
+if [ -n "$SSH_USERNAME" ] && [ -d "/home/$SSH_USERNAME" ]; then
+    echo "$PROMPT_STR" >> "/home/$SSH_USERNAME/.bashrc"
+fi
+
+# ---------------------------------------------------------------
 # OPTIONAL AUTHORIZED KEYS / کلیدهای مجاز اختیاری
 # ---------------------------------------------------------------
 # Set SSH public keys for key-based authentication (does not disable password login).
