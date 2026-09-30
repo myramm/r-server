@@ -187,13 +187,92 @@ function getToolsStatus() {
   return { claude, agy };
 }
 
+// Usage & Credit metrics calculation
+function getUsageMetrics() {
+  const trial = parseFloat(process.env.RAILWAY_TRIAL_CREDIT || '5.00');
+  const vcpuRate = parseFloat(process.env.RAILWAY_VCPU_RATE || '0.02778');
+  const memRate = parseFloat(process.env.RAILWAY_MEM_RATE || '0.01386');
+  const egressRate = parseFloat(process.env.RAILWAY_EGRESS_RATE || '0.05');
+
+  let cpu = os.cpus().length;
+  try {
+    if (fs.existsSync('/sys/fs/cgroup/cpu.max')) {
+      const parts = fs.readFileSync('/sys/fs/cgroup/cpu.max', 'utf8').trim().split(' ');
+      if (parts[0] !== 'max' && parts[1]) {
+        cpu = parseFloat(parts[0]) / parseFloat(parts[1]);
+      }
+    }
+  } catch (e) {}
+  if (process.env.USAGE_CPU) cpu = parseFloat(process.env.USAGE_CPU);
+
+  let memGb = os.totalmem() / (1024 * 1024 * 1024);
+  try {
+    if (fs.existsSync('/sys/fs/cgroup/memory.max')) {
+      const val = fs.readFileSync('/sys/fs/cgroup/memory.max', 'utf8').trim();
+      if (val !== 'max') {
+        memGb = parseFloat(val) / (1024 * 1024 * 1024);
+      }
+    }
+  } catch (e) {}
+  if (process.env.USAGE_MEM_GB) memGb = parseFloat(process.env.USAGE_MEM_GB);
+
+  let egressGb = 0;
+  try {
+    const netDev = fs.readFileSync('/proc/net/dev', 'utf8').split('\n');
+    let txBytes = 0;
+    for (let i = 2; i < netDev.length; i++) {
+      const line = netDev[i].trim();
+      if (!line || line.startsWith('lo:')) continue;
+      const parts = line.split(/\s+/);
+      if (parts.length >= 10) {
+        txBytes += parseInt(parts[9], 10) || 0;
+      }
+    }
+    egressGb = txBytes / (1024 * 1024 * 1024);
+  } catch (e) {}
+  if (process.env.USAGE_EGRESS_GB) egressGb = parseFloat(process.env.USAGE_EGRESS_GB);
+
+  let ageSec = os.uptime();
+  try {
+    const deployMark = '/var/lib/ara/deploy-start';
+    if (fs.existsSync(deployMark)) {
+      const ts = parseInt(fs.readFileSync(deployMark, 'utf8').trim(), 10);
+      if (ts > 0) {
+        ageSec = Math.floor(Date.now() / 1000) - ts;
+      }
+    }
+  } catch (e) {}
+  if (process.env.USAGE_ELAPSED_SEC) ageSec = parseInt(process.env.USAGE_ELAPSED_SEC, 10);
+
+  const burnRateHourly = cpu * vcpuRate + memGb * memRate;
+  const usedCost = burnRateHourly * (ageSec / 3600) + egressGb * egressRate;
+  const remainingCost = Math.max(0, trial - usedCost);
+  const percentUsed = trial > 0 ? Math.min(100, Math.round((usedCost / trial) * 1000) / 10) : 0;
+  const uptimeRemainingHours = burnRateHourly > 0 ? remainingCost / burnRateHourly : 0;
+  const trialDaysLeft = burnRateHourly > 0 ? (trial / (burnRateHourly * 24)) : 0;
+
+  return {
+    trial: trial.toFixed(2),
+    used: usedCost.toFixed(2),
+    remaining: remainingCost.toFixed(2),
+    percentUsed,
+    burnRateHourly: burnRateHourly.toFixed(5),
+    runtimeFormatted: formatUptime(ageSec),
+    uptimeRemainingFormatted: formatUptime(Math.round(uptimeRemainingHours * 3600)),
+    trialDaysLeft: trialDaysLeft.toFixed(1),
+    cpuAlloc: cpu.toFixed(2),
+    memAllocGb: memGb.toFixed(2),
+    egressGb: egressGb.toFixed(3),
+  };
+}
+
 // Collect all metrics
 function getAllMetrics() {
   return {
     timestamp: Date.now(),
     server: {
       name: 'R-SERVER',
-      hostname: os.hostname(),
+      hostname: 'server',
       os: 'Debian GNU/Linux 12 (bookworm)',
       kernel: os.release(),
       arch: os.arch(),
@@ -210,6 +289,7 @@ function getAllMetrics() {
     memory: getMemoryMetrics(),
     disk: getDiskMetrics(),
     tools: getToolsStatus(),
+    usage: getUsageMetrics(),
     processes: getTopProcesses(),
   };
 }
