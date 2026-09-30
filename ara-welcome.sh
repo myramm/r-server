@@ -47,8 +47,6 @@ printf '%s\n' "${C_BLUE}${C_BOLD}  ██╔══██╗╚════╝╚
 printf '%s\n' "${C_PURPLE}${C_BOLD}  ██║  ██║      ███████║███████╗██║  ██║ ╚████╔╝ ███████╗██║  ██║${C_RESET}"
 printf '%s\n' "${C_PURPLE}${C_BOLD}  ╚═╝  ╚═╝      ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝${C_RESET}"
 printf '\n'
-printf '%s\n' "${C_WHITE}${C_BOLD}                ☁  Cloud Shell · Debian 12 (Bookworm)  ⚡${C_RESET}"
-printf '\n'
 
 # Divider / خط‌جدا‌کننده
 line="${C_GREY}  ───────────────────────────────────────────────────────────────${C_RESET}"
@@ -63,7 +61,6 @@ row "CPU" "│" "${C_WHITE}${_cpu} ${C_GREY}(${_cores} cores)${C_RESET}"
 row "Memory" "│" "${C_WHITE}${_mem}${C_RESET}"
 row "Disk" "│" "${C_WHITE}${_disk}${C_RESET}"
 row "IP" "│" "${C_WHITE}${_ip}${C_RESET}"
-row "Web Mon" "│" "${C_CYAN}https://r-server-production-3b83.up.railway.app${C_RESET}"
 row "Claude" "│" "${_claude}"
 if command -v agy >/dev/null 2>&1 || command -v antigravity >/dev/null 2>&1; then
   row "AGY" "│" "${_antigravity}"
@@ -80,7 +77,6 @@ fi
 row "src" "│" "${_src}"
 
 printf '%s\n' "$line"
-printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Web Dashboard:${C_RESET} ${C_CYAN}${C_BOLD}https://r-server-production-3b83.up.railway.app${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}cl${C_RESET} ${C_DIM}(or ${C_RESET}${C_YELLOW}${C_BOLD}زم${C_RESET}${C_DIM}) to launch Claude Code in tmux${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}agy${C_RESET} ${C_DIM}(or ${C_RESET}${C_YELLOW}${C_BOLD}ag${C_RESET}${C_DIM}) to launch Antigravity CLI${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}usage${C_RESET} ${C_DIM}to check resource & uptime stats${C_RESET}\n"
