@@ -229,6 +229,34 @@ if [ -f "/opt/dashboard/server.js" ]; then
 fi
 
 # ---------------------------------------------------------------
+# START XRDP / REMOTE DESKTOP SERVICE (PORT 3389)
+# ---------------------------------------------------------------
+if command -v xrdp >/dev/null 2>&1; then
+    msg "Starting XRDP Remote Desktop service on port 3389..." "Starting XRDP Remote Desktop service on port 3389..."
+    # Ensure DBus system daemon is running for desktop sessions
+    mkdir -p /var/run/dbus /var/run/xrdp /var/log/xrdp
+    [ -f /var/lib/dbus/machine-id ] || dbus-uuidgen > /var/lib/dbus/machine-id 2>/dev/null || true
+    service dbus start 2>/dev/null || true
+    
+    # Configure xsession
+    echo "startxfce4" > /root/.xsession
+    chmod 644 /root/.xsession
+    echo "startxfce4" > /etc/skel/.xsession
+    if [ -n "$SSH_USERNAME" ] && [ -d "/home/$SSH_USERNAME" ]; then
+        echo "startxfce4" > "/home/$SSH_USERNAME/.xsession"
+        chown "$SSH_USERNAME:$SSH_USERNAME" "/home/$SSH_USERNAME/.xsession"
+    fi
+    adduser xrdp ssl-cert 2>/dev/null || true
+    
+    # Clean up stale PID and socket files
+    rm -f /var/run/xrdp/xrdp.pid /var/run/xrdp/xrdp-sesman.pid /var/run/xrdp.pid /var/run/xrdp-sesman.pid 2>/dev/null || true
+    
+    # Start XRDP session manager & server
+    /usr/sbin/xrdp-sesman 2>/dev/null || true
+    /usr/sbin/xrdp 2>/dev/null || true
+fi
+
+# ---------------------------------------------------------------
 # START SSH SERVER / راه‌اندازی سرور SSH
 # ---------------------------------------------------------------
 msg "Starting SSH server..." "در حال راه‌اندازی سرور SSH..."

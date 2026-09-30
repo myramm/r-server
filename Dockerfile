@@ -13,7 +13,7 @@ RUN userdel -r debian 2>/dev/null || userdel -r ubuntu 2>/dev/null || true
 # A full cloud-workstation toolkit on Debian 12: networking, editors, monitoring, archives,
 # dev tools, Python, Node.js and locales.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         ca-certificates gnupg apt-transport-https \
         openssh-server sudo \
         curl wget \
@@ -26,12 +26,14 @@ RUN apt-get update \
         python3 python3-pip python3-venv python3-dev \
         nodejs npm ffmpeg \
         locales ncurses-term \
+        dbus dbus-x11 x11-xserver-utils \
+        xrdp xorgxrdp xfce4 xfce4-terminal \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
     && (curl -fsSL https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && chmod +x /usr/local/bin/yt-dlp || true) \
     && (npm install -g n 2>/dev/null || true) \
-    && mkdir -p /run/sshd \
-    && chmod 755 /run/sshd \
+    && mkdir -p /run/sshd /var/run/dbus /var/run/xrdp /var/log/xrdp \
+    && chmod 755 /run/sshd /var/run/dbus /var/run/xrdp \
     && ssh-keygen -A \
     && echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config \
     # Enable root login
@@ -43,7 +45,12 @@ RUN apt-get update \
     && sed -i 's/^session.*pam_lastlog.so/#&/' /etc/pam.d/sshd /etc/pam.d/login 2>/dev/null || true \
     && chmod -x /etc/update-motd.d/* 2>/dev/null || true \
     && rm -f /etc/legal /etc/motd /etc/update-motd.d/* 2>/dev/null || true \
-    && touch /root/.hushlogin /etc/skel/.hushlogin
+    && touch /root/.hushlogin /etc/skel/.hushlogin \
+    # XRDP and XFCE4 default session setup
+    && adduser xrdp ssl-cert 2>/dev/null || true \
+    && echo "startxfce4" > /etc/skel/.xsession \
+    && echo "startxfce4" > /root/.xsession \
+    && chmod 644 /etc/skel/.xsession /root/.xsession
 
 # Generate English locale
 RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen en_US.UTF-8
@@ -99,8 +106,9 @@ RUN chmod +x /usr/local/bin/usage
 COPY dashboard /opt/dashboard
 RUN chmod -R 755 /opt/dashboard
 
-# Expose port 22 (SSH) and 8080 (Web Dashboard)
+# Expose port 22 (SSH), 3389 (XRDP / Remote Desktop) and 8080 (Web Dashboard)
 EXPOSE 22
+EXPOSE 3389
 EXPOSE 8080
 
 # Start the SSH server & background services

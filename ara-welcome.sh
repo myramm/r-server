@@ -65,6 +65,9 @@ row "Claude" "│" "${_claude}"
 if command -v agy >/dev/null 2>&1 || command -v antigravity >/dev/null 2>&1; then
   row "AGY" "│" "${_antigravity}"
 fi
+if command -v xrdp >/dev/null 2>&1; then
+  row "XRDP" "│" "${C_GREEN}● ready (port 3389)${C_RESET}"
+fi
 
 # src ⇄ GitHub sync status (reads the local repo mark; no network call)
 # وضعیت همگام‌سازی src با GitHub (نشانگر محلی مخزن را می‌خواند؛ بدون فراخوانی شبکه)
@@ -80,5 +83,8 @@ printf '%s\n' "$line"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}claude${C_RESET} ${C_DIM}(or ${C_RESET}${C_YELLOW}${C_BOLD}cl${C_RESET}${C_DIM}) to launch Claude Code in tmux${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}agy${C_RESET} ${C_DIM}(or ${C_RESET}${C_YELLOW}${C_BOLD}ag${C_RESET}${C_DIM}) to launch Antigravity CLI${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}usage${C_RESET} ${C_DIM}to check resource & uptime stats${C_RESET}\n"
+if command -v xrdp >/dev/null 2>&1; then
+  printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}XRDP Desktop:${C_RESET} ${C_YELLOW}${C_BOLD}Connect via RDP Client to port 3389${C_RESET}\n"
+fi
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}src-sync --status${C_RESET} ${C_DIM}to see your private backup repo${C_RESET}\n"
 printf '\n'
