@@ -83,8 +83,7 @@ RUN chmod +x /usr/local/bin/ssh-user-config.sh
 
 # Copy the "cl" helper command (opens a tmux session running Claude Code)
 COPY cl /usr/local/bin/cl
-RUN chmod +x /usr/local/bin/cl \
-    && ln -sf /usr/local/bin/cl /usr/local/bin/زم
+RUN chmod +x /usr/local/bin/cl
 
 # Copy the "ag" helper command (opens a tmux session running Antigravity CLI)
 COPY ag /usr/local/bin/ag
