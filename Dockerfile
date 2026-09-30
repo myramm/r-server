@@ -24,10 +24,12 @@ RUN apt-get update \
         unzip zip tar gzip bzip2 xz-utils p7zip-full \
         git build-essential cmake pkg-config autoconf automake libtool gcc g++ \
         python3 python3-pip python3-venv python3-dev \
-        nodejs npm \
+        nodejs npm ffmpeg \
         locales ncurses-term \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && (curl -fsSL https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && chmod +x /usr/local/bin/yt-dlp || true) \
+    && (npm install -g n 2>/dev/null || true) \
     && mkdir -p /run/sshd \
     && chmod 755 /run/sshd \
     && ssh-keygen -A \

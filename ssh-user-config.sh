@@ -204,6 +204,23 @@ else
 fi
 
 # ---------------------------------------------------------------
+# OPTIONAL CUSTOM NODE.JS VERSION & EXTRA TOOLS
+# ---------------------------------------------------------------
+if [ -n "$NODE_VERSION" ] && [ "$NODE_VERSION" != "default" ]; then
+    msg "Configuring Node.js version $NODE_VERSION..." "Configuring Node.js version $NODE_VERSION..."
+    n "$NODE_VERSION" 2>/dev/null || true
+fi
+
+if [ -n "$EXTRA_PACKAGES" ]; then
+    msg "Installing extra packages: $EXTRA_PACKAGES..." "Installing extra packages: $EXTRA_PACKAGES..."
+    apt-get update -y && apt-get install -y --no-install-recommends $EXTRA_PACKAGES 2>/dev/null || true
+fi
+
+if [[ "$INSTALL_AI" =~ "aider" ]]; then
+    pip3 install --break-system-packages aider-chat 2>/dev/null || pip3 install aider-chat 2>/dev/null || true
+fi
+
+# ---------------------------------------------------------------
 # START WEB MONITORING & MANAGEMENT DASHBOARD
 # ---------------------------------------------------------------
 msg "Starting Web Monitoring Dashboard on port ${PORT:-8080}..." "در حال راه‌اندازی داشبورد وب..."
