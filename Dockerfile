@@ -85,13 +85,14 @@ RUN chmod +x /usr/local/bin/ag
 COPY usage /usr/local/bin/usage
 RUN chmod +x /usr/local/bin/usage
 
-# Copy the "src-sync" command (/root/src ⇄ private GitHub repo for persistence)
-COPY src-sync.sh /usr/local/bin/src-sync
-RUN chmod +x /usr/local/bin/src-sync \
-    && mkdir -p /root/src
+# Copy Web Monitoring & Management Dashboard
+COPY dashboard /opt/dashboard
+RUN chmod -R 755 /opt/dashboard
 
-# Expose port 22 (default SSH port)
+# Expose port 22 (SSH) and 8080 (Web Dashboard)
 EXPOSE 22
+EXPOSE 8080
 
-# Start the SSH server
+# Start the SSH server & background services
 CMD ["/usr/local/bin/ssh-user-config.sh"]
+

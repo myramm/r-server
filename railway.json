@@ -10,12 +10,13 @@
       "claude-settings.json",
       "ara-welcome.sh",
       "cl",
-      "ag"
+      "ag",
+      "dashboard/**"
     ]
   },
   "deploy": {
     "startCommand": "/usr/local/bin/ssh-user-config.sh",
-    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyType": "ALWAYS",
     "restartPolicyMaxRetries": 10,
     "healthcheckTimeout": 150,
     "sleepApplicationStop": true,

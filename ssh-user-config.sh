@@ -191,9 +191,18 @@ else
 fi
 
 # ---------------------------------------------------------------
+# START WEB MONITORING & MANAGEMENT DASHBOARD
+# ---------------------------------------------------------------
+msg "Starting Web Monitoring Dashboard on port ${PORT:-8080}..." "در حال راه‌اندازی داشبورد وب..."
+if [ -f "/opt/dashboard/server.js" ]; then
+    nohup node /opt/dashboard/server.js >/var/log/dashboard.log 2>&1 &
+fi
+
+# ---------------------------------------------------------------
 # START SSH SERVER / راه‌اندازی سرور SSH
 # ---------------------------------------------------------------
 msg "Starting SSH server..." "در حال راه‌اندازی سرور SSH..."
 # Generate host keys if missing (idempotent) / تولید کلیدهای میزبان در صورت نبود
 ssh-keygen -A 2>/dev/null || true
 exec /usr/sbin/sshd -D
+
