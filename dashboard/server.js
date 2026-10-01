@@ -615,13 +615,16 @@ EOF
   // ==========================================
   // 3. AI & MACHINE LEARNING / AI CODING AGENTS
   // ==========================================
+  // ==========================================
+  // 3. AI & MACHINE LEARNING / AI CODING AGENTS (MASTER LIST V3)
+  // ==========================================
   {
     id: 'claude',
     name: 'Claude Code CLI',
     icon: '🤖',
     category: 'ai_ml',
     categoryName: 'AI & Coding Agents',
-    description: 'Official terminal coding agent by Anthropic (perintah: claude / cl). Otomatis refactor, bug fixing, dan test.',
+    description: 'Official terminal coding agent by Anthropic (perintah: claude / cl). Otomatis refactor, bug fixing, test, dan git workflow.',
     checkCmd: 'claude --version',
     installScript: `
       npm install -g @anthropic-ai/claude-code
@@ -637,6 +640,10 @@ Terminal=false
 Categories=Development;
 EOF
       chmod +x /root/Desktop/claude-code.desktop 2>/dev/null || true
+    `,
+    uninstallScript: `
+      npm uninstall -g @anthropic-ai/claude-code
+      rm -f /root/Desktop/claude-code.desktop /usr/local/bin/claude /usr/local/bin/cl
     `
   },
   {
@@ -662,6 +669,53 @@ Terminal=false
 Categories=Development;
 EOF
       chmod +x /root/Desktop/antigravity.desktop 2>/dev/null || true
+    `,
+    uninstallScript: `
+      rm -f /usr/local/bin/agy /usr/local/bin/antigravity /root/.local/bin/agy /root/Desktop/antigravity.desktop
+    `
+  },
+  {
+    id: 'hermes',
+    name: 'Hermes Agent (Nous Research)',
+    icon: '🧠',
+    category: 'ai_ml',
+    categoryName: 'AI & Coding Agents',
+    description: 'Autonomous AI agent & terminal TUI by Nous Research. File operations, Git workflows, MCP integrations, persistent sessions, skills, tool delegation.',
+    checkCmd: 'which hermes || hermes --version 2>/dev/null || python3 -c "import hermes" 2>/dev/null',
+    installScript: `
+      pip3 install --break-system-packages hermes-agent 2>/dev/null || curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/install.sh | bash 2>/dev/null || pip3 install --break-system-packages git+https://github.com/NousResearch/hermes-agent.git 2>/dev/null || true
+      cat << 'EOF' > /root/Desktop/hermes.desktop
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Hermes Agent
+Comment=Nous Research AI Terminal Agent
+Exec=xfce4-terminal -T "Hermes Agent" -e "hermes"
+Icon=utilities-terminal
+Terminal=false
+Categories=Development;
+EOF
+      chmod +x /root/Desktop/hermes.desktop 2>/dev/null || true
+    `,
+    uninstallScript: `
+      pip3 uninstall -y hermes-agent 2>/dev/null || true
+      rm -f /usr/local/bin/hermes /root/.local/bin/hermes /root/Desktop/hermes.desktop
+    `
+  },
+  {
+    id: '9router',
+    name: '9Router AI Gateway & Proxy',
+    icon: '🔀',
+    category: 'ai_ml',
+    categoryName: 'AI & Coding Agents',
+    description: 'AI Router/Proxy lokal (Port 20128) perantara Claude Code, Antigravity, Cursor, Aider, Codex, Gemini ke multiple providers (Claude, OpenAI, DeepSeek, Qwen, OpenRouter) dengan fallback & token saving.',
+    checkCmd: '9router --version || which 9router',
+    installScript: `
+      npm install -g 9router
+    `,
+    uninstallScript: `
+      pkill -f 9router 2>/dev/null || true
+      npm uninstall -g 9router
     `
   },
   {
@@ -686,6 +740,10 @@ Terminal=false
 Categories=Development;
 EOF
       chmod +x /root/Desktop/aider.desktop 2>/dev/null || true
+    `,
+    uninstallScript: `
+      pip3 uninstall -y aider-chat 2>/dev/null || true
+      rm -f /usr/local/bin/aider /root/.local/bin/aider /root/Desktop/aider.desktop
     `
   },
   {
@@ -698,6 +756,136 @@ EOF
     checkCmd: 'gemini --version || which gemini',
     installScript: `
       npm install -g @google/gemini-cli || true
+    `,
+    uninstallScript: `
+      npm uninstall -g @google/gemini-cli 2>/dev/null || true
+      rm -f /usr/local/bin/gemini /root/.local/bin/gemini
+    `
+  },
+  {
+    id: 'goose',
+    name: 'Goose AI Autonomous Agent',
+    icon: '🪿',
+    category: 'ai_ml',
+    categoryName: 'AI & Coding Agents',
+    description: 'Open-source, extensible AI agent by Block/Square that automates engineering tasks, bash execution, and MCP tools.',
+    checkCmd: 'which goose || goose --version 2>/dev/null',
+    installScript: `
+      curl -fsSL https://github.com/block/goose/releases/download/stable/download_cli.sh | bash 2>/dev/null || pip3 install --break-system-packages goose-ai 2>/dev/null || true
+    `,
+    uninstallScript: `
+      rm -f /root/.local/bin/goose /usr/local/bin/goose
+      pip3 uninstall -y goose-ai 2>/dev/null || true
+    `
+  },
+  {
+    id: 'open_interpreter',
+    name: 'Open Interpreter (Computer-Use)',
+    icon: '💻',
+    category: 'ai_ml',
+    categoryName: 'AI & Coding Agents',
+    description: 'Natural language terminal interface executing Python, JS, Bash, and OS/Browser control locally.',
+    checkCmd: 'which interpreter || interpreter --version 2>/dev/null',
+    installScript: `
+      pip3 install --break-system-packages open-interpreter
+    `,
+    uninstallScript: `
+      pip3 uninstall -y open-interpreter 2>/dev/null || true
+      rm -f /usr/local/bin/interpreter /root/.local/bin/interpreter
+    `
+  },
+  {
+    id: 'shellgpt',
+    name: 'ShellGPT (sgpt)',
+    icon: '🐚',
+    category: 'ai_ml',
+    categoryName: 'AI & Coding Agents',
+    description: 'Command-line AI productivity tool untuk generate bash commands, shell scripts, code refactors, dan penjelasan.',
+    checkCmd: 'which sgpt || sgpt --version 2>/dev/null',
+    installScript: `
+      pip3 install --break-system-packages shell-gpt
+    `,
+    uninstallScript: `
+      pip3 uninstall -y shell-gpt 2>/dev/null || true
+      rm -f /usr/local/bin/sgpt /root/.local/bin/sgpt
+    `
+  },
+  {
+    id: 'plandex',
+    name: 'Plandex AI Coding Engine',
+    icon: '🏗️',
+    category: 'ai_ml',
+    categoryName: 'AI & Coding Agents',
+    description: 'Terminal-based AI coding engine for complex, multi-file software engineering tasks with version control sandboxing.',
+    checkCmd: 'which plandex || plandex --version 2>/dev/null',
+    installScript: `
+      curl -sL https://plandex.ai/install.sh | bash 2>/dev/null || true
+      ln -sf /root/.plandex/bin/plandex /usr/local/bin/plandex 2>/dev/null || true
+    `,
+    uninstallScript: `
+      rm -rf /root/.plandex /usr/local/bin/plandex
+    `
+  },
+  {
+    id: 'swe_agent',
+    name: 'SWE-agent (Software Engineering)',
+    icon: '🛠️',
+    category: 'ai_ml',
+    categoryName: 'AI & Coding Agents',
+    description: 'Autonomous SWE agent by Princeton University for solving real-world GitHub issues and autonomous bug fixing.',
+    checkCmd: 'which sweagent || python3 -c "import sweagent" 2>/dev/null',
+    installScript: `
+      pip3 install --break-system-packages swe-agent 2>/dev/null || pip3 install --break-system-packages git+https://github.com/princeton-nlp/SWE-agent.git 2>/dev/null || true
+    `,
+    uninstallScript: `
+      pip3 uninstall -y swe-agent sweagent 2>/dev/null || true
+      rm -f /usr/local/bin/sweagent /root/.local/bin/sweagent
+    `
+  },
+  {
+    id: 'browser_use',
+    name: 'browser-use AI Web Agent',
+    icon: '🌐',
+    category: 'ai_ml',
+    categoryName: 'AI & Coding Agents',
+    description: 'AI agent for autonomous browser automation and web interactions powered by Playwright and LLMs.',
+    checkCmd: 'python3 -c "import browser_use; print(\"browser-use ready\")" 2>/dev/null',
+    installScript: `
+      pip3 install --break-system-packages browser-use playwright langchain-openai 2>/dev/null || true
+    `,
+    uninstallScript: `
+      pip3 uninstall -y browser-use 2>/dev/null || true
+    `
+  },
+  {
+    id: 'amazon_q',
+    name: 'Amazon Q Developer CLI',
+    icon: '☁️',
+    category: 'ai_ml',
+    categoryName: 'AI & Coding Agents',
+    description: 'Generative AI coding assistant by AWS for command line completions, git integrations, and cloud development.',
+    checkCmd: 'which q || q --version 2>/dev/null',
+    installScript: `
+      npm install -g @aws/q 2>/dev/null || true
+    `,
+    uninstallScript: `
+      npm uninstall -g @aws/q 2>/dev/null || true
+      rm -f /usr/local/bin/q /root/.local/bin/q
+    `
+  },
+  {
+    id: 'openhands',
+    name: 'OpenHands AI Framework',
+    icon: '👐',
+    category: 'ai_ml',
+    categoryName: 'AI & Coding Agents',
+    description: 'Open-source platform for autonomous software development agents with multi-runtime tools and sandbox support.',
+    checkCmd: 'python3 -c "import openhands" 2>/dev/null || which openhands',
+    installScript: `
+      pip3 install --break-system-packages openhands-ai 2>/dev/null || true
+    `,
+    uninstallScript: `
+      pip3 uninstall -y openhands-ai 2>/dev/null || true
     `
   },
   {
@@ -710,6 +898,10 @@ EOF
     checkCmd: 'opencode --version || which opencode',
     installScript: `
       npm install -g opencode-ai 2>/dev/null || npm install -g opencode 2>/dev/null || pip3 install --break-system-packages opencode 2>/dev/null || true
+    `,
+    uninstallScript: `
+      npm uninstall -g opencode-ai opencode 2>/dev/null || true
+      pip3 uninstall -y opencode 2>/dev/null || true
     `
   },
   {
@@ -722,6 +914,9 @@ EOF
     checkCmd: 'python3 -c "import qwen_agent; print(\"Qwen Ready\")" 2>/dev/null || which qwen-agent',
     installScript: `
       pip3 install --break-system-packages qwen-agent 2>/dev/null || true
+    `,
+    uninstallScript: `
+      pip3 uninstall -y qwen-agent 2>/dev/null || true
     `
   },
   {
@@ -734,6 +929,25 @@ EOF
     checkCmd: 'gh copilot --version 2>/dev/null || npm list -g @githubnext/github-copilot-cli 2>/dev/null',
     installScript: `
       gh extension install github/gh-copilot 2>/dev/null || npm install -g @githubnext/github-copilot-cli 2>/dev/null || true
+    `,
+    uninstallScript: `
+      gh extension remove github/gh-copilot 2>/dev/null || true
+      npm uninstall -g @githubnext/github-copilot-cli 2>/dev/null || true
+    `
+  },
+  {
+    id: 'agent_frameworks',
+    name: 'AI Multi-Agent Frameworks Pack',
+    icon: '🧩',
+    category: 'ai_ml',
+    categoryName: 'AI & Coding Agents',
+    description: 'Paket Multi-Agent Frameworks: CrewAI, LangGraph, AutoGen, Agno (Phidata), DSPy, LlamaIndex, PydanticAI.',
+    checkCmd: 'python3 -c "import crewai, langgraph; print(\"Frameworks ready\")" 2>/dev/null',
+    installScript: `
+      pip3 install --break-system-packages crewai langgraph autogen-agentchat agno dspy-ai llama-index pydantic-ai 2>/dev/null || true
+    `,
+    uninstallScript: `
+      pip3 uninstall -y crewai langgraph autogen-agentchat agno dspy-ai llama-index pydantic-ai 2>/dev/null || true
     `
   },
   {
@@ -748,6 +962,11 @@ EOF
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -y && apt-get install -y zstd curl
       curl -fsSL https://ollama.com/install.sh | sh
+    `,
+    uninstallScript: `
+      pkill -f ollama 2>/dev/null || true
+      rm -f /usr/local/bin/ollama
+      rm -rf /root/.ollama /usr/share/ollama
     `
   },
   {
@@ -760,6 +979,10 @@ EOF
     checkCmd: 'huggingface-cli --version',
     installScript: `
       pip3 install --break-system-packages huggingface_hub
+    `,
+    uninstallScript: `
+      pip3 uninstall -y huggingface_hub 2>/dev/null || true
+      rm -f /usr/local/bin/huggingface-cli /root/.local/bin/huggingface-cli
     `
   },
   {
@@ -774,6 +997,9 @@ EOF
       curl -LsSf https://astral.sh/uv/install.sh | sh
       ln -sf /root/.local/bin/uv /usr/local/bin/uv 2>/dev/null || true
       ln -sf /root/.local/bin/uvx /usr/local/bin/uvx 2>/dev/null || true
+    `,
+    uninstallScript: `
+      rm -f /usr/local/bin/uv /usr/local/bin/uvx /root/.local/bin/uv /root/.local/bin/uvx /root/.cargo/bin/uv
     `
   },
   {
@@ -786,6 +1012,10 @@ EOF
     checkCmd: 'jupyter --version || jupyter-lab --version',
     installScript: `
       pip3 install --break-system-packages jupyterlab ipython ipywidgets
+    `,
+    uninstallScript: `
+      pip3 uninstall -y jupyterlab ipython ipywidgets 2>/dev/null || true
+      rm -f /usr/local/bin/jupyter* /root/.local/bin/jupyter*
     `
   },
   {
@@ -798,6 +1028,9 @@ EOF
     checkCmd: 'python3 -c "import torch; print(torch.__version__)"',
     installScript: `
       pip3 install --break-system-packages torch torchvision torchaudio transformers numpy pandas scikit-learn scipy matplotlib
+    `,
+    uninstallScript: `
+      pip3 uninstall -y torch torchvision torchaudio transformers numpy pandas scikit-learn scipy matplotlib 2>/dev/null || true
     `
   },
 

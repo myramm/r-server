@@ -1033,7 +1033,7 @@
         </div>
       </div>
 
-      <!-- 10 AI Agents Grid -->
+      <!-- AI Agents Grid - Master List V3 -->
       <div class="ai-grid">
         <!-- Claude Code -->
         <div class="tool-card">
@@ -1041,7 +1041,7 @@
             <span class="tool-name">🤖 Anthropic Claude Code</span>
             <span class="tool-badge badge-ready">● Official CLI</span>
           </div>
-          <p class="tool-desc">AI agent otonom resmi Anthropic untuk terminal. Menulis kode, refactor, bug fixing.</p>
+          <p class="tool-desc">AI agent otonom resmi Anthropic untuk terminal. Menulis kode, refactor, bug fixing, test.</p>
           <div class="tool-footer">
             <button class="btn btn-ghost btn-sm" onclick="runQuick('claude --version')">Version</button>
             <button class="btn btn-primary btn-sm" onclick="runQuick('cl')">Launch</button>
@@ -1065,6 +1065,36 @@
           </div>
         </div>
 
+        <!-- Hermes Agent -->
+        <div class="tool-card">
+          <div class="tool-top">
+            <span class="tool-name">🧠 Hermes Agent</span>
+            <span class="tool-badge badge-ready">● Nous Research</span>
+          </div>
+          <p class="tool-desc">Autonomous AI agent terminal TUI by Nous Research. Git workflows, MCP tools, skills, persistent sessions.</p>
+          <div class="tool-footer">
+            <button class="btn btn-ghost btn-sm" onclick="runQuick('hermes --version || which hermes')">Version</button>
+            <button class="btn btn-primary btn-sm" onclick="runQuick('hermes')">Launch</button>
+            <button class="btn btn-secondary btn-sm" onclick="installTool('hermes')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('hermes', 'Hermes Agent')">🗑️ Hapus</button>
+          </div>
+        </div>
+
+        <!-- 9Router AI Gateway -->
+        <div class="tool-card">
+          <div class="tool-top">
+            <span class="tool-name">🔀 9Router AI Gateway</span>
+            <span class="tool-badge badge-ready">● Port 20128</span>
+          </div>
+          <p class="tool-desc">AI proxy & router multi-provider (Claude, OpenAI, DeepSeek, Qwen) dengan automatic fallback & token saving.</p>
+          <div class="tool-footer">
+            <button class="btn btn-ghost btn-sm" onclick="runQuick('9router --version || which 9router')">Version</button>
+            <button class="btn btn-primary btn-sm" onclick="runQuick('9router')">Start 9Router</button>
+            <button class="btn btn-secondary btn-sm" onclick="installTool('9router')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('9router', '9Router')">🗑️ Hapus</button>
+          </div>
+        </div>
+
         <!-- Aider AI -->
         <div class="tool-card">
           <div class="tool-top">
@@ -1077,6 +1107,94 @@
             <button class="btn btn-primary btn-sm" onclick="runQuick('ai')">Launch</button>
             <button class="btn btn-secondary btn-sm" onclick="installTool('aider')">Install</button>
             <button class="btn btn-danger btn-sm" onclick="uninstallTool('aider', 'Aider AI')">🗑️ Hapus</button>
+          </div>
+        </div>
+
+        <!-- Goose AI -->
+        <div class="tool-card">
+          <div class="tool-top">
+            <span class="tool-name">🪿 Goose AI Agent</span>
+            <span class="tool-badge badge-ready">● Block / Square</span>
+          </div>
+          <p class="tool-desc">Open-source autonomous agent by Block untuk automasi software engineering & MCP tools.</p>
+          <div class="tool-footer">
+            <button class="btn btn-ghost btn-sm" onclick="runQuick('goose --version || which goose')">Version</button>
+            <button class="btn btn-primary btn-sm" onclick="runQuick('goose')">Launch</button>
+            <button class="btn btn-secondary btn-sm" onclick="installTool('goose')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('goose', 'Goose AI')">🗑️ Hapus</button>
+          </div>
+        </div>
+
+        <!-- Open Interpreter -->
+        <div class="tool-card">
+          <div class="tool-top">
+            <span class="tool-name">💻 Open Interpreter</span>
+            <span class="tool-badge badge-ready">● Computer-Use</span>
+          </div>
+          <p class="tool-desc">Natural language terminal interface untuk kontrol OS, Python, Bash, dan browser.</p>
+          <div class="tool-footer">
+            <button class="btn btn-ghost btn-sm" onclick="runQuick('interpreter --version || which interpreter')">Version</button>
+            <button class="btn btn-primary btn-sm" onclick="runQuick('interpreter')">Launch</button>
+            <button class="btn btn-secondary btn-sm" onclick="installTool('open_interpreter')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('open_interpreter', 'Open Interpreter')">🗑️ Hapus</button>
+          </div>
+        </div>
+
+        <!-- ShellGPT -->
+        <div class="tool-card">
+          <div class="tool-top">
+            <span class="tool-name">🐚 ShellGPT (sgpt)</span>
+            <span class="tool-badge badge-ready">● CLI Helper</span>
+          </div>
+          <p class="tool-desc">Command-line AI productivity tool untuk generate bash command, scripts, dan query.</p>
+          <div class="tool-footer">
+            <button class="btn btn-ghost btn-sm" onclick="runQuick('sgpt --version || which sgpt')">Version</button>
+            <button class="btn btn-primary btn-sm" onclick="runQuick('sgpt --help')">Usage</button>
+            <button class="btn btn-secondary btn-sm" onclick="installTool('shellgpt')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('shellgpt', 'ShellGPT')">🗑️ Hapus</button>
+          </div>
+        </div>
+
+        <!-- Plandex AI -->
+        <div class="tool-card">
+          <div class="tool-top">
+            <span class="tool-name">🏗️ Plandex AI Engine</span>
+            <span class="tool-badge badge-ready">● Multi-File</span>
+          </div>
+          <p class="tool-desc">Terminal AI coding engine untuk proyek multi-file besar dengan sandboxing terisolasi.</p>
+          <div class="tool-footer">
+            <button class="btn btn-ghost btn-sm" onclick="runQuick('plandex --version || which plandex')">Version</button>
+            <button class="btn btn-primary btn-sm" onclick="runQuick('plandex')">Launch</button>
+            <button class="btn btn-secondary btn-sm" onclick="installTool('plandex')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('plandex', 'Plandex AI')">🗑️ Hapus</button>
+          </div>
+        </div>
+
+        <!-- SWE-agent -->
+        <div class="tool-card">
+          <div class="tool-top">
+            <span class="tool-name">🛠️ SWE-agent</span>
+            <span class="tool-badge badge-ready">● Princeton AI</span>
+          </div>
+          <p class="tool-desc">Autonomous software engineering agent untuk menyelesaikan GitHub issues dan bug fixes otomatis.</p>
+          <div class="tool-footer">
+            <button class="btn btn-ghost btn-sm" onclick="runQuick('which sweagent || python3 -c \"import sweagent; print(\\\"SWE Ready\\\")\"')">Version</button>
+            <button class="btn btn-secondary btn-sm" onclick="installTool('swe_agent')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('swe_agent', 'SWE-agent')">🗑️ Hapus</button>
+          </div>
+        </div>
+
+        <!-- browser-use -->
+        <div class="tool-card">
+          <div class="tool-top">
+            <span class="tool-name">🌐 browser-use Agent</span>
+            <span class="tool-badge badge-ready">● Web AI Agent</span>
+          </div>
+          <p class="tool-desc">Otonom browsing dan web agent menggunakan Playwright & LLM untuk automasi web visual.</p>
+          <div class="tool-footer">
+            <button class="btn btn-ghost btn-sm" onclick="runQuick('python3 -c \"import browser_use; print(\\\"browser-use ready\\\")\"')">Check</button>
+            <button class="btn btn-secondary btn-sm" onclick="installTool('browser_use')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('browser_use', 'browser-use')">🗑️ Hapus</button>
           </div>
         </div>
 
@@ -1122,17 +1240,17 @@
           </div>
         </div>
 
-        <!-- Hugging Face Hub -->
+        <!-- Amazon Q Developer -->
         <div class="tool-card">
           <div class="tool-top">
-            <span class="tool-name">🤗 Hugging Face Hub CLI</span>
-            <span class="tool-badge badge-ready">● Model Hub</span>
+            <span class="tool-name">☁️ Amazon Q Developer CLI</span>
+            <span class="tool-badge badge-ready">● AWS AI</span>
           </div>
-          <p class="tool-desc">Download ribuan model open-weight AI dan dataset langsung via terminal.</p>
+          <p class="tool-desc">AI coding assistant resmi AWS untuk command line completions dan cloud development.</p>
           <div class="tool-footer">
-            <button class="btn btn-ghost btn-sm" onclick="runQuick('huggingface-cli --version')">Version</button>
-            <button class="btn btn-primary btn-sm" onclick="installTool('huggingface')">Install</button>
-            <button class="btn btn-danger btn-sm" onclick="uninstallTool('huggingface', 'Hugging Face CLI')">🗑️ Hapus</button>
+            <button class="btn btn-ghost btn-sm" onclick="runQuick('q --version || which q')">Version</button>
+            <button class="btn btn-secondary btn-sm" onclick="installTool('amazon_q')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('amazon_q', 'Amazon Q Developer')">🗑️ Hapus</button>
           </div>
         </div>
 
@@ -1146,6 +1264,46 @@
           <div class="tool-footer">
             <button class="btn btn-primary btn-sm" onclick="installTool('copilot_cli')">Install</button>
             <button class="btn btn-danger btn-sm" onclick="uninstallTool('copilot_cli', 'GitHub Copilot CLI')">🗑️ Hapus</button>
+          </div>
+        </div>
+
+        <!-- OpenHands -->
+        <div class="tool-card">
+          <div class="tool-top">
+            <span class="tool-name">👐 OpenHands AI Agent</span>
+            <span class="tool-badge badge-ready">● SWE Platform</span>
+          </div>
+          <p class="tool-desc">Platform agent open-source untuk pengembangan software otomatis dalam sandbox.</p>
+          <div class="tool-footer">
+            <button class="btn btn-primary btn-sm" onclick="installTool('openhands')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('openhands', 'OpenHands AI')">🗑️ Hapus</button>
+          </div>
+        </div>
+
+        <!-- Multi-Agent Frameworks -->
+        <div class="tool-card">
+          <div class="tool-top">
+            <span class="tool-name">🧩 Multi-Agent Frameworks</span>
+            <span class="tool-badge badge-ready">● CrewAI / LangGraph</span>
+          </div>
+          <p class="tool-desc">CrewAI, LangGraph, AutoGen, Agno, DSPy, LlamaIndex, PydanticAI untuk multi-agent orchestration.</p>
+          <div class="tool-footer">
+            <button class="btn btn-primary btn-sm" onclick="installTool('agent_frameworks')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('agent_frameworks', 'Agent Frameworks')">🗑️ Hapus</button>
+          </div>
+        </div>
+
+        <!-- Hugging Face Hub -->
+        <div class="tool-card">
+          <div class="tool-top">
+            <span class="tool-name">🤗 Hugging Face Hub CLI</span>
+            <span class="tool-badge badge-ready">● Model Hub</span>
+          </div>
+          <p class="tool-desc">Download ribuan model open-weight AI dan dataset langsung via terminal.</p>
+          <div class="tool-footer">
+            <button class="btn btn-ghost btn-sm" onclick="runQuick('huggingface-cli --version')">Version</button>
+            <button class="btn btn-primary btn-sm" onclick="installTool('huggingface')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('huggingface', 'Hugging Face CLI')">🗑️ Hapus</button>
           </div>
         </div>
 
@@ -1184,19 +1342,25 @@
         <div class="terminal-box">
           <div class="terminal-output" id="termOutput">R-SERVER Interactive Terminal Ready. Ketik perintah bash dan tekan Enter...&#10;</div>
           <form onsubmit="execTerminal(event)" class="terminal-form">
-            <input type="text" id="termInput" class="terminal-input" placeholder="e.g. google-chrome --version, uname -a, ps aux, free -h, df -h..." autocomplete="off">
+            <input type="text" id="termInput" class="terminal-input" placeholder="e.g. 9router, hermes, claude, agy, aider, goose, interpreter, sgpt, free -h, df -h..." autocomplete="off">
             <button type="submit" class="btn btn-primary btn-sm">⚡ Run</button>
           </form>
           <div class="quick-cmd-bar">
-            <span class="quick-pill" onclick="runQuick('google-chrome --version')">chrome --version</span>
-            <span class="quick-pill" onclick="runQuick('claude --version')">claude --version</span>
-            <span class="quick-pill" onclick="runQuick('agy --version')">agy --version</span>
-            <span class="quick-pill" onclick="runQuick('aider --version')">aider --version</span>
-            <span class="quick-pill" onclick="runQuick('uv --version')">uv --version</span>
+            <span class="quick-pill" onclick="runQuick('claude --version')">claude</span>
+            <span class="quick-pill" onclick="runQuick('agy --version')">agy</span>
+            <span class="quick-pill" onclick="runQuick('hermes --version || which hermes')">hermes</span>
+            <span class="quick-pill" onclick="runQuick('9router --version || which 9router')">9router</span>
+            <span class="quick-pill" onclick="runQuick('aider --version')">aider</span>
+            <span class="quick-pill" onclick="runQuick('goose --version || which goose')">goose</span>
+            <span class="quick-pill" onclick="runQuick('interpreter --version || which interpreter')">interpreter</span>
+            <span class="quick-pill" onclick="runQuick('sgpt --version || which sgpt')">sgpt</span>
+            <span class="quick-pill" onclick="runQuick('plandex --version || which plandex')">plandex</span>
+            <span class="quick-pill" onclick="runQuick('uv --version')">uv</span>
+            <span class="quick-pill" onclick="runQuick('ollama --version')">ollama</span>
             <span class="quick-pill" onclick="runQuick('free -h')">free -h</span>
             <span class="quick-pill" onclick="runQuick('df -h')">df -h</span>
             <span class="quick-pill" onclick="runQuick('uptime')">uptime</span>
-            <span class="quick-pill" onclick="runQuick('ps aux | head -n 10')">ps aux</span>
+            <span class="quick-pill" onclick="runQuick('ps aux | head -n 15')">ps aux</span>
           </div>
         </div>
       </div>
@@ -1288,42 +1452,141 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- VIEW 6: 📖 CHEATSHEET & DOCS                               -->
+    <!-- VIEW 6: 📖 CHEATSHEET & AI MASTER LIST V3                  -->
     <!-- ========================================================= -->
     <section id="view-docs" class="page-view">
       <div class="page-header">
         <div>
-          <h2 class="page-title">📖 Linux & AI Agent Cheatsheet</h2>
-          <p class="page-desc">Panduan cepat baris perintah terminal untuk mengelola server.</p>
+          <h2 class="page-title">📖 AI Coding Agents Master List — V3 & System Docs</h2>
+          <p class="page-desc">Dokumentasi lengkap ekosistem AI coding agents, Hermes Agent, 9Router, and VPS architecture.</p>
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
+      <!-- Quick AI Architecture Diagram -->
+      <div class="card" style="margin-bottom: 16px;">
+        <div class="card-title">🌐 AI VPS Workflow & Routing Diagram</div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; background: rgba(0,0,0,0.5); padding: 14px; border-radius: 8px; border: 1px solid var(--border); overflow-x: auto; color: #a5b4fc; line-height: 1.6;">
+Windows / Mac / Android / iOS
+      │
+      │ RDP (Port 3389 / sakura.proxy.rlwy.net:17792)  OR  SSH (altaria.proxy.rlwy.net:22000)
+      ▼
+Ubuntu / Debian + XFCE4 Desktop + XRDP + Web Dashboard
+      │
+      ├── Visual Tools: VS Code Server, Chrome (no-sandbox), Firefox, File Manager
+      ├── CLI AI Agents: Claude Code, Antigravity (agy), Hermes Agent, Aider, Goose, SWE-agent, Open Interpreter, ShellGPT
+      │
+      ▼
+9Router AI Proxy / Gateway (http://localhost:20128)
+      │
+      ├── Claude (Anthropic API / OAuth)
+      ├── OpenAI (GPT-4o, Codex, o1, o3)
+      ├── Google Gemini (Gemini 1.5/2.0 Flash & Pro)
+      ├── Qwen & DeepSeek Coder (Open-weights / DashScope / DeepSeek API)
+      ├── OpenRouter / GLM / Kimi / Local Ollama (Port 11434)
+      └── Automatic Fallback & Token Saving Pipeline
+        </div>
+      </div>
+
+      <!-- 9Router & Hermes Spotlight -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; margin-bottom: 16px;">
+        <div class="card" style="border-left: 3px solid #6366f1;">
+          <div class="card-title" style="color: #818cf8;">🔀 9Router — AI Gateway & Proxy</div>
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px;">
+            Proxy/Gateway cerdas antara coding tools (Claude Code, Cursor, Antigravity, Aider, Cline) dan multiple AI Providers.
+          </div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; display: flex; flex-direction: column; gap: 4px; color: #cbd5e1;">
+            <div>• <strong>Dashboard:</strong> <code>http://localhost:20128</code></div>
+            <div>• <strong>API Endpoint:</strong> <code>http://localhost:20128/v1</code></div>
+            <div>• <strong>Install:</strong> <code>npm install -g 9router</code></div>
+            <div>• <strong>Jalankan:</strong> <code>9router</code> (atau background via pm2/nohup)</div>
+          </div>
+        </div>
+
+        <div class="card" style="border-left: 3px solid #10b981;">
+          <div class="card-title" style="color: #34d399;">🧠 Hermes Agent (Nous Research)</div>
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px;">
+            Autonomous terminal TUI coding agent dari Nous Research dengan fitur Git workflow, MCP integrations, persistent sessions, dan tool delegation.
+          </div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; display: flex; flex-direction: column; gap: 4px; color: #cbd5e1;">
+            <div>• <strong>Docs:</strong> <code>hermes-agent.nousresearch.com</code></div>
+            <div>• <strong>Install:</strong> <code>pip3 install hermes-agent</code></div>
+            <div>• <strong>Jalankan:</strong> <code>hermes</code></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Master List Categorized Cards -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px;">
         <div class="card">
-          <div class="card-title">🤖 AI Agent Shortcuts</div>
-          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); display: flex; flex-direction: column; gap: 6px;">
-            <div><strong style="color:#fff;">cl</strong> &rarr; Jalankan Claude Code</div>
-            <div><strong style="color:#fff;">ag</strong> &rarr; Jalankan Google Antigravity</div>
-            <div><strong style="color:#fff;">ai</strong> &rarr; Jalankan Aider AI Pair Programmer</div>
-            <div><strong style="color:#fff;">uv pip install [pkg]</strong> &rarr; Ultra-fast pip install</div>
+          <div class="card-title">1. 🤖 Core Coding Agents</div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px;">
+            <div>• Claude Code (<code>cl</code>)</div>
+            <div>• Google Antigravity (<code>agy</code> / <code>ag</code>)</div>
+            <div>• Aider Pair Programmer (<code>ai</code>)</div>
+            <div>• Hermes Agent (<code>hermes</code>)</div>
+            <div>• Goose AI (<code>goose</code>)</div>
+            <div>• Plandex (<code>plandex</code>)</div>
+            <div>• SWE-agent (<code>sweagent</code>)</div>
+            <div>• Open Interpreter (<code>interpreter</code>)</div>
+            <div>• ShellGPT (<code>sgpt</code>)</div>
+            <div>• Gemini CLI (<code>gemini</code>)</div>
+            <div>• OpenAI Codex CLI & Qwen Code</div>
+            <div>• OpenHands, Devin, SWE-ReX, Jules</div>
           </div>
         </div>
 
         <div class="card">
-          <div class="card-title">🖥️ GUI & Browser Safe Run</div>
-          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); display: flex; flex-direction: column; gap: 6px;">
-            <div><strong style="color:#fff;">google-chrome-stable</strong> &rarr; Buka Chrome (no-sandbox)</div>
-            <div><strong style="color:#fff;">service xrdp restart</strong> &rarr; Restart server RDP</div>
-            <div><strong style="color:#fff;">pkill xfce4-session</strong> &rarr; Reset GUI session</div>
+          <div class="card-title">2. 💻 IDE & Editor Agents</div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px;">
+            <div>• Cursor & Windsurf</div>
+            <div>• Cline & Roo Code (VS Code extensions)</div>
+            <div>• Continue.dev (Open-source AI assistant)</div>
+            <div>• GitHub Copilot & Coding Agent</div>
+            <div>• Gemini Code Assist & Amazon Q Developer</div>
+            <div>• Zed AI, Void, Tabnine, Codeium, Supermaven</div>
           </div>
         </div>
 
         <div class="card">
-          <div class="card-title">⚡ System & Package Management</div>
-          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); display: flex; flex-direction: column; gap: 6px;">
-            <div><strong style="color:#fff;">apt-get update -y</strong> &rarr; Update database paket</div>
-            <div><strong style="color:#fff;">htop / btop</strong> &rarr; Interactive task manager</div>
-            <div><strong style="color:#fff;">fastfetch</strong> &rarr; Ringkasan spec & OS server</div>
+          <div class="card-title">3. 🌐 Web & Autonomous SE</div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px;">
+            <div>• OpenHands (formerly OpenDevin)</div>
+            <div>• SWE-agent & AutoCodeRover</div>
+            <div>• Devin, Factory, Sweep, Agentless</div>
+            <div>• GPT Pilot, GPT Engineer, Devika</div>
+            <div>• Replit Agent, Bolt.new, Lovable, v0</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">4. 🧩 Multi-Agent Frameworks</div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px;">
+            <div>• CrewAI (<code>pip install crewai</code>)</div>
+            <div>• LangGraph & LangChain Agents</div>
+            <div>• Microsoft AutoGen & Semantic Kernel</div>
+            <div>• Agno (Phidata) & DSPy</div>
+            <div>• LlamaIndex Agents & PydanticAI</div>
+            <div>• OpenAI Agents SDK & Google ADK</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">5. 🦙 Local Model Backends</div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px;">
+            <div>• Ollama (<code>ollama run qwen2.5-coder</code>)</div>
+            <div>• llama.cpp & llamafile</div>
+            <div>• vLLM & LocalAI</div>
+            <div>• DeepSeek Coder, Qwen Coder, Codestral</div>
+            <div>• Gemma, Llama 3, StarCoder2, Granite</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">6. ⚡ Hardware & Planning Notes</div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px;">
+            <div>• <strong>2 vCPU / 4 GB RAM:</strong> CLI AI agents (Claude, agy, Aider, Hermes).</div>
+            <div>• <strong>4 vCPU / 8 GB RAM:</strong> Desktop GUI (XRDP) + Chrome + VS Code + 9Router + Agents.</div>
+            <div>• <strong>8+ GB RAM:</strong> Local Ollama model inference + Heavy Multi-Agent stacks.</div>
           </div>
         </div>
       </div>
