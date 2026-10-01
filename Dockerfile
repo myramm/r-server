@@ -90,6 +90,12 @@ RUN npm install -g @anthropic-ai/claude-code
 RUN curl -fsSL https://antigravity.google/cli/install.sh | bash -s -- --dir /usr/local/bin \
     && ln -sf /usr/local/bin/agy /usr/local/bin/antigravity || true
 
+# Install Astral uv and Aider AI Coding Agent
+RUN (curl -LsSf https://astral.sh/uv/install.sh | sh \
+    && ln -sf /root/.local/bin/uv /usr/local/bin/uv \
+    && ln -sf /root/.local/bin/uvx /usr/local/bin/uvx || true) \
+    && pip3 install --break-system-packages aider-chat huggingface_hub rich click typer ipython 2>/dev/null || true
+
 # Copy ssh user config to configure the user's password and authorized keys
 COPY ssh-user-config.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/ssh-user-config.sh
@@ -101,6 +107,10 @@ RUN chmod +x /usr/local/bin/cl
 # Copy the "ag" helper command (opens a tmux session running Antigravity CLI)
 COPY ag /usr/local/bin/ag
 RUN chmod +x /usr/local/bin/ag
+
+# Copy the "ai" helper command (opens a tmux session running Aider AI)
+COPY ai /usr/local/bin/ai
+RUN chmod +x /usr/local/bin/ai
 
 # Copy the "usage" command (Railway trial credit + uptime monitor)
 COPY usage /usr/local/bin/usage

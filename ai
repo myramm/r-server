@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# ============================================================
+# R-SERVER — "ai" command: open a tmux session running Aider AI
+# ============================================================
+# Creates a new tmux session named "aider" and runs `aider` inside it.
+# If the session already exists, it attaches to it instead.
+
+SESSION="aider"
+
+if tmux has-session -t "$SESSION" 2>/dev/null; then
+    tmux attach -t "$SESSION"
+else
+    tmux new-session -s "$SESSION" "aider"
+fi
