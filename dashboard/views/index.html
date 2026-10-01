@@ -1088,41 +1088,125 @@
         </div>
       </div>
 
-      <!-- AI Agents Quick Status Cards -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px;">
+      <!-- AI Agents Quick Status & Action Grid (10 Agents) -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px;">
         <div class="card">
           <div class="card-header">
-            <span class="card-title">Anthropic Claude Code</span>
+            <span class="card-title">🤖 Anthropic Claude Code</span>
             <span class="tool-status-badge badge-installed">● Ready</span>
           </div>
           <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Official CLI Coding Agent oleh Anthropic. Menulis kode, debugging, dan auto-refactor.</p>
           <div style="display: flex; gap: 8px;">
-            <button class="btn-action btn-ghost" onclick="quickCmd('claude --version')" style="font-size: 11px; padding: 4px 10px;">Check Version</button>
+            <button class="btn-action btn-ghost" onclick="quickCmd('claude --version')" style="font-size: 11px; padding: 4px 10px;">Version</button>
             <button class="btn-action btn-primary" onclick="quickCmd('cl')" style="font-size: 11px; padding: 4px 10px;">Launch (cl)</button>
+            <button class="btn-action btn-warning" onclick="triggerToolInstall('claude', 'Claude Code CLI')" style="font-size: 11px; padding: 4px 10px;">Install</button>
           </div>
         </div>
 
         <div class="card">
           <div class="card-header">
-            <span class="card-title">Google Antigravity CLI</span>
+            <span class="card-title">⚡ Google Antigravity CLI</span>
             <span class="tool-status-badge badge-installed">● Ready</span>
           </div>
           <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Google autonomous coding assistant (agy). Mendukung multi-agent & skills.</p>
           <div style="display: flex; gap: 8px;">
-            <button class="btn-action btn-ghost" onclick="quickCmd('agy --version')" style="font-size: 11px; padding: 4px 10px;">Check Version</button>
+            <button class="btn-action btn-ghost" onclick="quickCmd('agy --version')" style="font-size: 11px; padding: 4px 10px;">Version</button>
             <button class="btn-action btn-primary" onclick="quickCmd('ag')" style="font-size: 11px; padding: 4px 10px;">Launch (ag)</button>
+            <button class="btn-action btn-warning" onclick="triggerToolInstall('agy', 'Google Antigravity CLI')" style="font-size: 11px; padding: 4px 10px;">Install</button>
           </div>
         </div>
 
         <div class="card">
           <div class="card-header">
-            <span class="card-title">Aider AI Pair Programming</span>
+            <span class="card-title">🤝 Aider AI Pair Programming</span>
             <span class="tool-status-badge badge-installed">● Ready</span>
           </div>
           <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">AI pair programmer terminal terintegrasi langsung dengan Git repository.</p>
           <div style="display: flex; gap: 8px;">
-            <button class="btn-action btn-ghost" onclick="quickCmd('aider --version')" style="font-size: 11px; padding: 4px 10px;">Check Version</button>
+            <button class="btn-action btn-ghost" onclick="quickCmd('aider --version')" style="font-size: 11px; padding: 4px 10px;">Version</button>
             <button class="btn-action btn-primary" onclick="quickCmd('ai')" style="font-size: 11px; padding: 4px 10px;">Launch (ai)</button>
+            <button class="btn-action btn-warning" onclick="triggerToolInstall('aider', 'Aider AI')" style="font-size: 11px; padding: 4px 10px;">Install</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">✨ Google Gemini CLI</span>
+            <span class="tool-status-badge badge-installed">● Ready</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Official Gemini multimodal CLI untuk reasoning, search, dan script generation.</p>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-action btn-ghost" onclick="quickCmd('gemini --version || which gemini')" style="font-size: 11px; padding: 4px 10px;">Version</button>
+            <button class="btn-action btn-primary" onclick="triggerToolInstall('gemini_cli', 'Google Gemini CLI')" style="font-size: 11px; padding: 4px 10px;">Install</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">💻 OpenCode AI Agent</span>
+            <span class="tool-status-badge badge-not-installed">● Open-Source</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Autonomous AI coding assistant berbasis terminal untuk task codebase otomatis.</p>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-action btn-primary" onclick="triggerToolInstall('opencode', 'OpenCode AI Agent')" style="font-size: 11px; padding: 4px 10px;">1-Click Install</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">🔮 Qwen Code Assistant</span>
+            <span class="tool-status-badge badge-not-installed">● Alibaba Cloud</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Agent coding Qwen dengan kapabilitas analisa code & tool calling.</p>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-action btn-primary" onclick="triggerToolInstall('qwen_code', 'Qwen Code Assistant')" style="font-size: 11px; padding: 4px 10px;">1-Click Install</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">🐙 GitHub Copilot CLI</span>
+            <span class="tool-status-badge badge-not-installed">● GitHub</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Bantuan baris perintah resmi GitHub (`gh copilot`) untuk command assistant.</p>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-action btn-primary" onclick="triggerToolInstall('copilot_cli', 'GitHub Copilot CLI')" style="font-size: 11px; padding: 4px 10px;">1-Click Install</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">🦙 Ollama Local LLMs</span>
+            <span class="tool-status-badge badge-installed">● Ready</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Menjalankan model LLM lokal seperti Llama 3, DeepSeek, Mistral langsung di VPS.</p>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-action btn-ghost" onclick="quickCmd('ollama --version')" style="font-size: 11px; padding: 4px 10px;">Version</button>
+            <button class="btn-action btn-primary" onclick="triggerToolInstall('ollama', 'Ollama Local LLM Engine')" style="font-size: 11px; padding: 4px 10px;">Install</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">🤗 Hugging Face Hub CLI</span>
+            <span class="tool-status-badge badge-installed">● Ready</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Download & kelola ratusan ribu AI models & datasets open source.</p>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-action btn-ghost" onclick="quickCmd('huggingface-cli --version')" style="font-size: 11px; padding: 4px 10px;">Version</button>
+            <button class="btn-action btn-primary" onclick="triggerToolInstall('huggingface', 'Hugging Face CLI')" style="font-size: 11px; padding: 4px 10px;">Install</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">⚡ Astral UV (Speed Runner)</span>
+            <span class="tool-status-badge badge-installed">● Ready</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Ultra-fast Python package installer & resolver (10-100x lebih cepat dari pip).</p>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-action btn-ghost" onclick="quickCmd('uv --version')" style="font-size: 11px; padding: 4px 10px;">Version</button>
+            <button class="btn-action btn-primary" onclick="triggerToolInstall('uv_astral', 'Astral UV Package Manager')" style="font-size: 11px; padding: 4px 10px;">Install</button>
           </div>
         </div>
       </div>

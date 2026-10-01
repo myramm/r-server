@@ -572,18 +572,30 @@ EOF
   },
 
   // ==========================================
-  // 3. AI & MACHINE LEARNING
+  // 3. AI & MACHINE LEARNING / AI CODING AGENTS
   // ==========================================
   {
     id: 'claude',
     name: 'Claude Code CLI',
     icon: '🤖',
     category: 'ai_ml',
-    categoryName: 'AI & Machine Learning',
-    description: 'Official terminal coding agent by Anthropic (perintah: claude / cl).',
+    categoryName: 'AI & Coding Agents',
+    description: 'Official terminal coding agent by Anthropic (perintah: claude / cl). Otomatis refactor, bug fixing, dan test.',
     checkCmd: 'claude --version',
     installScript: `
       npm install -g @anthropic-ai/claude-code
+      cat << 'EOF' > /root/Desktop/claude-code.desktop
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Claude Code
+Comment=Anthropic AI Coding Agent
+Exec=xfce4-terminal -T "Claude Code" -e "claude"
+Icon=utilities-terminal
+Terminal=false
+Categories=Development;
+EOF
+      chmod +x /root/Desktop/claude-code.desktop 2>/dev/null || true
     `
   },
   {
@@ -591,12 +603,24 @@ EOF
     name: 'Google Antigravity CLI',
     icon: '⚡',
     category: 'ai_ml',
-    categoryName: 'AI & Machine Learning',
+    categoryName: 'AI & Coding Agents',
     description: 'Google Antigravity autonomous developer & pair programming assistant (perintah: agy / ag).',
     checkCmd: 'agy --version',
     installScript: `
       curl -fsSL https://antigravity.google/cli/install.sh | bash -s -- --dir /usr/local/bin
       ln -sf /usr/local/bin/agy /usr/local/bin/antigravity 2>/dev/null || true
+      cat << 'EOF' > /root/Desktop/antigravity.desktop
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Google Antigravity
+Comment=Google AI Coding Agent
+Exec=xfce4-terminal -T "Google Antigravity" -e "agy"
+Icon=utilities-terminal
+Terminal=false
+Categories=Development;
+EOF
+      chmod +x /root/Desktop/antigravity.desktop 2>/dev/null || true
     `
   },
   {
@@ -604,11 +628,111 @@ EOF
     name: 'Aider AI Pair Programming',
     icon: '🤝',
     category: 'ai_ml',
-    categoryName: 'AI & Machine Learning',
-    description: 'AI pair programmer langsung di git repo terminal (perintah: aider).',
+    categoryName: 'AI & Coding Agents',
+    description: 'AI pair programmer langsung di git repo terminal dengan multi-model support (perintah: aider / ai).',
     checkCmd: 'aider --version',
     installScript: `
       pip3 install --break-system-packages aider-chat || pip3 install aider-chat
+      cat << 'EOF' > /root/Desktop/aider.desktop
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Aider AI
+Comment=AI Pair Programming in Terminal
+Exec=xfce4-terminal -T "Aider AI" -e "aider"
+Icon=utilities-terminal
+Terminal=false
+Categories=Development;
+EOF
+      chmod +x /root/Desktop/aider.desktop 2>/dev/null || true
+    `
+  },
+  {
+    id: 'gemini_cli',
+    name: 'Google Gemini CLI',
+    icon: '✨',
+    category: 'ai_ml',
+    categoryName: 'AI & Coding Agents',
+    description: 'Official Google Gemini developer CLI untuk prompt, multi-modal reasoning & coding di terminal.',
+    checkCmd: 'gemini --version || which gemini',
+    installScript: `
+      npm install -g @google/gemini-cli || true
+    `
+  },
+  {
+    id: 'opencode',
+    name: 'OpenCode AI Agent',
+    icon: '💻',
+    category: 'ai_ml',
+    categoryName: 'AI & Coding Agents',
+    description: 'Open-source autonomous AI coding agent untuk terminal & repository workflow.',
+    checkCmd: 'opencode --version || which opencode',
+    installScript: `
+      npm install -g opencode-ai 2>/dev/null || npm install -g opencode 2>/dev/null || pip3 install --break-system-packages opencode 2>/dev/null || true
+    `
+  },
+  {
+    id: 'qwen_code',
+    name: 'Qwen Code Assistant',
+    icon: '🔮',
+    category: 'ai_ml',
+    categoryName: 'AI & Coding Agents',
+    description: 'Qwen AI coding & developer agent toolkit by Alibaba Cloud.',
+    checkCmd: 'python3 -c "import qwen_agent; print(\"Qwen Ready\")" 2>/dev/null || which qwen-agent',
+    installScript: `
+      pip3 install --break-system-packages qwen-agent 2>/dev/null || true
+    `
+  },
+  {
+    id: 'copilot_cli',
+    name: 'GitHub Copilot CLI',
+    icon: '🐙',
+    category: 'ai_ml',
+    categoryName: 'AI & Coding Agents',
+    description: 'GitHub Copilot in the CLI (`gh copilot`) untuk saran perintah bash dan coding query.',
+    checkCmd: 'gh copilot --version 2>/dev/null || npm list -g @githubnext/github-copilot-cli 2>/dev/null',
+    installScript: `
+      gh extension install github/gh-copilot 2>/dev/null || npm install -g @githubnext/github-copilot-cli 2>/dev/null || true
+    `
+  },
+  {
+    id: 'ollama',
+    name: 'Ollama Local LLM Engine',
+    icon: '🦙',
+    category: 'ai_ml',
+    categoryName: 'AI & Coding Agents',
+    description: 'Jalankan model LLM lokal seperti Llama 3, DeepSeek-Coder, Mistral, Qwen, Phi-3 langsung di VPS.',
+    checkCmd: 'ollama --version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y zstd curl
+      curl -fsSL https://ollama.com/install.sh | sh
+    `
+  },
+  {
+    id: 'huggingface',
+    name: 'Hugging Face Hub CLI',
+    icon: '🤗',
+    category: 'ai_ml',
+    categoryName: 'AI & Coding Agents',
+    description: 'Download, upload, dan kelola ribuan open-weight AI models & datasets via CLI.',
+    checkCmd: 'huggingface-cli --version',
+    installScript: `
+      pip3 install --break-system-packages huggingface_hub
+    `
+  },
+  {
+    id: 'uv_astral',
+    name: 'Astral UV & UVX',
+    icon: '⚡',
+    category: 'ai_ml',
+    categoryName: 'AI & Coding Agents',
+    description: 'Package manager Python 10-100x lebih cepat dari pip, built-in virtualenv dan script runner.',
+    checkCmd: 'uv --version',
+    installScript: `
+      curl -LsSf https://astral.sh/uv/install.sh | sh
+      ln -sf /root/.local/bin/uv /usr/local/bin/uv 2>/dev/null || true
+      ln -sf /root/.local/bin/uvx /usr/local/bin/uvx 2>/dev/null || true
     `
   },
   {
@@ -616,7 +740,7 @@ EOF
     name: 'JupyterLab & IPython',
     icon: '🪐',
     category: 'ai_ml',
-    categoryName: 'AI & Machine Learning',
+    categoryName: 'AI & Coding Agents',
     description: 'Interactive web-based notebook development environment untuk Python data & ML.',
     checkCmd: 'jupyter --version || jupyter-lab --version',
     installScript: `
@@ -628,7 +752,7 @@ EOF
     name: 'PyTorch & ML Core Libraries',
     icon: '🔥',
     category: 'ai_ml',
-    categoryName: 'AI & Machine Learning',
+    categoryName: 'AI & Coding Agents',
     description: 'PyTorch, TorchVision, TorchAudio, Transformers, NumPy, Pandas, Scikit-learn.',
     checkCmd: 'python3 -c "import torch; print(torch.__version__)"',
     installScript: `
