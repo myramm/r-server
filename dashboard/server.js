@@ -185,6 +185,47 @@ function getTopProcesses() {
 // XRDP LINUX DESKTOP - 40 CATEGORIES SOFTWARE CATALOG
 // -------------------------------------------------------------
 const TOOLS_CATALOG = [
+  // Standalone Core Services
+  {
+    id: 'xrdp',
+    name: 'XRDP Remote Desktop Server',
+    icon: '🖥️',
+    category: 'desktop_apps',
+    categoryName: 'Desktop & Office',
+    description: 'Server Remote Desktop Windows (RDP) pada Port 3389 untuk akses visual desktop Linux XFCE.',
+    checkCmd: 'which xrdp && which xorgxrdp',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y xrdp xorgxrdp xfce4 xfce4-terminal dbus-x11
+      adduser xrdp ssl-cert 2>/dev/null || true
+      echo "startxfce4" > /root/.xsession
+      service xrdp restart 2>/dev/null || true
+    `,
+    uninstallScript: `
+      service xrdp stop 2>/dev/null || true
+      apt-get remove --purge -y xrdp xorgxrdp
+      apt-get autoremove -y
+      rm -rf /etc/xrdp /var/log/xrdp /var/run/xrdp
+    `
+  },
+  {
+    id: 'git',
+    name: 'Git Version Control & LFS',
+    icon: '🐙',
+    category: 'programming',
+    categoryName: 'Languages & Compilers',
+    description: 'Sistem kontrol versi Git, Git Large File Storage (git-lfs), dan GitHub CLI (gh).',
+    checkCmd: 'git --version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y git git-lfs gh
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y git git-lfs gh
+      apt-get autoremove -y
+    `
+  },
+
   // ==========================================
   // SUPER BUNDLES (1-Click Multiple Tools)
   // ==========================================
@@ -1135,6 +1176,82 @@ function getToolsList() {
   });
 }
 
+function startToolUninstall(toolId, customCmd = null) {
+  if (currentInstall && currentInstall.status === 'running') {
+    throw new Error(`Operasi lain sedang berjalan: ${currentInstall.toolName}`);
+  }
+
+  let commandToRun = '';
+  let toolName = 'Custom Package';
+
+  if (toolId) {
+    const tool = TOOLS_CATALOG.find(t => t.id === toolId);
+    if (!tool) throw new Error(`Tool ID '${toolId}' tidak ditemukan.`);
+    commandToRun = tool.uninstallScript || `
+      echo "Mencoba menghapus ${tool.name}..."
+      apt-get remove --purge -y ${tool.id} 2>/dev/null || true
+      npm uninstall -g ${tool.id} 2>/dev/null || true
+      pip3 uninstall -y ${tool.id} 2>/dev/null || true
+      apt-get autoremove -y
+    `;
+    toolName = `Hapus ${tool.name}`;
+  } else if (customCmd) {
+    commandToRun = customCmd;
+    toolName = `Custom Uninstall: ${customCmd.substring(0, 30)}`;
+  } else {
+    throw new Error('Tidak ada tool atau command yang ditentukan.');
+  }
+
+  currentInstall = {
+    id: toolId || 'custom',
+    toolName,
+    status: 'running',
+    logs: `[${new Date().toLocaleTimeString()}] Memulai proses hapus / uninstall ${toolName}...\n----------------------------------------\n`,
+    startTime: Date.now(),
+    exitCode: null,
+  };
+
+  installEmitter.emit('log', { type: 'start', install: currentInstall });
+
+  const child = spawn('bash', ['-c', commandToRun], {
+    env: {
+      ...process.env,
+      DEBIAN_FRONTEND: 'noninteractive',
+      TERM: 'xterm-256color',
+    }
+  });
+
+  child.stdout.on('data', (data) => {
+    const text = data.toString();
+    currentInstall.logs += text;
+    installEmitter.emit('log', { type: 'data', text });
+  });
+
+  child.stderr.on('data', (data) => {
+    const text = data.toString();
+    currentInstall.logs += text;
+    installEmitter.emit('log', { type: 'data', text });
+  });
+
+  child.on('close', (code) => {
+    currentInstall.exitCode = code;
+    currentInstall.status = code === 0 ? 'success' : 'failed';
+    const endMsg = `\n----------------------------------------\n[${new Date().toLocaleTimeString()}] Selesai! Status: ${code === 0 ? 'BERHASIL DIHAPUS (Success ✅)' : 'SELESAI DENGAN CATATAN (Exit Code ' + code + ')'}\n`;
+    currentInstall.logs += endMsg;
+    installEmitter.emit('log', { type: 'end', install: currentInstall });
+  });
+
+  child.on('error', (err) => {
+    currentInstall.exitCode = 1;
+    currentInstall.status = 'failed';
+    const errMsg = `\n[ERROR]: ${err.message}\n`;
+    currentInstall.logs += errMsg;
+    installEmitter.emit('log', { type: 'error', error: err.message });
+  });
+
+  return currentInstall;
+}
+
 function startToolInstall(toolId, customCmd = null) {
   if (currentInstall && currentInstall.status === 'running') {
     throw new Error(`Instalasi lain sedang berjalan: ${currentInstall.toolName}`);
@@ -1475,6 +1592,36 @@ const server = http.createServer((req, res) => {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       return res.end(JSON.stringify({ error: err.message }));
     }
+  }
+
+  // POST /api/tools/uninstall: Trigger uninstallation of a tool
+  if (url.pathname === '/api/tools/uninstall' && req.method === 'POST') {
+    if (!isAuthenticated(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ error: 'Unauthorized' }));
+    }
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const { toolId, customCmd } = JSON.parse(body);
+        const uninstallJob = startToolUninstall(toolId, customCmd);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({
+          success: true,
+          message: `Penghapusan ${uninstallJob.toolName} dimulai.`,
+          install: {
+            id: uninstallJob.id,
+            toolName: uninstallJob.toolName,
+            status: uninstallJob.status
+          }
+        }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
   }
 
   // POST /api/tools/install: Trigger installation of a tool

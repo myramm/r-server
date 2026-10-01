@@ -921,8 +921,9 @@
           <p class="tool-desc">AI agent otonom resmi Anthropic untuk terminal. Menulis kode, refactor, bug fixing.</p>
           <div class="tool-footer">
             <button class="btn btn-ghost btn-sm" onclick="runQuick('claude --version')">Version</button>
-            <button class="btn btn-primary btn-sm" onclick="runQuick('cl')">Launch (cl)</button>
+            <button class="btn btn-primary btn-sm" onclick="runQuick('cl')">Launch</button>
             <button class="btn btn-secondary btn-sm" onclick="installTool('claude')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('claude', 'Claude Code')">🗑️ Hapus</button>
           </div>
         </div>
 
@@ -935,8 +936,9 @@
           <p class="tool-desc">Google autonomous coding assistant (agy) dengan fitur multi-agent workflows.</p>
           <div class="tool-footer">
             <button class="btn btn-ghost btn-sm" onclick="runQuick('agy --version')">Version</button>
-            <button class="btn btn-primary btn-sm" onclick="runQuick('ag')">Launch (ag)</button>
+            <button class="btn btn-primary btn-sm" onclick="runQuick('ag')">Launch</button>
             <button class="btn btn-secondary btn-sm" onclick="installTool('agy')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('agy', 'Google Antigravity')">🗑️ Hapus</button>
           </div>
         </div>
 
@@ -949,8 +951,9 @@
           <p class="tool-desc">AI pair programmer terminal langsung terintegrasi dengan Git repository.</p>
           <div class="tool-footer">
             <button class="btn btn-ghost btn-sm" onclick="runQuick('aider --version')">Version</button>
-            <button class="btn btn-primary btn-sm" onclick="runQuick('ai')">Launch (ai)</button>
+            <button class="btn btn-primary btn-sm" onclick="runQuick('ai')">Launch</button>
             <button class="btn btn-secondary btn-sm" onclick="installTool('aider')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('aider', 'Aider AI')">🗑️ Hapus</button>
           </div>
         </div>
 
@@ -963,7 +966,8 @@
           <p class="tool-desc">Developer CLI resmi Google Gemini untuk prompt, reasoning, dan scripting.</p>
           <div class="tool-footer">
             <button class="btn btn-ghost btn-sm" onclick="runQuick('gemini --version || which gemini')">Version</button>
-            <button class="btn btn-primary btn-sm" onclick="installTool('gemini_cli')">1-Click Install</button>
+            <button class="btn btn-primary btn-sm" onclick="installTool('gemini_cli')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('gemini_cli', 'Google Gemini CLI')">🗑️ Hapus</button>
           </div>
         </div>
 
@@ -976,7 +980,8 @@
           <p class="tool-desc">Jalankan model lokal Llama 3, DeepSeek, Mistral, Qwen langsung di VPS.</p>
           <div class="tool-footer">
             <button class="btn btn-ghost btn-sm" onclick="runQuick('ollama --version')">Version</button>
-            <button class="btn btn-primary btn-sm" onclick="installTool('ollama')">1-Click Install</button>
+            <button class="btn btn-primary btn-sm" onclick="installTool('ollama')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('ollama', 'Ollama Local LLMs')">🗑️ Hapus</button>
           </div>
         </div>
 
@@ -989,7 +994,8 @@
           <p class="tool-desc">Package manager Python 10-100x lebih cepat dari pip, built-in virtualenv.</p>
           <div class="tool-footer">
             <button class="btn btn-ghost btn-sm" onclick="runQuick('uv --version')">Version</button>
-            <button class="btn btn-primary btn-sm" onclick="installTool('uv_astral')">1-Click Install</button>
+            <button class="btn btn-primary btn-sm" onclick="installTool('uv_astral')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('uv_astral', 'Astral UV')">🗑️ Hapus</button>
           </div>
         </div>
 
@@ -1002,7 +1008,8 @@
           <p class="tool-desc">Download ribuan model open-weight AI dan dataset langsung via terminal.</p>
           <div class="tool-footer">
             <button class="btn btn-ghost btn-sm" onclick="runQuick('huggingface-cli --version')">Version</button>
-            <button class="btn btn-primary btn-sm" onclick="installTool('huggingface')">1-Click Install</button>
+            <button class="btn btn-primary btn-sm" onclick="installTool('huggingface')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('huggingface', 'Hugging Face CLI')">🗑️ Hapus</button>
           </div>
         </div>
 
@@ -1014,7 +1021,8 @@
           </div>
           <p class="tool-desc">CLI command generator resmi GitHub (`gh copilot`) untuk panduan terminal.</p>
           <div class="tool-footer">
-            <button class="btn btn-primary btn-sm" onclick="installTool('copilot_cli')">1-Click Install</button>
+            <button class="btn btn-primary btn-sm" onclick="installTool('copilot_cli')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('copilot_cli', 'GitHub Copilot CLI')">🗑️ Hapus</button>
           </div>
         </div>
 
@@ -1026,7 +1034,8 @@
           </div>
           <p class="tool-desc">Autonomous AI agent open-source untuk eksekusi workflow codebase.</p>
           <div class="tool-footer">
-            <button class="btn btn-primary btn-sm" onclick="installTool('opencode')">1-Click Install</button>
+            <button class="btn btn-primary btn-sm" onclick="installTool('opencode')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('opencode', 'OpenCode AI')">🗑️ Hapus</button>
           </div>
         </div>
 
@@ -1038,7 +1047,8 @@
           </div>
           <p class="tool-desc">Qwen AI code assistant & tool calling framework.</p>
           <div class="tool-footer">
-            <button class="btn btn-primary btn-sm" onclick="installTool('qwen_code')">1-Click Install</button>
+            <button class="btn btn-primary btn-sm" onclick="installTool('qwen_code')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('qwen_code', 'Qwen Code')">🗑️ Hapus</button>
           </div>
         </div>
       </div>
@@ -1468,10 +1478,15 @@
           </div>
           <p class="tool-desc">${t.description || ''}</p>
           <div class="tool-footer">
-            <span style="font-size: 11px; color: var(--text-dim); font-family: monospace;">${t.version ? t.version.substring(0, 18) : t.categoryName}</span>
-            <button class="btn ${t.installed ? 'btn-secondary' : 'btn-primary'} btn-sm" onclick="installTool('${t.id}')">
-              ${t.installed ? 'Reinstall' : '1-Click Install'}
-            </button>
+            <span style="font-size: 11px; color: var(--text-dim); font-family: monospace;">${t.version ? t.version.substring(0, 14) : t.categoryName}</span>
+            <div style="display: flex; gap: 4px;">
+              <button class="btn ${t.installed ? 'btn-secondary' : 'btn-primary'} btn-sm" onclick="installTool('${t.id}')">
+                ${t.installed ? 'Reinstall' : 'Install'}
+              </button>
+              <button class="btn btn-danger btn-sm" onclick="uninstallTool('${t.id}', '${t.name}')" title="Hapus / Copot software">
+                🗑️ Hapus
+              </button>
+            </div>
           </div>
         </div>
       `).join('');
@@ -1491,6 +1506,27 @@
           listenInstallLogs();
         } else {
           showToast(d.error || 'Gagal memulai instalasi');
+        }
+      } catch (err) {
+        showToast('Error: ' + err.message);
+      }
+    }
+
+    // 1-Click Uninstall / Hapus Tool
+    async function uninstallTool(toolId, toolName) {
+      if (!confirm(`Yakin ingin MENGHAPUS / UNINSTALL software "${toolName || toolId}" dari server?`)) return;
+      try {
+        openDrawer(`🗑️ Menghapus software: ${toolName || toolId}...`);
+        const res = await fetch('/api/tools/uninstall', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ toolId })
+        });
+        const d = await res.json();
+        if (d.success) {
+          listenInstallLogs();
+        } else {
+          showToast(d.error || 'Gagal menghapus software');
         }
       } catch (err) {
         showToast('Error: ' + err.message);
