@@ -247,8 +247,8 @@ except Exception as e:
 " 2>/dev/null || true
 
 if [ -f "/usr/local/lib/node_modules/9router/app/server.js" ]; then
-    msg "Starting 9Router AI Gateway on port 20128..." "Starting 9Router AI Gateway on port 20128..."
-    NODE_PATH="/root/.9router/runtime/node_modules:/usr/local/lib/node_modules/9router/app/node_modules" PORT=20128 HOST=0.0.0.0 nohup node /usr/local/lib/node_modules/9router/app/server.js >/var/log/9router.log 2>&1 &
+    msg "Starting 9Router AI Gateway on port 20128 (PM2)..." "Starting 9Router AI Gateway on port 20128 (PM2)..."
+    PORT=20128 HOST=0.0.0.0 HOSTNAME=0.0.0.0 pm2 start /usr/local/lib/node_modules/9router/app/server.js --name 9router 2>/dev/null || (PORT=20128 HOST=0.0.0.0 HOSTNAME=0.0.0.0 nohup node /usr/local/lib/node_modules/9router/app/server.js >/var/log/9router.log 2>&1 &)
 elif command -v 9router >/dev/null 2>&1; then
     msg "Starting 9Router AI Gateway on port 20128..." "Starting 9Router AI Gateway on port 20128..."
     nohup 9router --tray --skip-update -p 20128 >/var/log/9router.log 2>&1 &

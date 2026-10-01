@@ -2176,7 +2176,10 @@ const server = http.createServer((req, res) => {
       return res.end(JSON.stringify({ error: 'Unauthorized' }));
     }
     const publicUrl = `${req.headers['x-forwarded-proto'] || 'https'}://${req.headers.host || 'r-server-production-3b83.up.railway.app'}/v1`;
-    const checkReq = http.get('http://127.0.0.1:20128/v1/models', { timeout: 3000 }, (checkRes) => {
+    const checkReq = http.get('http://127.0.0.1:20128/v1/models', {
+      headers: { 'Authorization': 'Bearer sk-9router-master' },
+      timeout: 3000
+    }, (checkRes) => {
       let data = '';
       checkRes.on('data', chunk => data += chunk);
       checkRes.on('end', () => {
@@ -2213,9 +2216,10 @@ const server = http.createServer((req, res) => {
       res.writeHead(401, { 'Content-Type': 'application/json' });
       return res.end(JSON.stringify({ error: 'Unauthorized' }));
     }
-    exec('pkill -f "9router" 2>/dev/null || true; nohup 9router --tray --skip-update -p 20128 >/var/log/9router.log 2>&1 &', (err) => {
+    const restartCmd = 'PORT=20128 HOST=0.0.0.0 HOSTNAME=0.0.0.0 pm2 restart 9router 2>/dev/null || (PORT=20128 HOST=0.0.0.0 HOSTNAME=0.0.0.0 pm2 start /usr/local/lib/node_modules/9router/app/server.js --name 9router 2>/dev/null || nohup 9router --tray --skip-update -p 20128 >/var/log/9router.log 2>&1 &)';
+    exec(restartCmd, (err) => {
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      return res.end(JSON.stringify({ success: true, message: '9Router daemon restarted on port 20128' }));
+      return res.end(JSON.stringify({ success: true, message: '9Router daemon restarted on port 20128 via PM2' }));
     });
     return;
   }
