@@ -83,18 +83,23 @@ ARG ANTHROPIC_AUTH_TOKEN=""
 COPY claude-settings.json /root/.claude/settings.json
 RUN sed -i "s|__ANTHROPIC_AUTH_TOKEN__|${ANTHROPIC_AUTH_TOKEN}|g" /root/.claude/settings.json
 
-# Install Claude Code (official CLI by Anthropic) globally
-RUN npm install -g @anthropic-ai/claude-code
+# Install Claude Code (official CLI by Anthropic), 9Router, pnpm & pm2 globally
+RUN npm install -g @anthropic-ai/claude-code 9router pnpm pm2 2>/dev/null || npm install -g @anthropic-ai/claude-code
 
 # Install Google Antigravity CLI (agy) globally
 RUN curl -fsSL https://antigravity.google/cli/install.sh | bash -s -- --dir /usr/local/bin \
     && ln -sf /usr/local/bin/agy /usr/local/bin/antigravity || true
 
-# Install Astral uv and Aider AI Coding Agent
+# Install Golang (Go 1.23 Stable)
+RUN curl -fsSL https://go.dev/dl/go1.23.1.linux-amd64.tar.gz | tar -C /usr/local -xzf - \
+    && ln -sf /usr/local/go/bin/go /usr/local/bin/go \
+    && ln -sf /usr/local/go/bin/gofmt /usr/local/bin/gofmt
+
+# Install Astral uv, Aider AI, and Hermes Agent
 RUN (curl -LsSf https://astral.sh/uv/install.sh | sh \
     && ln -sf /root/.local/bin/uv /usr/local/bin/uv \
     && ln -sf /root/.local/bin/uvx /usr/local/bin/uvx || true) \
-    && pip3 install --break-system-packages aider-chat huggingface_hub rich click typer ipython 2>/dev/null || true
+    && pip3 install --break-system-packages aider-chat hermes-agent huggingface_hub rich click typer ipython 2>/dev/null || true
 
 # Copy ssh user config to configure the user's password and authorized keys
 COPY ssh-user-config.sh /usr/local/bin/
