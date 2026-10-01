@@ -790,6 +790,72 @@
           <button class="btn btn-secondary btn-sm" onclick="runQuick('uv --version')">⚡ Astral UV Version</button>
         </div>
       </div>
+
+      <!-- Overview Quick AI Agents Section -->
+      <div class="card">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <div class="card-title" style="margin-bottom: 0;">🤖 AI Coding Agents (Quick Launch)</div>
+          <button class="btn btn-ghost btn-sm" onclick="switchTab('ai')">Lihat Semua 10 AI Agents &rarr;</button>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-bottom: 14px;">
+          <div class="tool-card" style="padding: 10px 12px;">
+            <div class="tool-top">
+              <span class="tool-name" style="font-size: 12px;">🤖 Claude Code</span>
+              <span class="tool-badge badge-ready">● Ready</span>
+            </div>
+            <div style="display: flex; gap: 6px; margin-top: 8px;">
+              <button class="btn btn-primary btn-sm" style="flex: 1;" onclick="runQuick('cl')">Launch (cl)</button>
+              <button class="btn btn-ghost btn-sm" onclick="runQuick('claude --version')">v</button>
+            </div>
+          </div>
+          <div class="tool-card" style="padding: 10px 12px;">
+            <div class="tool-top">
+              <span class="tool-name" style="font-size: 12px;">⚡ Google Antigravity</span>
+              <span class="tool-badge badge-ready">● Ready</span>
+            </div>
+            <div style="display: flex; gap: 6px; margin-top: 8px;">
+              <button class="btn btn-primary btn-sm" style="flex: 1;" onclick="runQuick('ag')">Launch (ag)</button>
+              <button class="btn btn-ghost btn-sm" onclick="runQuick('agy --version')">v</button>
+            </div>
+          </div>
+          <div class="tool-card" style="padding: 10px 12px;">
+            <div class="tool-top">
+              <span class="tool-name" style="font-size: 12px;">🤝 Aider AI</span>
+              <span class="tool-badge badge-ready">● Ready</span>
+            </div>
+            <div style="display: flex; gap: 6px; margin-top: 8px;">
+              <button class="btn btn-primary btn-sm" style="flex: 1;" onclick="runQuick('ai')">Launch (ai)</button>
+              <button class="btn btn-ghost btn-sm" onclick="runQuick('aider --version')">v</button>
+            </div>
+          </div>
+          <div class="tool-card" style="padding: 10px 12px;">
+            <div class="tool-top">
+              <span class="tool-name" style="font-size: 12px;">⚡ Astral UV</span>
+              <span class="tool-badge badge-ready">● Ready</span>
+            </div>
+            <div style="display: flex; gap: 6px; margin-top: 8px;">
+              <button class="btn btn-secondary btn-sm" style="flex: 1;" onclick="runQuick('uv --version')">Check UV</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overview Quick Tools Installer Section -->
+      <div class="card">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <div class="card-title" style="margin-bottom: 0;">🛠️ Software & Developer Tools Catalog</div>
+          <button class="btn btn-primary btn-sm" onclick="switchTab('apps')">Buka Katalog Lengkap (40+ Tools) &rarr;</button>
+        </div>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
+          Tersedia 40+ paket software: Google Chrome, VS Code Server, GCC/Rust/Go Compilers, Ollama, Nginx, PostgreSQL, Docker CLI, dan Super Bundles.
+        </p>
+        <div class="actions-row">
+          <button class="btn btn-secondary btn-sm" onclick="switchTab('apps'); filterCategory('browsers');">🌐 Web Browsers</button>
+          <button class="btn btn-secondary btn-sm" onclick="switchTab('apps'); filterCategory('ai_ml');">🤖 AI & Coding Agents</button>
+          <button class="btn btn-secondary btn-sm" onclick="switchTab('apps'); filterCategory('programming');">💻 Compilers & Dev</button>
+          <button class="btn btn-secondary btn-sm" onclick="switchTab('apps'); filterCategory('bundles');">📦 Super Bundles</button>
+        </div>
+      </div>
     </section>
 
     <!-- ========================================================= -->
