@@ -683,7 +683,9 @@ EOF
     description: 'Autonomous AI agent & terminal TUI by Nous Research. File operations, Git workflows, MCP integrations, persistent sessions, skills, tool delegation.',
     checkCmd: 'which hermes || hermes --version 2>/dev/null || python3 -c "import hermes" 2>/dev/null',
     installScript: `
-      pip3 install --break-system-packages hermes-agent 2>/dev/null || curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/install.sh | bash 2>/dev/null || pip3 install --break-system-packages git+https://github.com/NousResearch/hermes-agent.git 2>/dev/null || true
+      export DEBIAN_FRONTEND=noninteractive
+      echo "==> [Hermes Agent] Memulai instalasi Hermes Agent via PyPI..."
+      pip3 install --break-system-packages hermes-agent || pip3 install --break-system-packages git+https://github.com/NousResearch/hermes-agent.git
       cat << 'EOF' > /root/Desktop/hermes.desktop
 [Desktop Entry]
 Version=1.0
@@ -696,6 +698,9 @@ Terminal=false
 Categories=Development;
 EOF
       chmod +x /root/Desktop/hermes.desktop 2>/dev/null || true
+      echo "==> [Hermes Agent] Verifikasi instalasi..."
+      which hermes && hermes --version 2>/dev/null || true
+      echo "==> [Hermes Agent] Berhasil terpasang! Ketik: hermes"
     `,
     uninstallScript: `
       pip3 uninstall -y hermes-agent 2>/dev/null || true
@@ -711,7 +716,12 @@ EOF
     description: 'AI Router/Proxy lokal (Port 20128) perantara Claude Code, Antigravity, Cursor, Aider, Codex, Gemini ke multiple providers (Claude, OpenAI, DeepSeek, Qwen, OpenRouter) dengan fallback & token saving.',
     checkCmd: '9router --version || which 9router',
     installScript: `
-      npm install -g 9router
+      export DEBIAN_FRONTEND=noninteractive
+      echo "==> [9Router] Mengunduh dan menginstal 9router dari npm global..."
+      npm install -g 9router --foreground-scripts || npm install -g 9router
+      echo "==> [9Router] Verifikasi instalasi..."
+      which 9router && 9router --version || true
+      echo "==> [9Router] Berhasil terpasang! Ketik: 9router (Port 20128)"
     `,
     uninstallScript: `
       pkill -f 9router 2>/dev/null || true
@@ -1970,9 +1980,12 @@ const server = http.createServer((req, res) => {
     }
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive'
+      'Cache-Control': 'no-cache, no-transform',
+      'Connection': 'keep-alive',
+      'X-Accel-Buffering': 'no',
+      'Access-Control-Allow-Origin': '*'
     });
+    res.write(`: ping\n\n`);
 
     if (currentInstall) {
       res.write(`data: ${JSON.stringify({ type: 'init', logs: currentInstall.logs, status: currentInstall.status })}\n\n`);

@@ -2200,41 +2200,74 @@ Ubuntu / Debian + XFCE4 Desktop + XRDP + Web Dashboard
       }
     }
 
-    // Install Drawer & Live Stream Logs
+    // Install Drawer & Live Stream Logs (Hybrid SSE + Polling Fallback)
     let installSse = null;
+    let installPollTimer = null;
+
     function openDrawer(title) {
       const drawer = document.getElementById('installDrawer');
       document.getElementById('drawerTitle').innerText = title;
-      document.getElementById('drawerConsole').innerText = 'Memulai proses...\n';
+      document.getElementById('drawerConsole').innerText = 'Memulai proses & menghubungkan terminal output...\n';
       drawer.style.display = 'block';
     }
 
     function closeDrawer() {
       document.getElementById('installDrawer').style.display = 'none';
-      if (installSse) installSse.close();
+      if (installSse) { installSse.close(); installSse = null; }
+      if (installPollTimer) { clearInterval(installPollTimer); installPollTimer = null; }
       loadTools();
     }
 
     function listenInstallLogs() {
-      if (installSse) installSse.close();
-      installSse = new EventSource('/api/tools/stream');
+      if (installSse) { installSse.close(); installSse = null; }
+      if (installPollTimer) { clearInterval(installPollTimer); installPollTimer = null; }
+
       const consoleBox = document.getElementById('drawerConsole');
-      
-      installSse.onmessage = (e) => {
+
+      try {
+        installSse = new EventSource('/api/tools/stream');
+        installSse.onmessage = (e) => {
+          try {
+            const ev = JSON.parse(e.data);
+            if (ev.type === 'init') {
+              consoleBox.innerText = ev.logs || '';
+            } else if (ev.type === 'data') {
+              consoleBox.innerText += ev.text;
+            } else if (ev.type === 'end') {
+              consoleBox.innerText += `\n[Status]: Selesai (${ev.install.status})`;
+              showToast('Proses ' + ev.install.toolName + ' selesai!');
+              if (installPollTimer) { clearInterval(installPollTimer); installPollTimer = null; }
+              loadTools();
+            }
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+          } catch (err) {}
+        };
+        installSse.onerror = () => {
+          // SSE reconnecting or blocked, fallback interval handles it
+        };
+      } catch (err) {}
+
+      // Polling fallback every 1000ms
+      installPollTimer = setInterval(async () => {
         try {
-          const ev = JSON.parse(e.data);
-          if (ev.type === 'init') {
-            consoleBox.innerText = ev.logs || '';
-          } else if (ev.type === 'data') {
-            consoleBox.innerText += ev.text;
-          } else if (ev.type === 'end') {
-            consoleBox.innerText += `\n[Status]: Selesai (${ev.install.status})`;
-            showToast('Proses ' + ev.install.toolName + ' selesai!');
-            loadTools();
+          const res = await fetch('/api/tools/install-status');
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.install) {
+              if (data.install.logs && data.install.logs.length >= consoleBox.innerText.length) {
+                consoleBox.innerText = data.install.logs;
+                consoleBox.scrollTop = consoleBox.scrollHeight;
+              }
+              if (data.install.status === 'success' || data.install.status === 'failed') {
+                clearInterval(installPollTimer);
+                installPollTimer = null;
+                showToast('Proses ' + data.install.toolName + ' selesai!');
+                loadTools();
+              }
+            }
           }
-          consoleBox.scrollTop = consoleBox.scrollHeight;
-        } catch (err) {}
-      };
+        } catch (e) {}
+      }, 1000);
     }
 
     // Server actions
