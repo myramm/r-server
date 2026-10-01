@@ -234,7 +234,7 @@ fi
 if command -v xrdp >/dev/null 2>&1; then
     msg "Starting XRDP Remote Desktop service on port 3389..." "Starting XRDP Remote Desktop service on port 3389..."
     # Ensure DBus system daemon is running for desktop sessions
-    mkdir -p /var/run/dbus /var/run/xrdp /var/log/xrdp
+    mkdir -p /var/run/dbus /var/run/xrdp /var/log/xrdp /root/Desktop /etc/skel/Desktop
     [ -f /var/lib/dbus/machine-id ] || dbus-uuidgen > /var/lib/dbus/machine-id 2>/dev/null || true
     service dbus start 2>/dev/null || true
     
@@ -247,6 +247,42 @@ if command -v xrdp >/dev/null 2>&1; then
         chown "$SSH_USERNAME:$SSH_USERNAME" "/home/$SSH_USERNAME/.xsession"
     fi
     adduser xrdp ssl-cert 2>/dev/null || true
+
+    # Configure root-safe wrappers for Web Browsers (Chrome, Chromium, Brave)
+    if [ -f /usr/bin/google-chrome-stable ] || [ -f /usr/bin/google-chrome ]; then
+        cat << 'EOF' > /usr/local/bin/google-chrome-stable
+#!/bin/bash
+exec /usr/bin/google-chrome-stable --no-sandbox --disable-dev-shm-usage --disable-gpu "$@"
+EOF
+        chmod +x /usr/local/bin/google-chrome-stable
+        cp /usr/local/bin/google-chrome-stable /usr/local/bin/chrome 2>/dev/null || true
+        cp /usr/local/bin/google-chrome-stable /usr/local/bin/google-chrome 2>/dev/null || true
+    fi
+
+    if [ -f /usr/bin/chromium ] || [ -f /usr/bin/chromium-browser ]; then
+        cat << 'EOF' > /usr/local/bin/chromium-browser
+#!/bin/bash
+exec /usr/bin/chromium --no-sandbox --disable-dev-shm-usage "$@"
+EOF
+        chmod +x /usr/local/bin/chromium-browser
+        cp /usr/local/bin/chromium-browser /usr/local/bin/chromium 2>/dev/null || true
+    fi
+
+    if [ -f /usr/bin/brave-browser-stable ] || [ -f /usr/bin/brave-browser ]; then
+        cat << 'EOF' > /usr/local/bin/brave-browser-stable
+#!/bin/bash
+exec /usr/bin/brave-browser-stable --no-sandbox --disable-dev-shm-usage "$@"
+EOF
+        chmod +x /usr/local/bin/brave-browser-stable
+    fi
+
+    # Create Desktop shortcuts
+    for d_file in /usr/share/applications/google-chrome.desktop /usr/share/applications/chromium.desktop /usr/share/applications/chromium-browser.desktop /usr/share/applications/firefox-esr.desktop /usr/share/applications/firefox.desktop /usr/share/applications/brave-browser.desktop /usr/share/applications/xfce4-terminal.desktop; do
+        if [ -f "$d_file" ]; then
+            cp "$d_file" /root/Desktop/ 2>/dev/null || true
+        fi
+    done
+    chmod +x /root/Desktop/*.desktop 2>/dev/null || true
     
     # Clean up stale PID and socket files
     rm -f /var/run/xrdp/xrdp.pid /var/run/xrdp/xrdp-sesman.pid /var/run/xrdp.pid /var/run/xrdp-sesman.pid 2>/dev/null || true

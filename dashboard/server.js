@@ -1,15 +1,18 @@
 const http = require('http');
 const fs = require('fs');
 const os = require('os');
-const { exec, execSync } = require('child_process');
+const { exec, execSync, spawn } = require('child_process');
 const crypto = require('crypto');
 const path = require('path');
+const EventEmitter = require('events');
 
 const PORT = parseInt(process.env.PORT || '8080', 10);
 const HOST = '0.0.0.0';
 const ROOT_PASSWORD = process.env.ROOT_PASSWORD || process.env.SSH_PASSWORD || 'RamaGans76_';
 const activeSessions = new Set();
 const failedAttempts = new Map();
+const installEmitter = new EventEmitter();
+let currentInstall = null;
 
 const LOGIN_HTML = fs.readFileSync(path.join(__dirname, 'views/login.html'), 'utf8');
 const DASHBOARD_HTML = fs.readFileSync(path.join(__dirname, 'views/index.html'), 'utf8');
@@ -178,13 +181,432 @@ function getTopProcesses() {
   }
 }
 
-// Check AI tools
+// -------------------------------------------------------------
+// Comprehensive Tools Catalog (Browsers, AI, Remote Desktop, Dev)
+// -------------------------------------------------------------
+const TOOLS_CATALOG = [
+  // 1. Browsers for XRDP / GUI
+  {
+    id: 'chrome',
+    name: 'Google Chrome',
+    icon: '🌐',
+    category: 'browsers',
+    categoryName: 'Web Browsers (XRDP)',
+    description: 'Browser resmi Google Chrome 64-bit lengkap dengan auto-wrapper --no-sandbox untuk root XRDP.',
+    checkCmd: 'google-chrome --version || google-chrome-stable --version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y
+      apt-get install -y wget curl ca-certificates libxss1 libappindicator1 libindicator7 libasound2 libgbm1 fonts-liberation xdg-utils
+      wget -q -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+      dpkg -i /tmp/chrome.deb || apt-get install -fy
+      rm -f /tmp/chrome.deb
+      mkdir -p /root/Desktop /etc/skel/Desktop
+      cat << 'EOF' > /usr/local/bin/google-chrome-stable
+#!/bin/bash
+exec /usr/bin/google-chrome-stable --no-sandbox --disable-dev-shm-usage --disable-gpu "$@"
+EOF
+      chmod +x /usr/local/bin/google-chrome-stable
+      cp /usr/local/bin/google-chrome-stable /usr/local/bin/chrome 2>/dev/null || true
+      cp /usr/local/bin/google-chrome-stable /usr/local/bin/google-chrome 2>/dev/null || true
+      if [ -f /usr/share/applications/google-chrome.desktop ]; then
+        cp /usr/share/applications/google-chrome.desktop /root/Desktop/
+        chmod +x /root/Desktop/google-chrome.desktop
+      fi
+    `
+  },
+  {
+    id: 'chromium',
+    name: 'Chromium Browser',
+    icon: '🧭',
+    category: 'browsers',
+    categoryName: 'Web Browsers (XRDP)',
+    description: 'Browser open-source cepat & ringan berbasis engine Chromium dengan konfigurasi sandbox.',
+    checkCmd: 'chromium --version || chromium-browser --version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y
+      apt-get install -y chromium chromium-common || apt-get install -y chromium-browser
+      cat << 'EOF' > /usr/local/bin/chromium-browser
+#!/bin/bash
+exec /usr/bin/chromium --no-sandbox --disable-dev-shm-usage "$@"
+EOF
+      chmod +x /usr/local/bin/chromium-browser
+      cp /usr/local/bin/chromium-browser /usr/local/bin/chromium 2>/dev/null || true
+      mkdir -p /root/Desktop
+      if [ -f /usr/share/applications/chromium.desktop ]; then
+        cp /usr/share/applications/chromium.desktop /root/Desktop/
+        chmod +x /root/Desktop/chromium.desktop
+      elif [ -f /usr/share/applications/chromium-browser.desktop ]; then
+        cp /usr/share/applications/chromium-browser.desktop /root/Desktop/
+        chmod +x /root/Desktop/chromium-browser.desktop
+      fi
+    `
+  },
+  {
+    id: 'firefox',
+    name: 'Mozilla Firefox',
+    icon: '🦊',
+    category: 'browsers',
+    categoryName: 'Web Browsers (XRDP)',
+    description: 'Browser modern Mozilla Firefox ESR yang aman, stabil, dan ramah memory di remote desktop.',
+    checkCmd: 'firefox --version || firefox-esr --version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y
+      apt-get install -y firefox-esr || apt-get install -y firefox
+      mkdir -p /root/Desktop
+      if [ -f /usr/share/applications/firefox-esr.desktop ]; then
+        cp /usr/share/applications/firefox-esr.desktop /root/Desktop/
+        chmod +x /root/Desktop/firefox-esr.desktop
+      elif [ -f /usr/share/applications/firefox.desktop ]; then
+        cp /usr/share/applications/firefox.desktop /root/Desktop/
+        chmod +x /root/Desktop/firefox.desktop
+      fi
+    `
+  },
+  {
+    id: 'brave',
+    name: 'Brave Browser',
+    icon: '🦁',
+    category: 'browsers',
+    categoryName: 'Web Browsers (XRDP)',
+    description: 'Browser privasi dengan built-in ad blocker dan perlindungan tracking.',
+    checkCmd: 'brave-browser --version || brave --version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y
+      apt-get install -y curl ca-certificates
+      curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+      echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" > /etc/apt/sources.list.d/brave-browser-release.list
+      apt-get update -y
+      apt-get install -y brave-browser
+      cat << 'EOF' > /usr/local/bin/brave-browser-stable
+#!/bin/bash
+exec /usr/bin/brave-browser-stable --no-sandbox --disable-dev-shm-usage "$@"
+EOF
+      chmod +x /usr/local/bin/brave-browser-stable
+      mkdir -p /root/Desktop
+      if [ -f /usr/share/applications/brave-browser.desktop ]; then
+        cp /usr/share/applications/brave-browser.desktop /root/Desktop/
+        chmod +x /root/Desktop/brave-browser.desktop
+      fi
+    `
+  },
+
+  // 2. AI Coding Agents
+  {
+    id: 'claude',
+    name: 'Claude Code CLI',
+    icon: '🤖',
+    category: 'ai',
+    categoryName: 'AI Coding Agents',
+    description: 'Official terminal coding agent by Anthropic (perintah: claude / cl).',
+    checkCmd: 'claude --version',
+    installScript: `
+      npm install -g @anthropic-ai/claude-code
+    `
+  },
+  {
+    id: 'agy',
+    name: 'Google Antigravity CLI',
+    icon: '⚡',
+    category: 'ai',
+    categoryName: 'AI Coding Agents',
+    description: 'Google Antigravity autonomous developer & pair programming assistant (perintah: agy / ag).',
+    checkCmd: 'agy --version',
+    installScript: `
+      curl -fsSL https://antigravity.google/cli/install.sh | bash -s -- --dir /usr/local/bin
+      ln -sf /usr/local/bin/agy /usr/local/bin/antigravity 2>/dev/null || true
+    `
+  },
+  {
+    id: 'aider',
+    name: 'Aider AI Pair Programming',
+    icon: '🤝',
+    category: 'ai',
+    categoryName: 'AI Coding Agents',
+    description: 'AI pair programmer langsung di git repo terminal (perintah: aider).',
+    checkCmd: 'aider --version',
+    installScript: `
+      pip3 install --break-system-packages aider-chat || pip3 install aider-chat
+    `
+  },
+
+  // 3. Remote Desktop & Workstation
+  {
+    id: 'xrdp',
+    name: 'XRDP + XFCE4 GUI',
+    icon: '🖥️',
+    category: 'desktop',
+    categoryName: 'Desktop & GUI',
+    description: 'Remote Desktop Protocol server & lightweight XFCE4 GUI environment (Port 3389).',
+    checkCmd: 'which xrdp && which xfce4-session',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y
+      apt-get install -y xrdp xorgxrdp xfce4 xfce4-goodies dbus dbus-x11 x11-xserver-utils
+      mkdir -p /var/run/dbus /var/run/xrdp /var/log/xrdp /root/Desktop /etc/skel/Desktop
+      echo "startxfce4" > /root/.xsession
+      echo "startxfce4" > /etc/skel/.xsession
+      chmod 644 /root/.xsession /etc/skel/.xsession
+      adduser xrdp ssl-cert 2>/dev/null || true
+      service dbus start 2>/dev/null || true
+      /usr/sbin/xrdp-sesman 2>/dev/null || true
+      /usr/sbin/xrdp 2>/dev/null || true
+    `
+  },
+  {
+    id: 'vscode',
+    name: 'VS Code Server',
+    icon: '💻',
+    category: 'desktop',
+    categoryName: 'Desktop & GUI',
+    description: 'Visual Studio Code versi Web Server (code-server) dapat diakses langsung via browser.',
+    checkCmd: 'code-server --version || code --version',
+    installScript: `
+      curl -fsSL https://code-server.dev/install.sh | sh
+    `
+  },
+
+  // 4. Developer & Media Tools
+  {
+    id: 'ffmpeg',
+    name: 'FFmpeg Suite',
+    icon: '🎬',
+    category: 'dev',
+    categoryName: 'Dev & Media Tools',
+    description: 'Media processing engine audio/video encoding, streaming, remuxing & subtitle handling.',
+    checkCmd: 'ffmpeg -version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y ffmpeg
+    `
+  },
+  {
+    id: 'ytdlp',
+    name: 'YT-DLP Downloader',
+    icon: '📥',
+    category: 'dev',
+    categoryName: 'Dev & Media Tools',
+    description: 'Downloader video/audio serbaguna berkecepatan tinggi dari YouTube & 1000+ website.',
+    checkCmd: 'yt-dlp --version',
+    installScript: `
+      curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
+      chmod a+rx /usr/local/bin/yt-dlp
+    `
+  },
+  {
+    id: 'python_dev',
+    name: 'Python 3 Dev & PIP',
+    icon: '🐍',
+    category: 'dev',
+    categoryName: 'Dev & Media Tools',
+    description: 'Python 3, PIP3, virtualenv, python-dev header & compiler build-essential.',
+    checkCmd: 'python3 --version && pip3 --version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y python3 python3-pip python3-venv python3-dev build-essential
+    `
+  },
+  {
+    id: 'nodejs',
+    name: 'Node.js LTS & NPM',
+    icon: '🟢',
+    category: 'dev',
+    categoryName: 'Dev & Media Tools',
+    description: 'Node.js JavaScript runtime environment & package manager NPM / n version manager.',
+    checkCmd: 'node -v && npm -v',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y nodejs npm
+      npm install -g n
+      n lts
+    `
+  },
+  {
+    id: 'docker',
+    name: 'Docker CLI & Tools',
+    icon: '🐳',
+    category: 'dev',
+    categoryName: 'Dev & Media Tools',
+    description: 'Docker container CLI & Docker Compose untuk menjalankan multi-container app.',
+    checkCmd: 'docker --version || which docker',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y docker.io docker-compose || (curl -fsSL https://get.docker.com | sh)
+    `
+  },
+  {
+    id: 'nginx',
+    name: 'Nginx Web Server',
+    icon: '🌐',
+    category: 'dev',
+    categoryName: 'Dev & Media Tools',
+    description: 'High performance HTTP/Reverse Proxy server untuk host website & API.',
+    checkCmd: 'nginx -v',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y nginx
+      service nginx start 2>/dev/null || true
+    `
+  },
+  {
+    id: 'redis',
+    name: 'Redis Database',
+    icon: '🗄️',
+    category: 'dev',
+    categoryName: 'Dev & Media Tools',
+    description: 'In-memory data structure store & fast key-value caching server.',
+    checkCmd: 'redis-cli --version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y redis-server redis-tools
+      service redis-server start 2>/dev/null || true
+    `
+  },
+  {
+    id: 'fastfetch',
+    name: 'Fastfetch & Neofetch',
+    icon: '📊',
+    category: 'dev',
+    categoryName: 'Dev & Media Tools',
+    description: 'System info tool untuk menampilkan ringkasan OS, hardware, logo, dan spec di terminal.',
+    checkCmd: 'fastfetch --version || neofetch --version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y
+      apt-get install -y neofetch 2>/dev/null || true
+      curl -fsSL https://raw.githubusercontent.com/dylanaraps/neofetch/master/neofetch -o /usr/local/bin/neofetch
+      chmod +x /usr/local/bin/neofetch
+      (curl -fsSL https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.deb -o /tmp/fastfetch.deb && dpkg -i /tmp/fastfetch.deb && rm -f /tmp/fastfetch.deb) 2>/dev/null || true
+    `
+  },
+  {
+    id: 'dev_essentials',
+    name: 'Terminal Super Tools',
+    icon: '🛠️',
+    category: 'dev',
+    categoryName: 'Dev & Media Tools',
+    description: 'Kumpulan tool esensial: htop, btop, tmux, zsh, git, curl, wget, zip, unzip, nano, micro, vim, tree.',
+    checkCmd: 'which htop && which tmux && which zsh && which git',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y
+      apt-get install -y htop btop tmux screen zsh git curl wget zip unzip tar gzip bzip2 xz-utils p7zip-full nano vim micro tree jq bat ripgrep fd-find
+    `
+  }
+];
+
+function getToolsList() {
+  return TOOLS_CATALOG.map(tool => {
+    let installed = false;
+    let version = null;
+    try {
+      const out = execSync(tool.checkCmd, { encoding: 'utf8', timeout: 3000, stdio: ['pipe', 'pipe', 'ignore'] });
+      installed = true;
+      const firstLine = out.trim().split('\n')[0].substring(0, 60);
+      version = firstLine || 'Installed';
+    } catch (e) {
+      installed = false;
+      version = null;
+    }
+    const isInstalling = currentInstall && currentInstall.id === tool.id && currentInstall.status === 'running';
+    return {
+      id: tool.id,
+      name: tool.name,
+      icon: tool.icon,
+      category: tool.category,
+      categoryName: tool.categoryName,
+      description: tool.description,
+      installed,
+      version,
+      isInstalling,
+    };
+  });
+}
+
+function startToolInstall(toolId, customCmd = null) {
+  if (currentInstall && currentInstall.status === 'running') {
+    throw new Error(`Instalasi lain sedang berjalan: ${currentInstall.toolName}`);
+  }
+
+  let commandToRun = '';
+  let toolName = 'Custom Package';
+
+  if (toolId) {
+    const tool = TOOLS_CATALOG.find(t => t.id === toolId);
+    if (!tool) throw new Error(`Tool ID '${toolId}' tidak ditemukan.`);
+    commandToRun = tool.installScript;
+    toolName = tool.name;
+  } else if (customCmd) {
+    commandToRun = customCmd;
+    toolName = `Custom: ${customCmd.substring(0, 30)}`;
+  } else {
+    throw new Error('Tidak ada tool atau command yang ditentukan.');
+  }
+
+  currentInstall = {
+    id: toolId || 'custom',
+    toolName,
+    status: 'running',
+    logs: `[${new Date().toLocaleTimeString()}] Memulai instalasi ${toolName}...\n----------------------------------------\n`,
+    startTime: Date.now(),
+    exitCode: null,
+  };
+
+  installEmitter.emit('log', { type: 'start', install: currentInstall });
+
+  const child = spawn('bash', ['-c', commandToRun], {
+    env: {
+      ...process.env,
+      DEBIAN_FRONTEND: 'noninteractive',
+      TERM: 'xterm-256color',
+    }
+  });
+
+  child.stdout.on('data', (data) => {
+    const text = data.toString();
+    currentInstall.logs += text;
+    installEmitter.emit('log', { type: 'data', text });
+  });
+
+  child.stderr.on('data', (data) => {
+    const text = data.toString();
+    currentInstall.logs += text;
+    installEmitter.emit('log', { type: 'data', text });
+  });
+
+  child.on('close', (code) => {
+    currentInstall.exitCode = code;
+    currentInstall.status = code === 0 ? 'success' : 'failed';
+    const endMsg = `\n----------------------------------------\n[${new Date().toLocaleTimeString()}] Selesai! Status: ${code === 0 ? 'BERHASIL (Success ✅)' : 'GAGAL (Exit Code ' + code + ' ❌)'}\n`;
+    currentInstall.logs += endMsg;
+    installEmitter.emit('log', { type: 'end', install: currentInstall });
+  });
+
+  child.on('error', (err) => {
+    currentInstall.exitCode = 1;
+    currentInstall.status = 'failed';
+    const errMsg = `\n[ERROR]: ${err.message}\n`;
+    currentInstall.logs += errMsg;
+    installEmitter.emit('log', { type: 'error', error: err.message });
+  });
+
+  return currentInstall;
+}
+
+// Check AI tools (compact)
 function getToolsStatus() {
   let claude = false;
   let agy = false;
+  let chrome = false;
+  let xrdp = false;
   try { execSync('which claude'); claude = true; } catch (e) {}
   try { execSync('which agy'); agy = true; } catch (e) {}
-  return { claude, agy };
+  try { execSync('which google-chrome || which chromium'); chrome = true; } catch (e) {}
+  try { execSync('which xrdp'); xrdp = true; } catch (e) {}
+  return { claude, agy, chrome, xrdp };
 }
 
 // Usage & Credit metrics calculation
@@ -414,6 +836,111 @@ const server = http.createServer((req, res) => {
     sendData();
     const interval = setInterval(sendData, 2000);
     req.on('close', () => clearInterval(interval));
+    return;
+  }
+
+  // -------------------------------------------------------------
+  // Tool Installer APIs
+  // -------------------------------------------------------------
+
+  // GET /api/tools: Get list of tools with installation status
+  if (url.pathname === '/api/tools' && req.method === 'GET') {
+    if (!isAuthenticated(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ error: 'Unauthorized' }));
+    }
+    try {
+      const tools = getToolsList();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({
+        tools,
+        currentInstall: currentInstall ? {
+          id: currentInstall.id,
+          toolName: currentInstall.toolName,
+          status: currentInstall.status,
+          exitCode: currentInstall.exitCode,
+          startTime: currentInstall.startTime,
+        } : null
+      }));
+    } catch (err) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ error: err.message }));
+    }
+  }
+
+  // POST /api/tools/install: Trigger installation of a tool
+  if (url.pathname === '/api/tools/install' && req.method === 'POST') {
+    if (!isAuthenticated(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ error: 'Unauthorized' }));
+    }
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const { toolId, customCmd } = JSON.parse(body);
+        const installJob = startToolInstall(toolId, customCmd);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({
+          success: true,
+          message: `Instalasi ${installJob.toolName} dimulai.`,
+          install: {
+            id: installJob.id,
+            toolName: installJob.toolName,
+            status: installJob.status
+          }
+        }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // GET /api/tools/install-status: Get live status & logs of installation
+  if (url.pathname === '/api/tools/install-status') {
+    if (!isAuthenticated(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ error: 'Unauthorized' }));
+    }
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({
+      install: currentInstall ? {
+        id: currentInstall.id,
+        toolName: currentInstall.toolName,
+        status: currentInstall.status,
+        logs: currentInstall.logs,
+        exitCode: currentInstall.exitCode,
+        startTime: currentInstall.startTime,
+      } : null
+    }));
+  }
+
+  // GET /api/tools/stream: SSE for live real-time installation logs
+  if (url.pathname === '/api/tools/stream') {
+    if (!isAuthenticated(req)) {
+      res.writeHead(401, { 'Content-Type': 'text/plain' });
+      return res.end('Unauthorized');
+    }
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive'
+    });
+
+    if (currentInstall) {
+      res.write(`data: ${JSON.stringify({ type: 'init', logs: currentInstall.logs, status: currentInstall.status })}\n\n`);
+    }
+
+    const logListener = (event) => {
+      try {
+        res.write(`data: ${JSON.stringify(event)}\n\n`);
+      } catch (e) {}
+    };
+
+    installEmitter.on('log', logListener);
+    req.on('close', () => installEmitter.removeListener('log', logListener));
     return;
   }
 

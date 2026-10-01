@@ -160,6 +160,13 @@
     .btn-primary:hover {
       box-shadow: 0 4px 15px rgba(37, 99, 235, 0.5);
     }
+    .btn-emerald {
+      background: linear-gradient(135deg, #059669, #10b981);
+      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+    }
+    .btn-emerald:hover {
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.5);
+    }
     .btn-ghost {
       background: rgba(255, 255, 255, 0.05);
       border-color: var(--card-border);
@@ -311,6 +318,7 @@
     /* Tabs & Content */
     .tabs-nav {
       display: flex;
+      flex-wrap: wrap;
       gap: 8px;
       border-bottom: 1px solid var(--card-border);
       margin-bottom: 18px;
@@ -328,9 +336,14 @@
       transition: all 0.2s;
       font-family: inherit;
     }
+    .tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
     .tab-btn.active {
       background: rgba(59, 130, 246, 0.15);
       color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
     }
 
     /* Process Table */
@@ -437,6 +450,232 @@
       border-color: rgba(59, 130, 246, 0.3);
     }
 
+    /* -------------------------------------------------------------
+       Tool & Browser Installer Styles
+       ------------------------------------------------------------- */
+    .installer-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .cat-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .cat-pill {
+      padding: 6px 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .cat-pill:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+    .cat-pill.active {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: rgba(59, 130, 246, 0.5);
+      color: #60a5fa;
+    }
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .tool-card {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .tool-card:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+    .tool-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .tool-icon-box {
+      font-size: 26px;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+    .tool-title-wrap {
+      flex: 1;
+    }
+    .tool-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tool-cat-badge {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-top: 2px;
+      display: block;
+    }
+    .tool-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 14px;
+      flex: 1;
+    }
+    .tool-status-badge {
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 12px;
+      width: fit-content;
+    }
+    .badge-installed {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+    }
+    .badge-not-installed {
+      background: rgba(148, 163, 184, 0.1);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: #94a3b8;
+    }
+    .badge-installing {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #fbbf24;
+      animation: pulse 1.5s infinite;
+    }
+    .tool-btn-row {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-install {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: #fff;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .btn-install-primary {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+    }
+    .btn-install-primary:hover {
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+    .btn-install-re {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+    }
+    .btn-install-re:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    /* Install Log Drawer / Terminal */
+    .install-drawer {
+      background: #040711;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 20px;
+      display: none;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    }
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 10px;
+    }
+    .drawer-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #60a5fa;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .install-console {
+      height: 220px;
+      overflow-y: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #38bdf8;
+      background: #02040a;
+      padding: 12px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+
+    /* Custom Package Box */
+    .custom-pkg-card {
+      background: rgba(30, 41, 59, 0.4);
+      border: 1px dashed var(--card-border);
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      justify-content: space-between;
+    }
+    .custom-pkg-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     /* Toast */
     .toast {
       position: fixed;
@@ -448,22 +687,23 @@
       border-radius: 12px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(12px);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
       display: none;
       align-items: center;
       gap: 10px;
-      font-size: 13px;
-      font-weight: 500;
       z-index: 1000;
-      animation: slideUp 0.3s ease;
+      animation: slideIn 0.3s ease;
     }
-    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
     /* Modal */
     .modal-overlay {
       position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
+      inset: 0;
       background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(6px);
+      backdrop-filter: blur(8px);
       display: none;
       align-items: center;
       justify-content: center;
@@ -473,11 +713,12 @@
     .modal-content {
       background: #0f172a;
       border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 28px;
+      border-radius: 18px;
+      padding: 24px;
       max-width: 440px;
       width: 100%;
       text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
     }
   </style>
 </head>
@@ -489,13 +730,16 @@
       <div class="brand-section">
         <div class="brand-logo">R</div>
         <div class="brand-title">
-          <h1>R-SERVER <span class="live-badge"><span class="live-dot"></span> ONLINE</span></h1>
-          <p class="brand-subtitle">Cloud Workstation · Debian 12 (Bookworm)</p>
+          <h1>
+            <span>R-SERVER CLOUD</span>
+            <span class="live-badge"><span class="live-dot"></span> LIVE DASHBOARD</span>
+          </h1>
+          <div class="brand-subtitle">High Performance Debian 12 · AI Agents · Remote Desktop XRDP · Tools Installer</div>
         </div>
       </div>
       <div class="header-actions">
         <button class="btn-action btn-ghost" onclick="toggleAutoRefresh()" id="refreshToggleBtn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
           <span id="refreshStatusText">Auto-Refresh (2s)</span>
         </button>
         <button class="btn-action btn-ghost" onclick="handleLogout()">
@@ -681,16 +925,68 @@
       </div>
     </div>
 
-    <!-- Management Section: Processes & Terminal -->
+    <!-- Management Section: Tool Installer, Processes, Terminal & Access -->
     <div class="card" style="padding: 20px;">
       <div class="tabs-nav">
-        <button class="tab-btn active" onclick="switchTab('processes', event)">Top Processes (RAM/CPU)</button>
-        <button class="tab-btn" onclick="switchTab('terminal', event)">Web Terminal / Command Runner</button>
-        <button class="tab-btn" onclick="switchTab('access', event)">SSH & Connection Info</button>
+        <button class="tab-btn active" onclick="switchTab('installer', event)">🛠️ Tool & Browser Installer</button>
+        <button class="tab-btn" onclick="switchTab('processes', event)">Top Processes (RAM/CPU)</button>
+        <button class="tab-btn" onclick="switchTab('terminal', event)">Web Terminal / Console</button>
+        <button class="tab-btn" onclick="switchTab('access', event)">SSH & XRDP Connection Info</button>
+      </div>
+
+      <!-- Tab: Tool & Browser Installer (1-Click Package Manager) -->
+      <div id="tab-installer">
+        <div class="installer-header">
+          <div class="cat-pills">
+            <button class="cat-pill active" onclick="filterCategory('all', event)">✨ Semua Tool</button>
+            <button class="cat-pill" onclick="filterCategory('browsers', event)">🌐 Web Browsers (XRDP)</button>
+            <button class="cat-pill" onclick="filterCategory('ai', event)">🤖 AI Coding Agents</button>
+            <button class="cat-pill" onclick="filterCategory('desktop', event)">🖥️ Desktop & GUI</button>
+            <button class="cat-pill" onclick="filterCategory('dev', event)">⚙️ Dev & Media</button>
+          </div>
+          <button class="btn-action btn-ghost" onclick="fetchToolsList()" style="padding: 6px 12px; font-size: 12px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+            <span>Refresh Status</span>
+          </button>
+        </div>
+
+        <!-- Tool Cards Grid -->
+        <div class="tools-grid" id="toolsGrid">
+          <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-dim);">
+            Memuat daftar tools dan browser...
+          </div>
+        </div>
+
+        <!-- Custom Package Installer Card -->
+        <div class="custom-pkg-card">
+          <div class="custom-pkg-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+            <span>Custom Package Installer (APT / NPM / PIP):</span>
+          </div>
+          <form onsubmit="handleCustomInstall(event)" style="display: flex; gap: 8px; flex: 1; min-width: 280px;">
+            <input type="text" id="customPkgInput" class="terminal-input" style="padding: 8px 12px; font-size: 12px;" placeholder="e.g. apt-get install -y wireshark, pip3 install flask..." autocomplete="off">
+            <button type="submit" class="btn-action btn-primary" style="padding: 8px 16px; font-size: 12px;">Install</button>
+          </form>
+        </div>
+
+        <!-- Live Real-Time Installation Log Console Drawer -->
+        <div class="install-drawer" id="installLogDrawer">
+          <div class="drawer-header">
+            <div class="drawer-title">
+              <span id="drawerSpinner" class="live-dot" style="background:#60a5fa; box-shadow:0 0 8px #60a5fa;"></span>
+              <span id="drawerTitle">Live Installation Console</span>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-action btn-ghost" onclick="clearInstallLogs()" style="padding: 4px 10px; font-size: 11px;">Clear</button>
+              <button class="btn-action btn-ghost" onclick="closeInstallDrawer()" style="padding: 4px 10px; font-size: 11px;">Close Drawer</button>
+            </div>
+          </div>
+          <div class="install-console" id="installConsoleOutput">Menunggu log instalasi...</div>
+        </div>
       </div>
 
       <!-- Tab: Processes -->
-      <div id="tab-processes">
+      <div id="tab-processes" style="display: none;">
         <div class="table-container">
           <table>
             <thead>
@@ -716,10 +1012,11 @@
         <div class="terminal-box">
           <div class="terminal-output" id="termOutput">R-SERVER Terminal Console [Ready]&#10;Type any bash command and press Enter (or click Quick Shortcuts below)...&#10;</div>
           <form onsubmit="execTerminal(event)" class="terminal-input-row">
-            <input type="text" id="termInput" class="terminal-input" placeholder="e.g. free -h, df -h, ps aux, agy --version, node -v..." autocomplete="off">
+            <input type="text" id="termInput" class="terminal-input" placeholder="e.g. free -h, df -h, ps aux, google-chrome --version, agy --version..." autocomplete="off">
             <button type="submit" class="btn-action btn-primary">Run</button>
           </form>
           <div class="quick-cmds">
+            <span class="cmd-pill" onclick="quickCmd('google-chrome --version || chromium --version')">browser --version</span>
             <span class="cmd-pill" onclick="quickCmd('free -h')">free -h</span>
             <span class="cmd-pill" onclick="quickCmd('df -h')">df -h</span>
             <span class="cmd-pill" onclick="quickCmd('uptime')">uptime</span>
@@ -734,15 +1031,19 @@
       <!-- Tab: Connection Guide -->
       <div id="tab-access" style="display: none;">
         <div style="font-size: 13px; line-height: 1.7; color: var(--text-muted);">
-          <p style="margin-bottom: 12px; color: #fff; font-weight: 600;">Cara Koneksi SSH Terminal:</p>
+          <p style="margin-bottom: 8px; color: #fff; font-weight: 700;">🔑 Akses SSH Terminal (Root):</p>
           <div style="background: #050811; padding: 14px; border-radius: 10px; font-family: 'JetBrains Mono', monospace; color: #38bdf8; margin-bottom: 16px;">
-            ssh -p 22000 root@altaria.proxy.rlwy.net
+            ssh -p &lt;PORT_SSH&gt; root@&lt;IP_ADDRESS&gt;
           </div>
-          <p style="margin-bottom: 8px;">Koneksi langsung via IP:</p>
-          <div style="background: #050811; padding: 14px; border-radius: 10px; font-family: 'JetBrains Mono', monospace; color: #38bdf8; margin-bottom: 16px;">
-            ssh -p 22000 root@66.33.22.220
+
+          <p style="margin-bottom: 8px; color: #fff; font-weight: 700;">🖥️ Akses Remote Desktop GUI (XRDP / XFCE4):</p>
+          <div style="background: #050811; padding: 14px; border-radius: 10px; font-family: 'JetBrains Mono', monospace; color: #34d399; margin-bottom: 16px;">
+            • Client: Microsoft Remote Desktop (RD Client)<br>
+            • PC Name / Host: &lt;IP_ADDRESS&gt;:&lt;PORT_RDP&gt;<br>
+            • User: root<br>
+            • Password: (Password root VPS Anda)
           </div>
-          <p>Password root / login: <strong style="color: #fff; font-family: 'JetBrains Mono', monospace;">RamaGans76_</strong></p>
+          <p>💡 <em>Tip: Setelah login ke Remote Desktop, browser (Google Chrome / Chromium / Firefox) dapat langsung dibuka dari Desktop Icon atau Start Menu.</em></p>
         </div>
       </div>
     </div>
@@ -768,7 +1069,10 @@
   <script>
     let isAutoRefresh = true;
     let eventSource = null;
+    let toolEventSource = null;
     let pendingAction = null;
+    let cachedTools = [];
+    let currentCategory = 'all';
 
     function showToast(text, duration = 3000) {
       const toast = document.getElementById('toast');
@@ -912,12 +1216,197 @@
 
     function switchTab(tabId, ev) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-installer').style.display = 'none';
       document.getElementById('tab-processes').style.display = 'none';
       document.getElementById('tab-terminal').style.display = 'none';
       document.getElementById('tab-access').style.display = 'none';
 
       if (ev && ev.target) ev.target.classList.add('active');
       document.getElementById('tab-' + tabId).style.display = 'block';
+
+      if (tabId === 'installer') {
+        fetchToolsList();
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Tool & Browser Installer Client Logic
+    // -------------------------------------------------------------
+    async function fetchToolsList() {
+      try {
+        const res = await fetch('/api/tools');
+        if (res.status === 401) return window.location.reload();
+        const data = await res.json();
+        cachedTools = data.tools || [];
+        renderToolsGrid();
+
+        if (data.currentInstall && data.currentInstall.status === 'running') {
+          openInstallDrawer(data.currentInstall.toolName);
+          attachInstallStream();
+        }
+      } catch (err) {
+        document.getElementById('toolsGrid').innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#ef4444;">Gagal memuat status tools: ' + err.message + '</div>';
+      }
+    }
+
+    function filterCategory(cat, ev) {
+      currentCategory = cat;
+      document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+      if (ev && ev.target) ev.target.classList.add('active');
+      renderToolsGrid();
+    }
+
+    function renderToolsGrid() {
+      const grid = document.getElementById('toolsGrid');
+      if (!cachedTools || cachedTools.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:var(--text-dim);">Tidak ada tools yang tersedia.</div>';
+        return;
+      }
+
+      const filtered = currentCategory === 'all' ? cachedTools : cachedTools.filter(t => t.category === currentCategory);
+      let html = '';
+
+      filtered.forEach(tool => {
+        let statusBadge = '';
+        let btnText = '🚀 Install';
+        let btnClass = 'btn-install-primary';
+
+        if (tool.isInstalling) {
+          statusBadge = '<span class="tool-status-badge badge-installing">⏳ Sedang Menginstal...</span>';
+          btnText = '⏳ Installing...';
+        } else if (tool.installed) {
+          const verDisplay = tool.version ? tool.version.substring(0, 24) : 'Ready';
+          statusBadge = '<span class="tool-status-badge badge-installed">✅ ' + verDisplay + '</span>';
+          btnText = '🔄 Reinstall';
+          btnClass = 'btn-install-re';
+        } else {
+          statusBadge = '<span class="tool-status-badge badge-not-installed">⚪ Belum Terpasang</span>';
+        }
+
+        html += `
+          <div class="tool-card">
+            <div>
+              <div class="tool-top">
+                <div class="tool-icon-box">${tool.icon}</div>
+                <div class="tool-title-wrap">
+                  <div class="tool-title">${tool.name}</div>
+                  <span class="tool-cat-badge">${tool.categoryName}</span>
+                </div>
+              </div>
+              <div class="tool-desc">${tool.description}</div>
+            </div>
+            <div>
+              ${statusBadge}
+              <div class="tool-btn-row">
+                <button class="btn-install ${btnClass}" onclick="triggerToolInstall('${tool.id}', '${tool.name}')" ${tool.isInstalling ? 'disabled' : ''}>
+                  ${btnText}
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      grid.innerHTML = html;
+    }
+
+    async function triggerToolInstall(toolId, toolName) {
+      if (!confirm('Mulai instalasi ' + toolName + ' sekarang?')) return;
+      openInstallDrawer(toolName);
+      document.getElementById('installConsoleOutput').textContent = `[${new Date().toLocaleTimeString()}] Menghubungkan ke server...\n`;
+
+      try {
+        const res = await fetch('/api/tools/install', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ toolId })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast('Instalasi dimulai: ' + toolName);
+          attachInstallStream();
+          fetchToolsList();
+        } else {
+          showToast('Gagal: ' + (data.error || 'Terjadi kesalahan'));
+          document.getElementById('installConsoleOutput').textContent += '\n[ERROR]: ' + data.error + '\n';
+        }
+      } catch (err) {
+        showToast('Koneksi gagal');
+      }
+    }
+
+    async function handleCustomInstall(e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById('customPkgInput');
+      const cmd = input.value.trim();
+      if (!cmd) return;
+
+      if (!confirm('Jalankan perintah instalasi kustom:\n\n' + cmd + '\n\nLanjutkan?')) return;
+      input.value = '';
+      openInstallDrawer('Custom Package: ' + cmd.substring(0, 30));
+
+      try {
+        const res = await fetch('/api/tools/install', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ customCmd: cmd })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast('Instalasi kustom dimulai!');
+          attachInstallStream();
+        } else {
+          showToast(data.error || 'Gagal memulai instalasi');
+        }
+      } catch (err) {
+        showToast('Request gagal');
+      }
+    }
+
+    function openInstallDrawer(title = 'Installation Console') {
+      const drawer = document.getElementById('installLogDrawer');
+      document.getElementById('drawerTitle').textContent = title;
+      drawer.style.display = 'block';
+      drawer.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function closeInstallDrawer() {
+      document.getElementById('installLogDrawer').style.display = 'none';
+      if (toolEventSource) {
+        toolEventSource.close();
+        toolEventSource = null;
+      }
+    }
+
+    function clearInstallLogs() {
+      document.getElementById('installConsoleOutput').textContent = '';
+    }
+
+    function attachInstallStream() {
+      if (toolEventSource) toolEventSource.close();
+      const consoleBox = document.getElementById('installConsoleOutput');
+
+      toolEventSource = new EventSource('/api/tools/stream');
+      toolEventSource.onmessage = (e) => {
+        try {
+          const event = JSON.parse(e.data);
+          if (event.type === 'init') {
+            consoleBox.textContent = event.logs || '';
+          } else if (event.type === 'data') {
+            consoleBox.textContent += event.text;
+          } else if (event.type === 'start') {
+            consoleBox.textContent += event.install.logs;
+          } else if (event.type === 'end') {
+            showToast('Instalasi ' + (event.install.status === 'success' ? 'Berhasil! ✅' : 'Gagal ❌'));
+            fetchToolsList();
+          }
+          consoleBox.scrollTop = consoleBox.scrollHeight;
+        } catch (err) {}
+      };
+
+      toolEventSource.onerror = () => {
+        // Fallback to polling status if SSE disconnects
+      };
     }
 
     async function execTerminal(e) {
@@ -987,8 +1476,10 @@
       window.location.reload();
     }
 
+    // Initial load
     fetchStats();
     initSSE();
+    fetchToolsList();
   </script>
 </body>
 </html>
