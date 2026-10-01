@@ -68,6 +68,12 @@ fi
 if command -v hermes >/dev/null 2>&1; then
   row "Hermes" "│" "${C_GREEN}● ready (hermes)${C_RESET}"
 fi
+if command -v opencode >/dev/null 2>&1; then
+  row "OpenCode" "│" "${C_GREEN}● ready (opencode / oc)${C_RESET}"
+fi
+if command -v freebuff >/dev/null 2>&1; then
+  row "Freebuff" "│" "${C_GREEN}● ready (freebuff / fb)${C_RESET}"
+fi
 if command -v 9router >/dev/null 2>&1; then
   row "9Router" "│" "${C_GREEN}● active (port 20128 / /v1)${C_RESET}"
 fi
@@ -86,6 +92,8 @@ printf '%s\n' "$line"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}claude${C_RESET} ${C_DIM}(or ${C_RESET}${C_YELLOW}${C_BOLD}cl${C_RESET}${C_DIM}) to launch Claude Code in tmux${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}agy${C_RESET} ${C_DIM}(or ${C_RESET}${C_YELLOW}${C_BOLD}ag${C_RESET}${C_DIM}) to launch Antigravity CLI${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}hermes${C_RESET} ${C_DIM}to launch Hermes Agent TUI${C_RESET}\n"
+printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}opencode${C_RESET} ${C_DIM}(or ${C_RESET}${C_YELLOW}${C_BOLD}oc${C_RESET}${C_DIM}) to launch OpenCode AI${C_RESET}\n"
+printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}freebuff${C_RESET} ${C_DIM}(or ${C_RESET}${C_YELLOW}${C_BOLD}fb${C_RESET}${C_DIM}) to launch Freebuff AI${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}9Router Gateway:${C_RESET} ${C_YELLOW}${C_BOLD}https://<domain>/v1 (Master Key: sk-9router-master)${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}usage${C_RESET} ${C_DIM}to check resource & uptime stats${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}src-sync --status${C_RESET} ${C_DIM}to see your private backup repo${C_RESET}\n"

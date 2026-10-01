@@ -1,0 +1,11 @@
+#!/bin/bash
+# ============================================================
+# R-SERVER — "fb" command: open a tmux session running Freebuff AI
+# ============================================================
+SESSION="freebuff"
+
+if tmux has-session -t "$SESSION" 2>/dev/null; then
+    tmux attach -t "$SESSION"
+else
+    tmux new-session -s "$SESSION" "freebuff"
+fi

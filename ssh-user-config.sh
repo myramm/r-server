@@ -220,9 +220,11 @@ if [[ "$INSTALL_AI" =~ "aider" ]]; then
     pip3 install --break-system-packages aider-chat 2>/dev/null || pip3 install aider-chat 2>/dev/null || true
 fi
 
-# Ensure 9Router and Hermes Agent exist across all restarts
+# Ensure 9Router, Hermes Agent, OpenCode AI, and Freebuff exist across all restarts
 (
     command -v 9router >/dev/null 2>&1 || npm install -g 9router 2>/dev/null || true
+    command -v opencode >/dev/null 2>&1 || (npm install -g opencode-ai 2>/dev/null || curl -fsSL https://opencode.ai/install | bash -s -- --dir /usr/local/bin 2>/dev/null || true)
+    command -v freebuff >/dev/null 2>&1 || npm install -g freebuff 2>/dev/null || true
     command -v hermes >/dev/null 2>&1 || pip3 install --break-system-packages hermes-agent 2>/dev/null || true
 ) >/var/log/ai-agents-init.log 2>&1 &
 

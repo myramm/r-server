@@ -1001,6 +1001,14 @@
           <span class="pill-dot pill-green" id="dot9Router"></span>
           <span>9Router Gateway: <strong id="status9Router">Online (:20128)</strong></span>
         </div>
+        <div class="core-pill">
+          <span class="pill-dot pill-green" id="dotOpenCode"></span>
+          <span>OpenCode: <strong id="statusOpenCode">Ready</strong></span>
+        </div>
+        <div class="core-pill">
+          <span class="pill-dot pill-green" id="dotFreebuff"></span>
+          <span>Freebuff: <strong id="statusFreebuff">Ready</strong></span>
+        </div>
       </div>
 
       <!-- 4 Core Metrics Cards -->
@@ -1196,6 +1204,36 @@
             <button class="btn btn-primary btn-sm" onclick="runQuick('9router')">Start 9Router</button>
             <button class="btn btn-secondary btn-sm" onclick="installTool('9router')">Install</button>
             <button class="btn btn-danger btn-sm" onclick="uninstallTool('9router', '9Router')">🗑️ Hapus</button>
+          </div>
+        </div>
+
+        <!-- OpenCode AI -->
+        <div class="tool-card">
+          <div class="tool-top">
+            <span class="tool-name">⚡ OpenCode AI Terminal</span>
+            <span class="tool-badge badge-ready">● Open Source</span>
+          </div>
+          <p class="tool-desc">Autonomous AI agent untuk terminal (OpenCode AI). Refactoring, smart code edits, multi-file agents & tools (oc).</p>
+          <div class="tool-footer">
+            <button class="btn btn-ghost btn-sm" onclick="runQuick('opencode --version || which opencode')">Version</button>
+            <button class="btn btn-primary btn-sm" onclick="runQuick('oc')">Launch</button>
+            <button class="btn btn-secondary btn-sm" onclick="installTool('opencode')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('opencode', 'OpenCode AI')">🗑️ Hapus</button>
+          </div>
+        </div>
+
+        <!-- Freebuff AI -->
+        <div class="tool-card">
+          <div class="tool-top">
+            <span class="tool-name">🛡️ Freebuff AI Assistant</span>
+            <span class="tool-badge badge-ready">● Multi-Agent</span>
+          </div>
+          <p class="tool-desc">Ad-supported multi-agent coding assistant CLI dengan AI models gratis dan akses tool otomatis (fb).</p>
+          <div class="tool-footer">
+            <button class="btn btn-ghost btn-sm" onclick="runQuick('freebuff --version || which freebuff')">Version</button>
+            <button class="btn btn-primary btn-sm" onclick="runQuick('fb')">Launch</button>
+            <button class="btn btn-secondary btn-sm" onclick="installTool('freebuff')">Install</button>
+            <button class="btn btn-danger btn-sm" onclick="uninstallTool('freebuff', 'Freebuff AI')">🗑️ Hapus</button>
           </div>
         </div>
 
@@ -1453,6 +1491,8 @@
             <span class="quick-pill" onclick="runQuick('claude --version')">claude</span>
             <span class="quick-pill" onclick="runQuick('agy --version')">agy</span>
             <span class="quick-pill" onclick="runQuick('hermes --version || which hermes')">hermes</span>
+            <span class="quick-pill" onclick="runQuick('opencode --version || which opencode')">opencode</span>
+            <span class="quick-pill" onclick="runQuick('freebuff --version || which freebuff')">freebuff</span>
             <span class="quick-pill" onclick="runQuick('9router --version || which 9router')">9router</span>
             <span class="quick-pill" onclick="runQuick('aider --version')">aider</span>
             <span class="quick-pill" onclick="runQuick('goose --version || which goose')">goose</span>
@@ -1671,10 +1711,16 @@ Model    : tokenharbor/claude-sonnet-5 / tokenharbor/deepseek-v4.1-flash:free</c
           </div>
 
           <div id="routerTab-opencode" class="router-tab-content" style="display: none;">
-            <pre style="background: #090d16; border: 1px solid rgba(255,255,255,0.06); padding: 10px; border-radius: 6px; font-size: 11px; color: #cbd5e1; margin: 0; overflow-x: auto;"><code># OpenCode / Hermes Agent via Railway Domain:
+            <pre style="background: #090d16; border: 1px solid rgba(255,255,255,0.06); padding: 10px; border-radius: 6px; font-size: 11px; color: #cbd5e1; margin: 0; overflow-x: auto;"><code># OpenCode AI:
 OPENAI_BASE_URL="<span class="dyn-origin">https://r-server-production-3b83.up.railway.app</span>/v1" \
 OPENAI_API_KEY="sk-9router-master" \
-opencode</code></pre>
+opencode  # atau perintah cepat: oc
+
+# Freebuff AI:
+freebuff  # atau perintah cepat: fb
+
+# Hermes Agent:
+hermes</code></pre>
           </div>
 
           <div id="routerTab-python" class="router-tab-content" style="display: none;">
@@ -1997,6 +2043,8 @@ curl -s <span class="dyn-origin">https://r-server-production-3b83.up.railway.app
         setToolDot('dotAgy', 'statusAgy', data.tools.agy);
         setToolDot('dotHermes', 'statusHermes', data.tools.hermes);
         setToolDot('dot9Router', 'status9Router', data.tools.nineRouter, 'Online (:20128)');
+        setToolDot('dotOpenCode', 'statusOpenCode', data.tools.opencode);
+        setToolDot('dotFreebuff', 'statusFreebuff', data.tools.freebuff);
       }
 
       // Budget metrics

@@ -723,6 +723,48 @@ EOF
     `
   },
   {
+    id: 'opencode',
+    name: 'OpenCode AI Terminal',
+    icon: '⚡',
+    category: 'ai_ml',
+    categoryName: 'AI & Coding Agents',
+    description: 'Autonomous open-source AI terminal agent (OpenCode AI) untuk refactoring, code editing, command execution & multi-file agents (perintah: opencode / oc).',
+    checkCmd: 'opencode --version || which opencode',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      echo "==> [OpenCode] Menginstal OpenCode AI..."
+      npm install -g opencode-ai || curl -fsSL https://opencode.ai/install | bash -s -- --dir /usr/local/bin
+      echo "==> [OpenCode] Verifikasi instalasi..."
+      which opencode && opencode --version || true
+      echo "==> [OpenCode] Berhasil terpasang! Ketik: opencode atau oc"
+    `,
+    uninstallScript: `
+      npm uninstall -g opencode-ai 2>/dev/null || true
+      rm -f /usr/local/bin/opencode /root/.local/bin/opencode
+    `
+  },
+  {
+    id: 'freebuff',
+    name: 'Freebuff AI Assistant',
+    icon: '🛡️',
+    category: 'ai_ml',
+    categoryName: 'AI & Coding Agents',
+    description: 'Ad-supported multi-agent coding assistant CLI dengan berbagai model AI gratis dan akses tools otomatis (perintah: freebuff / fb).',
+    checkCmd: 'freebuff --version || which freebuff',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      echo "==> [Freebuff] Menginstal Freebuff CLI..."
+      npm install -g freebuff
+      echo "==> [Freebuff] Verifikasi instalasi..."
+      which freebuff && freebuff --version || true
+      echo "==> [Freebuff] Berhasil terpasang! Ketik: freebuff atau fb"
+    `,
+    uninstallScript: `
+      npm uninstall -g freebuff 2>/dev/null || true
+      rm -f /usr/local/bin/freebuff /root/.local/bin/freebuff
+    `
+  },
+  {
     id: 'aider',
     name: 'Aider AI Pair Programming',
     icon: '🤝',
@@ -1621,11 +1663,15 @@ function getToolsStatus() {
   let agy = false;
   let hermes = false;
   let nineRouter = false;
+  let opencode = false;
+  let freebuff = false;
   try { execSync('which claude'); claude = true; } catch (e) {}
   try { execSync('which agy || which antigravity'); agy = true; } catch (e) {}
   try { execSync('which hermes'); hermes = true; } catch (e) {}
   try { execSync('which 9router'); nineRouter = true; } catch (e) {}
-  return { claude, agy, hermes, nineRouter };
+  try { execSync('which opencode'); opencode = true; } catch (e) {}
+  try { execSync('which freebuff'); freebuff = true; } catch (e) {}
+  return { claude, agy, hermes, nineRouter, opencode, freebuff };
 }
 
 // Usage & Credit metrics calculation

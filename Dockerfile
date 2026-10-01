@@ -72,8 +72,9 @@ ARG ANTHROPIC_AUTH_TOKEN=""
 COPY claude-settings.json /root/.claude/settings.json
 RUN sed -i "s|__ANTHROPIC_AUTH_TOKEN__|${ANTHROPIC_AUTH_TOKEN}|g" /root/.claude/settings.json
 
-# Install Claude Code (official CLI by Anthropic), 9Router, pnpm & pm2 globally
-RUN npm install -g @anthropic-ai/claude-code 9router pnpm pm2 2>/dev/null || npm install -g @anthropic-ai/claude-code \
+# Install Claude Code, 9Router, OpenCode AI, Freebuff, pnpm & pm2 globally
+RUN npm install -g @anthropic-ai/claude-code 9router opencode-ai freebuff pnpm pm2 2>/dev/null || npm install -g @anthropic-ai/claude-code 9router \
+    && (curl -fsSL https://opencode.ai/install | bash -s -- --dir /usr/local/bin 2>/dev/null || true) \
     && (node -e 'try { require("/usr/local/lib/node_modules/9router/hooks/sqliteRuntime").ensureSqliteRuntime(); } catch(e) {}' 2>/dev/null || true)
 
 # Install Google Antigravity CLI (agy) globally
@@ -85,31 +86,24 @@ RUN curl -fsSL https://go.dev/dl/go1.23.1.linux-amd64.tar.gz | tar -C /usr/local
     && ln -sf /usr/local/go/bin/go /usr/local/bin/go \
     && ln -sf /usr/local/go/bin/gofmt /usr/local/bin/gofmt
 
-# Install Astral uv and Aider AI
+# Install Astral uv, Aider AI, and Hermes Agent
 RUN (curl -LsSf https://astral.sh/uv/install.sh | sh \
     && ln -sf /root/.local/bin/uv /usr/local/bin/uv \
     && ln -sf /root/.local/bin/uvx /usr/local/bin/uvx || true) \
-    && pip3 install --break-system-packages aider-chat huggingface_hub rich click typer ipython 2>/dev/null || true
+    && pip3 install --break-system-packages aider-chat hermes-agent huggingface_hub rich click typer ipython 2>/dev/null || true
 
 # Copy ssh user config to configure the user's password and authorized keys
 COPY ssh-user-config.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/ssh-user-config.sh
 
-# Copy the "cl" helper command (opens a tmux session running Claude Code)
+# Copy CLI helper commands
 COPY cl /usr/local/bin/cl
-RUN chmod +x /usr/local/bin/cl
-
-# Copy the "ag" helper command (opens a tmux session running Antigravity CLI)
 COPY ag /usr/local/bin/ag
-RUN chmod +x /usr/local/bin/ag
-
-# Copy the "ai" helper command (opens a tmux session running Aider AI)
 COPY ai /usr/local/bin/ai
-RUN chmod +x /usr/local/bin/ai
-
-# Copy the "usage" command (Railway trial credit + uptime monitor)
+COPY oc /usr/local/bin/oc
+COPY fb /usr/local/bin/fb
 COPY usage /usr/local/bin/usage
-RUN chmod +x /usr/local/bin/usage
+RUN chmod +x /usr/local/bin/cl /usr/local/bin/ag /usr/local/bin/ai /usr/local/bin/oc /usr/local/bin/fb /usr/local/bin/usage
 
 # Copy Web Monitoring & Management Dashboard
 COPY dashboard /opt/dashboard
