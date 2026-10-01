@@ -189,6 +189,53 @@ const TOOLS_CATALOG = [
   // SUPER BUNDLES (1-Click Multiple Tools)
   // ==========================================
   {
+    id: 'bundle_quick_stack',
+    name: '⚡ Quick Stack (Recommended)',
+    icon: '⚡',
+    category: 'bundles',
+    categoryName: 'Super Bundles',
+    description: 'Stack Cepat Siap Pakai: XFCE + XRDP + Chrome + Git/GH + Python/Node + FFmpeg + Fastfetch/Btop + Claude/Antigravity + Nginx + DB Clients.',
+    checkCmd: 'which google-chrome && which git && which node && which python3 && which ffmpeg',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y
+      apt-get install -y wget curl ca-certificates git gh python3 python3-pip python3-venv python3-dev nodejs npm ffmpeg fastfetch htop btop tmux jq zsh nginx sqlite3 postgresql-client redis-tools
+      wget -q -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && (dpkg -i /tmp/chrome.deb || apt-get install -fy) && rm -f /tmp/chrome.deb
+      npm install -g n pnpm pm2 @anthropic-ai/claude-code
+      curl -fsSL https://antigravity.google/cli/install.sh | bash -s -- --dir /usr/local/bin || true
+      ln -sf /usr/local/bin/agy /usr/local/bin/antigravity 2>/dev/null || true
+      pip3 install --break-system-packages uv aider-chat
+      mkdir -p /root/Desktop
+      cp /usr/share/applications/google-chrome.desktop /usr/share/applications/xfce4-terminal.desktop /root/Desktop/ 2>/dev/null || true
+      chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `
+  },
+  {
+    id: 'bundle_recommended_vps',
+    name: '💎 Recommended General VPS Pack',
+    icon: '💎',
+    category: 'bundles',
+    categoryName: 'Super Bundles',
+    description: 'Paket Lengkap Workstation & Cloud Developer: GUI + Browsers + Full Compilers (GCC/Rust/Go/Java) + Media + AI Agents + Cloud CLI.',
+    checkCmd: 'which google-chrome && which rustc && which go && which claude',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y
+      apt-get install -y wget curl ca-certificates git git-lfs gh build-essential gcc g++ clang cmake ninja-build python3 python3-pip python3-venv nodejs npm golang-go openjdk-17-jdk ffmpeg imagemagick mediainfo fastfetch htop btop ncdu tmux zsh fzf ripgrep bat eza sqlite3 postgresql-client redis-tools nginx certbot rsync rclone aria2
+      wget -q -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && (dpkg -i /tmp/chrome.deb || apt-get install -fy) && rm -f /tmp/chrome.deb
+      npm install -g n pnpm pm2 @anthropic-ai/claude-code @google/gemini-cli
+      curl -fsSL https://antigravity.google/cli/install.sh | bash -s -- --dir /usr/local/bin || true
+      ln -sf /usr/local/bin/agy /usr/local/bin/antigravity 2>/dev/null || true
+      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+      ln -sf /root/.cargo/bin/rustc /usr/local/bin/rustc 2>/dev/null || true
+      ln -sf /root/.cargo/bin/cargo /usr/local/bin/cargo 2>/dev/null || true
+      pip3 install --break-system-packages uv aider-chat jupyterlab
+      mkdir -p /root/Desktop
+      cp /usr/share/applications/google-chrome.desktop /usr/share/applications/xfce4-terminal.desktop /root/Desktop/ 2>/dev/null || true
+      chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `
+  },
+  {
     id: 'bundle_desktop_super',
     name: 'Full Desktop Super Pack',
     icon: '📦',
