@@ -233,55 +233,68 @@ fi
 # ---------------------------------------------------------------
 if command -v xrdp >/dev/null 2>&1; then
     msg "Starting XRDP Remote Desktop service on port 3389..." "Starting XRDP Remote Desktop service on port 3389..."
-    # Ensure DBus system daemon is running for desktop sessions
+    # Ensure DBus system daemon and valid machine-id
     mkdir -p /var/run/dbus /var/run/xrdp /var/log/xrdp /root/Desktop /etc/skel/Desktop
-    [ -f /var/lib/dbus/machine-id ] || dbus-uuidgen > /var/lib/dbus/machine-id 2>/dev/null || true
+    [ -f /var/lib/dbus/machine-id ] || dbus-uuidgen --ensure=/var/lib/dbus/machine-id 2>/dev/null || true
+    [ -f /etc/machine-id ] || dbus-uuidgen --ensure=/etc/machine-id 2>/dev/null || true
     service dbus start 2>/dev/null || true
     
-    # Configure xsession
-    echo "startxfce4" > /root/.xsession
-    chmod 644 /root/.xsession
-    echo "startxfce4" > /etc/skel/.xsession
+    # Configure xsession with dbus-launch
+    cat << 'EOF' > /root/.xsession
+#!/bin/bash
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+exec dbus-launch --exit-with-session startxfce4
+EOF
+    chmod 755 /root/.xsession
+    cp /root/.xsession /etc/skel/.xsession
     if [ -n "$SSH_USERNAME" ] && [ -d "/home/$SSH_USERNAME" ]; then
-        echo "startxfce4" > "/home/$SSH_USERNAME/.xsession"
+        cp /root/.xsession "/home/$SSH_USERNAME/.xsession"
         chown "$SSH_USERNAME:$SSH_USERNAME" "/home/$SSH_USERNAME/.xsession"
     fi
     adduser xrdp ssl-cert 2>/dev/null || true
 
     # Configure root-safe wrappers for Web Browsers (Chrome, Chromium, Brave)
-    if [ -f /usr/bin/google-chrome-stable ] || [ -f /usr/bin/google-chrome ]; then
-        cat << 'EOF' > /usr/local/bin/google-chrome-stable
+    if [ -f /usr/bin/google-chrome-stable ] && [ ! -f /usr/bin/google-chrome-stable.orig ]; then
+        mv /usr/bin/google-chrome-stable /usr/bin/google-chrome-stable.orig
+        cat << 'EOF' > /usr/bin/google-chrome-stable
 #!/bin/bash
-exec /usr/bin/google-chrome-stable --no-sandbox --disable-dev-shm-usage --disable-gpu "$@"
+exec /usr/bin/google-chrome-stable.orig --no-sandbox --disable-dev-shm-usage --disable-gpu "$@"
 EOF
-        chmod +x /usr/local/bin/google-chrome-stable
-        cp /usr/local/bin/google-chrome-stable /usr/local/bin/chrome 2>/dev/null || true
-        cp /usr/local/bin/google-chrome-stable /usr/local/bin/google-chrome 2>/dev/null || true
+        chmod +x /usr/bin/google-chrome-stable
+        cp /usr/bin/google-chrome-stable /usr/local/bin/google-chrome-stable 2>/dev/null || true
+        cp /usr/bin/google-chrome-stable /usr/local/bin/google-chrome 2>/dev/null || true
+        cp /usr/bin/google-chrome-stable /usr/local/bin/chrome 2>/dev/null || true
     fi
 
-    if [ -f /usr/bin/chromium ] || [ -f /usr/bin/chromium-browser ]; then
-        cat << 'EOF' > /usr/local/bin/chromium-browser
+    if [ -f /usr/bin/chromium ] && [ ! -f /usr/bin/chromium.orig ]; then
+        mv /usr/bin/chromium /usr/bin/chromium.orig
+        cat << 'EOF' > /usr/bin/chromium
 #!/bin/bash
-exec /usr/bin/chromium --no-sandbox --disable-dev-shm-usage "$@"
+exec /usr/bin/chromium.orig --no-sandbox --disable-dev-shm-usage --disable-gpu "$@"
 EOF
-        chmod +x /usr/local/bin/chromium-browser
-        cp /usr/local/bin/chromium-browser /usr/local/bin/chromium 2>/dev/null || true
+        chmod +x /usr/bin/chromium
+        cp /usr/bin/chromium /usr/local/bin/chromium 2>/dev/null || true
+        cp /usr/bin/chromium /usr/local/bin/chromium-browser 2>/dev/null || true
     fi
 
-    if [ -f /usr/bin/brave-browser-stable ] || [ -f /usr/bin/brave-browser ]; then
-        cat << 'EOF' > /usr/local/bin/brave-browser-stable
+    if [ -f /usr/bin/brave-browser-stable ] && [ ! -f /usr/bin/brave-browser-stable.orig ]; then
+        mv /usr/bin/brave-browser-stable /usr/bin/brave-browser-stable.orig
+        cat << 'EOF' > /usr/bin/brave-browser-stable
 #!/bin/bash
-exec /usr/bin/brave-browser-stable --no-sandbox --disable-dev-shm-usage "$@"
+exec /usr/bin/brave-browser-stable.orig --no-sandbox --disable-dev-shm-usage --disable-gpu "$@"
 EOF
-        chmod +x /usr/local/bin/brave-browser-stable
+        chmod +x /usr/bin/brave-browser-stable
     fi
 
-    # Create Desktop shortcuts
+    # Create Desktop shortcuts and fix permissions
     for d_file in /usr/share/applications/google-chrome.desktop /usr/share/applications/chromium.desktop /usr/share/applications/chromium-browser.desktop /usr/share/applications/firefox-esr.desktop /usr/share/applications/firefox.desktop /usr/share/applications/brave-browser.desktop /usr/share/applications/xfce4-terminal.desktop; do
         if [ -f "$d_file" ]; then
             cp "$d_file" /root/Desktop/ 2>/dev/null || true
         fi
     done
+    sed -i "s|Exec=/usr/bin/google-chrome-stable %U|Exec=/usr/bin/google-chrome-stable --no-sandbox --disable-dev-shm-usage --disable-gpu %U|g" /root/Desktop/google-chrome.desktop 2>/dev/null || true
+    sed -i "s|Exec=chromium %U|Exec=chromium --no-sandbox --disable-dev-shm-usage --disable-gpu %U|g" /root/Desktop/chromium.desktop 2>/dev/null || true
     chmod +x /root/Desktop/*.desktop 2>/dev/null || true
     
     # Clean up stale PID and socket files
