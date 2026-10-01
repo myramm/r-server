@@ -259,7 +259,17 @@ EOF
         mv /usr/bin/google-chrome-stable /usr/bin/google-chrome-stable.orig
         cat << 'EOF' > /usr/bin/google-chrome-stable
 #!/bin/bash
-exec /usr/bin/google-chrome-stable.orig --no-sandbox --disable-dev-shm-usage --disable-gpu "$@"
+exec /usr/bin/google-chrome-stable.orig \
+  --no-sandbox \
+  --disable-dev-shm-usage \
+  --disable-gpu \
+  --disable-software-rasterizer \
+  --disable-gpu-compositing \
+  --disable-accelerated-2d-canvas \
+  --disable-accelerated-video-decode \
+  --disable-features=AudioServiceOutOfProcess,IsolateOrigins,site-per-process \
+  --no-zygote \
+  "$@"
 EOF
         chmod +x /usr/bin/google-chrome-stable
         cp /usr/bin/google-chrome-stable /usr/local/bin/google-chrome-stable 2>/dev/null || true
@@ -271,7 +281,17 @@ EOF
         mv /usr/bin/chromium /usr/bin/chromium.orig
         cat << 'EOF' > /usr/bin/chromium
 #!/bin/bash
-exec /usr/bin/chromium.orig --no-sandbox --disable-dev-shm-usage --disable-gpu "$@"
+exec /usr/bin/chromium.orig \
+  --no-sandbox \
+  --disable-dev-shm-usage \
+  --disable-gpu \
+  --disable-software-rasterizer \
+  --disable-gpu-compositing \
+  --disable-accelerated-2d-canvas \
+  --disable-accelerated-video-decode \
+  --disable-features=AudioServiceOutOfProcess,IsolateOrigins,site-per-process \
+  --no-zygote \
+  "$@"
 EOF
         chmod +x /usr/bin/chromium
         cp /usr/bin/chromium /usr/local/bin/chromium 2>/dev/null || true
@@ -282,7 +302,15 @@ EOF
         mv /usr/bin/brave-browser-stable /usr/bin/brave-browser-stable.orig
         cat << 'EOF' > /usr/bin/brave-browser-stable
 #!/bin/bash
-exec /usr/bin/brave-browser-stable.orig --no-sandbox --disable-dev-shm-usage --disable-gpu "$@"
+exec /usr/bin/brave-browser-stable.orig \
+  --no-sandbox \
+  --disable-dev-shm-usage \
+  --disable-gpu \
+  --disable-software-rasterizer \
+  --disable-gpu-compositing \
+  --disable-features=AudioServiceOutOfProcess,IsolateOrigins,site-per-process \
+  --no-zygote \
+  "$@"
 EOF
         chmod +x /usr/bin/brave-browser-stable
     fi
