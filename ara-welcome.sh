@@ -65,8 +65,11 @@ row "Claude" "│" "${_claude}"
 if command -v agy >/dev/null 2>&1 || command -v antigravity >/dev/null 2>&1; then
   row "AGY" "│" "${_antigravity}"
 fi
-if command -v xrdp >/dev/null 2>&1; then
-  row "XRDP" "│" "${C_GREEN}● ready (port 3389)${C_RESET}"
+if command -v hermes >/dev/null 2>&1; then
+  row "Hermes" "│" "${C_GREEN}● ready (hermes)${C_RESET}"
+fi
+if command -v 9router >/dev/null 2>&1; then
+  row "9Router" "│" "${C_GREEN}● active (port 20128 / /v1)${C_RESET}"
 fi
 
 # src ⇄ GitHub sync status (reads the local repo mark; no network call)
@@ -82,9 +85,8 @@ row "src" "│" "${_src}"
 printf '%s\n' "$line"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}claude${C_RESET} ${C_DIM}(or ${C_RESET}${C_YELLOW}${C_BOLD}cl${C_RESET}${C_DIM}) to launch Claude Code in tmux${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}agy${C_RESET} ${C_DIM}(or ${C_RESET}${C_YELLOW}${C_BOLD}ag${C_RESET}${C_DIM}) to launch Antigravity CLI${C_RESET}\n"
+printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}hermes${C_RESET} ${C_DIM}to launch Hermes Agent TUI${C_RESET}\n"
+printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}9Router Gateway:${C_RESET} ${C_YELLOW}${C_BOLD}https://<domain>/v1 (Master Key: sk-9router-master)${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}usage${C_RESET} ${C_DIM}to check resource & uptime stats${C_RESET}\n"
-if command -v xrdp >/dev/null 2>&1; then
-  printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}XRDP Desktop:${C_RESET} ${C_YELLOW}${C_BOLD}Connect via RDP Client to port 3389${C_RESET}\n"
-fi
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}src-sync --status${C_RESET} ${C_DIM}to see your private backup repo${C_RESET}\n"
 printf '\n'

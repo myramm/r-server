@@ -958,7 +958,7 @@
     <div class="sidebar-footer">
       <div style="font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; display: flex; flex-direction: column; gap: 2px;">
         <span>Debian 12 · Singapore Node</span>
-        <span>Port SSH: 22 · XRDP: 3389</span>
+        <span>Port SSH: 22 · HTTP: 8080 · 9Router: 20128</span>
       </div>
     </div>
   </aside>
@@ -994,12 +994,12 @@
           <span>Google Antigravity: <strong id="statusAgy">Ready</strong></span>
         </div>
         <div class="core-pill">
-          <span class="pill-dot pill-green" id="dotChrome"></span>
-          <span>Chrome Browser: <strong id="statusChrome">Ready</strong></span>
+          <span class="pill-dot pill-green" id="dotHermes"></span>
+          <span>Hermes Agent: <strong id="statusHermes">Ready</strong></span>
         </div>
         <div class="core-pill">
-          <span class="pill-dot pill-green" id="dotXrdp"></span>
-          <span>XRDP Server: <strong id="statusXrdp">Active (:3389)</strong></span>
+          <span class="pill-dot pill-green" id="dot9Router"></span>
+          <span>9Router Gateway: <strong id="status9Router">Online (:20128)</strong></span>
         </div>
       </div>
 
@@ -1508,8 +1508,8 @@
     <section id="view-access" class="page-view">
       <div class="page-header">
         <div>
-          <h2 class="page-title">🌐 Remote Access & Connection Details</h2>
-          <p class="page-desc">Koneksi SSH root, Remote Desktop Windows (XRDP), dan Web endpoints.</p>
+          <h2 class="page-title">🌐 Remote Access, Domain Proxy & Endpoints</h2>
+          <p class="page-desc">Koneksi SSH root, Domain Proxy (HTTPS/TCP), dan 9Router API Gateway endpoints.</p>
         </div>
       </div>
 
@@ -1523,20 +1523,21 @@
             <button class="btn btn-ghost btn-sm" onclick="copyText('ssh -p 22000 root@altaria.proxy.rlwy.net')">Copy</button>
           </div>
           <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px;">
-            Port Container: <strong>22</strong> · User: <strong>root</strong>
+            Port Container: <strong>22</strong> · User: <strong>root</strong> · TCP Proxy: <strong>Railway</strong>
           </div>
         </div>
 
-        <!-- XRDP Remote Desktop Card -->
-        <div class="access-card">
-          <div class="card-title" style="color: #34d399;">🖥️ XRDP Remote Desktop GUI</div>
-          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Koneksi Remote Desktop (RDP) bawaan Windows atau Microsoft Remote Desktop:</p>
+        <!-- Domain Proxy & Custom Domains Card -->
+        <div class="access-card" style="border-top: 3px solid #6366f1;">
+          <div class="card-title" style="color: #a5b4fc;">🔀 Domain Proxy & Custom Domains</div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Reverse proxy HTTPS terintegrasi ke 9Router & Web Dashboard:</p>
           <div class="code-box">
-            <span id="rdpHostText">sakura.proxy.rlwy.net:17792</span>
-            <button class="btn btn-ghost btn-sm" onclick="copyText('sakura.proxy.rlwy.net:17792')">Copy</button>
+            <span id="gatewayProxyUrl">https://r-server-production-3b83.up.railway.app/v1</span>
+            <button class="btn btn-ghost btn-sm" onclick="copyText(document.getElementById('gatewayProxyUrl').innerText)">Copy</button>
           </div>
-          <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px;">
-            User: <strong>root</strong> · Default Password: <strong>RamaGans76_</strong>
+          <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px; line-height: 1.5;">
+            • <strong>HTTPS Domain</strong>: Otomatis proxy <code>/v1/*</code> ke Port 20128<br>
+            • <strong>Custom Domain</strong>: CNAME di Railway Settings (contoh: <code>api.domain.com</code>)
           </div>
         </div>
 
@@ -1568,26 +1569,25 @@
 
       <!-- Quick AI Architecture Diagram -->
       <div class="card" style="margin-bottom: 16px;">
-        <div class="card-title">🌐 AI VPS Workflow & Routing Diagram</div>
+        <div class="card-title">🌐 AI Workstation Workflow & Routing Diagram</div>
         <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; background: rgba(0,0,0,0.5); padding: 14px; border-radius: 8px; border: 1px solid var(--border); overflow-x: auto; color: #a5b4fc; line-height: 1.6;">
-Windows / Mac / Android / iOS
+Windows / Mac / Linux / Android / iOS
       │
-      │ RDP (Port 3389 / sakura.proxy.rlwy.net:17792)  OR  SSH (altaria.proxy.rlwy.net:22000)
+      │ HTTPS Public / Custom Domain (Port 8080)   OR   SSH (TCP Proxy :22000)
       ▼
-Ubuntu / Debian + XFCE4 Desktop + XRDP + Web Dashboard
+Debian 12 Cloud Workstation (No XRDP / Ultra-Lean & Fast)
       │
-      ├── Visual Tools: VS Code Server, Chrome (no-sandbox), Firefox, File Manager
-      ├── CLI AI Agents: Claude Code, Antigravity (agy), Hermes Agent, Aider, Goose, SWE-agent, Open Interpreter, ShellGPT
+      ├── CLI AI Agents: Claude Code, Antigravity (agy), Hermes Agent, Aider, UV
+      ├── Web Management Dashboard (Port 8080)
       │
       ▼
-9Router AI Proxy / Gateway (http://localhost:20128)
+9Router AI Proxy & Gateway (Port 20128 / Endpoint: /v1)
       │
-      ├── Claude (Anthropic API / OAuth)
-      ├── OpenAI (GPT-4o, Codex, o1, o3)
-      ├── Google Gemini (Gemini 1.5/2.0 Flash & Pro)
-      ├── Qwen & DeepSeek Coder (Open-weights / DashScope / DeepSeek API)
-      ├── OpenRouter / GLM / Kimi / Local Ollama (Port 11434)
-      └── Automatic Fallback & Token Saving Pipeline
+      ├── Anthropic Claude (Claude 3.5 Sonnet / 3.7 Sonnet)
+      ├── OpenAI (GPT-4o, Codex, o1, o3-mini)
+      ├── Google Gemini (Gemini 2.0 Flash / Pro)
+      ├── Qwen & DeepSeek Coder
+      └── OpenRouter / Ollama
         </div>
       </div>
 
@@ -1995,8 +1995,8 @@ curl -s <span class="dyn-origin">https://r-server-production-3b83.up.railway.app
       if (data.tools) {
         setToolDot('dotClaude', 'statusClaude', data.tools.claude);
         setToolDot('dotAgy', 'statusAgy', data.tools.agy);
-        setToolDot('dotChrome', 'statusChrome', data.tools.chrome);
-        setToolDot('dotXrdp', 'statusXrdp', data.tools.xrdp);
+        setToolDot('dotHermes', 'statusHermes', data.tools.hermes);
+        setToolDot('dot9Router', 'status9Router', data.tools.nineRouter, 'Online (:20128)');
       }
 
       // Budget metrics
@@ -2014,13 +2014,13 @@ curl -s <span class="dyn-origin">https://r-server-production-3b83.up.railway.app
       }
     }
 
-    function setToolDot(dotId, labelId, isReady) {
+    function setToolDot(dotId, labelId, isReady, customReadyText) {
       const dot = document.getElementById(dotId);
       const label = document.getElementById(labelId);
       if (!dot || !label) return;
       if (isReady) {
         dot.className = 'pill-dot pill-green';
-        label.innerText = 'Ready';
+        label.innerText = customReadyText || 'Ready';
       } else {
         dot.className = 'pill-dot pill-gray';
         label.innerText = 'Not Installed';

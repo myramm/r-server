@@ -19,9 +19,10 @@
 
 ## ✨ Features
 
-- 🖥️ **Remote Desktop GUI (XRDP + XFCE4)** (Reference: [danchitnis/container-xrdp](https://github.com/danchitnis/container-xrdp)):
-  - Lightweight **XFCE4** desktop environment running via XRDP on port `3389`.
-  - Connect with **Microsoft Remote Desktop** (Windows/Mac/iOS/Android) or **Remmina** (Linux).
+- 🔀 **Integrated 9Router AI Gateway**:
+  - Reverse proxy on public HTTPS domain (`https://<domain>/v1`) and localhost (`:20128`).
+  - Unified OpenAI & Anthropic compatible API routing for Claude, OpenAI, Gemini, Qwen, DeepSeek, and Ollama.
+  - Pre-configured Master Key (`sk-9router-master`) for instant agent setup.
 - 🌐 **Interactive Web Monitoring & Control Dashboard**:
   - Live RAM (Used, Free, Buffers/Cache) with dynamic progress bars.
   - Live CPU Load, Cores, and Disk Storage gauges.
@@ -32,13 +33,15 @@
 - 🤖 **Pre-Installed AI Coding Agents**:
   - **Anthropic Claude Code CLI** (`claude` / `cl` helper).
   - **Google Antigravity CLI** (`agy` / `ag` helper).
+  - **Hermes Agent** (`hermes`).
+  - **Aider AI** (`aider` / `ai` helper).
 - 🔑 **Full Root Access**:
   - Connect directly as `root` with custom shell prompt (`root@server:~#`).
   - Clean SSH MOTD banner with zero default system spam.
 - 🛠️ **Pre-Installed Developer & System Toolkit**:
+  - **Languages & Runtimes:** Go 1.23, Node.js + npm, Python 3 + uv, `build-essential`, `cmake`, `gcc`, `g++`.
   - **Monitoring:** `fastfetch`, `neofetch`, `htop`, `btop`, `ncdu`, `usage`.
-  - **Dev & Runtimes:** Python 3, Node.js + npm, `git`, `build-essential`, `cmake`, `gcc`, `g++`, `ffmpeg`, `yt-dlp`.
-  - **Terminal & Shell:** `tmux`, `screen`, `zsh`, `ripgrep`, `fd-find`, `bat`, `tree`, `jq`, `micro`, `vim`, `nano`.
+  - **Media & Utils:** `ffmpeg`, `yt-dlp`, `ripgrep`, `fd-find`, `bat`, `tree`, `jq`, `micro`, `vim`, `nano`, `zsh`, `tmux`.
 - 🔄 **Optional Work Persistence (`src-sync`)**:
   - Automatically syncs `/root/src` with a private GitHub repository on every container start.
 
@@ -57,13 +60,12 @@ ssh -p 22000 root@altaria.proxy.rlwy.net
 ssh -p 22000 root@66.33.22.220
 ```
 
-### 2. Remote Desktop GUI Access (XRDP / XFCE4)
-Connect using any RDP client (Microsoft Remote Desktop, Remmina, etc.):
+### 2. 9Router AI Gateway API Endpoint
+Access 9Router from any local or remote coding agent (Cursor, Aider, OpenCode, Python SDK):
 
-* **Host / Address:** `<TCP_PROXY_HOST>:<TCP_PROXY_PORT>` (Port 3389 TCP proxy on Railway)
-* **Username:** `root` (or `debian`)
-* **Password:** Enter your `ROOT_PASSWORD` (`RamaGans76_`)
-* **Session:** `Xorg` (Default XFCE4 desktop session)
+* **OpenAI Base URL:** `https://r-server-production-3b83.up.railway.app/v1`
+* **Master API Key:** `sk-9router-master`
+* **Web UI (Config & Keys):** `https://r-server-production-3b83.up.railway.app/9router`
 
 ### 3. Web Dashboard Access
 Open your Railway public HTTP URL in any browser:

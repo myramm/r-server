@@ -182,30 +182,28 @@ function getTopProcesses() {
 }
 
 // -------------------------------------------------------------
-// XRDP LINUX DESKTOP - 40 CATEGORIES SOFTWARE CATALOG
+// CLOUD WORKSTATION - 40 CATEGORIES SOFTWARE CATALOG
 // -------------------------------------------------------------
 const TOOLS_CATALOG = [
   // Standalone Core Services
   {
-    id: 'xrdp',
-    name: 'XRDP Remote Desktop Server',
-    icon: '🖥️',
-    category: 'desktop_apps',
-    categoryName: 'Desktop & Office',
-    description: 'Server Remote Desktop Windows (RDP) pada Port 3389 untuk akses visual desktop Linux XFCE.',
-    checkCmd: 'which xrdp && which xorgxrdp',
+    id: 'nine_router',
+    name: '9Router AI Gateway',
+    icon: '🔀',
+    category: 'ai_llm',
+    categoryName: 'AI & LLM Tools',
+    description: 'AI router & gateway proxy cerdas (Port 20128) untuk Claude, OpenAI, Gemini, Qwen, DeepSeek & Ollama.',
+    checkCmd: 'which 9router',
     installScript: `
       export DEBIAN_FRONTEND=noninteractive
-      apt-get update -y && apt-get install -y xrdp xorgxrdp xfce4 xfce4-terminal dbus-x11
-      adduser xrdp ssl-cert 2>/dev/null || true
-      echo "startxfce4" > /root/.xsession
-      service xrdp restart 2>/dev/null || true
+      npm install -g 9router pnpm pm2
+      node -e 'try { require("/usr/local/lib/node_modules/9router/hooks/sqliteRuntime").ensureSqliteRuntime(); } catch(e) {}' 2>/dev/null || true
+      PORT=20128 HOST=0.0.0.0 HOSTNAME=0.0.0.0 pm2 start /usr/local/lib/node_modules/9router/app/server.js --name 9router 2>/dev/null || (PORT=20128 HOST=0.0.0.0 HOSTNAME=0.0.0.0 nohup node /usr/local/lib/node_modules/9router/app/server.js >/var/log/9router.log 2>&1 &)
     `,
     uninstallScript: `
-      service xrdp stop 2>/dev/null || true
-      apt-get remove --purge -y xrdp xorgxrdp
-      apt-get autoremove -y
-      rm -rf /etc/xrdp /var/log/xrdp /var/run/xrdp
+      pm2 delete 9router 2>/dev/null || true
+      pkill -f "9router" 2>/dev/null || true
+      npm uninstall -g 9router
     `
   },
   {
@@ -235,20 +233,16 @@ const TOOLS_CATALOG = [
     icon: '⚡',
     category: 'bundles',
     categoryName: 'Super Bundles',
-    description: 'Stack Cepat Siap Pakai: XFCE + XRDP + Chrome + Git/GH + Python/Node + FFmpeg + Fastfetch/Btop + Claude/Antigravity + Nginx + DB Clients.',
-    checkCmd: 'which google-chrome && which git && which node && which python3 && which ffmpeg',
+    description: 'Stack Cepat Siap Pakai: Git/GH + Python/Node + FFmpeg + Fastfetch/Btop + Claude/Antigravity/Hermes/9Router + Nginx + DB Clients.',
+    checkCmd: 'which git && which node && which python3 && which ffmpeg',
     installScript: `
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -y
       apt-get install -y wget curl ca-certificates git gh python3 python3-pip python3-venv python3-dev nodejs npm ffmpeg fastfetch htop btop tmux jq zsh nginx sqlite3 postgresql-client redis-tools
-      wget -q -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && (dpkg -i /tmp/chrome.deb || apt-get install -fy) && rm -f /tmp/chrome.deb
-      npm install -g n pnpm pm2 @anthropic-ai/claude-code
+      npm install -g n pnpm pm2 @anthropic-ai/claude-code 9router
       curl -fsSL https://antigravity.google/cli/install.sh | bash -s -- --dir /usr/local/bin || true
       ln -sf /usr/local/bin/agy /usr/local/bin/antigravity 2>/dev/null || true
-      pip3 install --break-system-packages uv aider-chat
-      mkdir -p /root/Desktop
-      cp /usr/share/applications/google-chrome.desktop /usr/share/applications/xfce4-terminal.desktop /root/Desktop/ 2>/dev/null || true
-      chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+      pip3 install --break-system-packages uv aider-chat hermes-agent
     `
   },
   {
@@ -1625,13 +1619,13 @@ function startToolInstall(toolId, customCmd = null, version = null) {
 function getToolsStatus() {
   let claude = false;
   let agy = false;
-  let chrome = false;
-  let xrdp = false;
+  let hermes = false;
+  let nineRouter = false;
   try { execSync('which claude'); claude = true; } catch (e) {}
-  try { execSync('which agy'); agy = true; } catch (e) {}
-  try { execSync('which google-chrome || which chromium'); chrome = true; } catch (e) {}
-  try { execSync('which xrdp'); xrdp = true; } catch (e) {}
-  return { claude, agy, chrome, xrdp };
+  try { execSync('which agy || which antigravity'); agy = true; } catch (e) {}
+  try { execSync('which hermes'); hermes = true; } catch (e) {}
+  try { execSync('which 9router'); nineRouter = true; } catch (e) {}
+  return { claude, agy, hermes, nineRouter };
 }
 
 // Usage & Credit metrics calculation
