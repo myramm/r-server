@@ -1763,13 +1763,47 @@ function createSession() {
 // -------------------------------------------------------------
 // 9Router AI Gateway Reverse Proxy
 // -------------------------------------------------------------
+// Helper to generate 9Router internal CLI auth token
+// -------------------------------------------------------------
+let cachedCliToken = null;
+function get9RouterCliToken() {
+  if (cachedCliToken) return cachedCliToken;
+  try {
+    const dataDir = path.join(os.homedir(), '.9router');
+    const machineIdFile = path.join(dataDir, 'machine-id');
+    const authDir = path.join(dataDir, 'auth');
+    const cliSecretFile = path.join(authDir, 'cli-secret');
+
+    let raw = '';
+    try { raw = fs.readFileSync(machineIdFile, 'utf8').trim(); } catch {}
+    if (!raw) {
+      try {
+        const { machineIdSync } = require('/usr/local/lib/node_modules/9router/node_modules/node-machine-id');
+        raw = machineIdSync();
+      } catch {}
+    }
+
+    let secret = '';
+    try { secret = fs.readFileSync(cliSecretFile, 'utf8').trim(); } catch {}
+
+    if (raw && secret) {
+      cachedCliToken = crypto.createHash('sha256').update(raw + '9r-cli-auth' + secret).digest('hex').substring(0, 16);
+      return cachedCliToken;
+    }
+  } catch (e) {}
+  return '';
+}
+
+// -------------------------------------------------------------
+// 9ROUTER REVERSE PROXY FORWARDER
+// -------------------------------------------------------------
 function proxyTo9Router(req, res, targetPath) {
   const destPath = targetPath || (req.url.startsWith('/') ? req.url : '/' + req.url);
 
   // Setup CORS Headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, Accept, X-Requested-With, baggage, sentry-trace, x-api-key');
+  res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, Accept, X-Requested-With, baggage, sentry-trace, x-api-key, x-9r-cli-token');
   res.setHeader('Access-Control-Max-Age', '86400');
 
   if (req.method === 'OPTIONS') {
@@ -1782,6 +1816,12 @@ function proxyTo9Router(req, res, targetPath) {
   clientHeaders['x-forwarded-host'] = req.headers.host || 'localhost';
   clientHeaders['x-forwarded-proto'] = req.headers['x-forwarded-proto'] || 'https';
   clientHeaders['x-forwarded-for'] = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+
+  // Always inject 9Router CLI token for internal API operations (CLI tools, MITM, Antigravity, etc.)
+  const cliToken = get9RouterCliToken();
+  if (cliToken) {
+    clientHeaders['x-9r-cli-token'] = cliToken;
+  }
 
   // Inject default master key if no client authorization provided for API routes
   if (destPath.startsWith('/v1') && !clientHeaders['authorization'] && !clientHeaders['x-api-key']) {
