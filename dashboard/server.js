@@ -1781,10 +1781,22 @@ function get9RouterCliToken() {
         const { machineIdSync } = require('/usr/local/lib/node_modules/9router/node_modules/node-machine-id');
         raw = machineIdSync();
       } catch {}
+      if (!raw) raw = crypto.randomUUID();
+      try {
+        fs.mkdirSync(dataDir, { recursive: true });
+        fs.writeFileSync(machineIdFile, raw, { mode: 0o600 });
+      } catch {}
     }
 
     let secret = '';
     try { secret = fs.readFileSync(cliSecretFile, 'utf8').trim(); } catch {}
+    if (!secret) {
+      secret = crypto.randomBytes(32).toString('hex');
+      try {
+        fs.mkdirSync(authDir, { recursive: true });
+        fs.writeFileSync(cliSecretFile, secret, { mode: 0o600 });
+      } catch {}
+    }
 
     if (raw && secret) {
       cachedCliToken = crypto.createHash('sha256').update(raw + '9r-cli-auth' + secret).digest('hex').substring(0, 16);
@@ -1816,6 +1828,7 @@ function proxyTo9Router(req, res, targetPath) {
   clientHeaders['x-forwarded-host'] = req.headers.host || 'localhost';
   clientHeaders['x-forwarded-proto'] = req.headers['x-forwarded-proto'] || 'https';
   clientHeaders['x-forwarded-for'] = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+  clientHeaders['x-9r-real-ip'] = '127.0.0.1';
 
   // Always inject 9Router CLI token for internal API operations (CLI tools, MITM, Antigravity, etc.)
   const cliToken = get9RouterCliToken();

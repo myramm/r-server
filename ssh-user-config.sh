@@ -229,11 +229,22 @@ fi
 # ---------------------------------------------------------------
 # START 9ROUTER AI GATEWAY (PORT 20128)
 # ---------------------------------------------------------------
-mkdir -p /root/.9router/db /root/.9router/runtime
+mkdir -p /root/.9router/db /root/.9router/runtime /root/.9router/auth
 node -e 'try { require("/usr/local/lib/node_modules/9router/hooks/sqliteRuntime").ensureSqliteRuntime(); } catch(e) {}' 2>/dev/null || true
 python3 -c "
-import sqlite3, uuid, datetime, json
+import os, sys, sqlite3, uuid, datetime, json, secrets
 try:
+    data_dir = '/root/.9router'
+    m_file = os.path.join(data_dir, 'machine-id')
+    s_file = os.path.join(data_dir, 'auth', 'cli-secret')
+    os.makedirs(os.path.join(data_dir, 'auth'), exist_ok=True)
+    if not os.path.exists(m_file):
+        with open(m_file, 'w') as f:
+            f.write(str(uuid.uuid4()))
+    if not os.path.exists(s_file):
+        with open(s_file, 'w') as f:
+            f.write(secrets.token_hex(32))
+    
     con = sqlite3.connect('/root/.9router/db/data.sqlite')
     cur = con.cursor()
     cur.execute('''CREATE TABLE IF NOT EXISTS apiKeys (id TEXT PRIMARY KEY, key TEXT UNIQUE NOT NULL, name TEXT, machineId TEXT, isActive INTEGER DEFAULT 1, createdAt TEXT NOT NULL)''')
