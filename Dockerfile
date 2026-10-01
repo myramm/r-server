@@ -84,7 +84,8 @@ COPY claude-settings.json /root/.claude/settings.json
 RUN sed -i "s|__ANTHROPIC_AUTH_TOKEN__|${ANTHROPIC_AUTH_TOKEN}|g" /root/.claude/settings.json
 
 # Install Claude Code (official CLI by Anthropic), 9Router, pnpm & pm2 globally
-RUN npm install -g @anthropic-ai/claude-code 9router pnpm pm2 2>/dev/null || npm install -g @anthropic-ai/claude-code
+RUN npm install -g @anthropic-ai/claude-code 9router pnpm pm2 2>/dev/null || npm install -g @anthropic-ai/claude-code \
+    && (node -e 'try { require("/usr/local/lib/node_modules/9router/hooks/sqliteRuntime").ensureSqliteRuntime(); } catch(e) {}' 2>/dev/null || true)
 
 # Install Google Antigravity CLI (agy) globally
 RUN curl -fsSL https://antigravity.google/cli/install.sh | bash -s -- --dir /usr/local/bin \
