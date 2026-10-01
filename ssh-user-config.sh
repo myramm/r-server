@@ -227,6 +227,14 @@ fi
 ) >/var/log/ai-agents-init.log 2>&1 &
 
 # ---------------------------------------------------------------
+# START 9ROUTER AI GATEWAY (PORT 20128)
+# ---------------------------------------------------------------
+if command -v 9router >/dev/null 2>&1; then
+    msg "Starting 9Router AI Gateway on port 20128..." "Starting 9Router AI Gateway on port 20128..."
+    nohup 9router --tray --skip-update -p 20128 >/var/log/9router.log 2>&1 &
+fi
+
+# ---------------------------------------------------------------
 # START WEB MONITORING & MANAGEMENT DASHBOARD
 # ---------------------------------------------------------------
 msg "Starting Web Monitoring Dashboard on port ${PORT:-8080}..." "در حال راه‌اندازی داشبورد وب..."
