@@ -229,7 +229,26 @@ fi
 # ---------------------------------------------------------------
 # START 9ROUTER AI GATEWAY (PORT 20128)
 # ---------------------------------------------------------------
-if command -v 9router >/dev/null 2>&1; then
+mkdir -p /root/.9router/db /root/.9router/runtime
+python3 -c "
+import sqlite3, uuid, datetime, json
+try:
+    con = sqlite3.connect('/root/.9router/db/data.sqlite')
+    cur = con.cursor()
+    cur.execute('''CREATE TABLE IF NOT EXISTS apiKeys (id TEXT PRIMARY KEY, key TEXT UNIQUE NOT NULL, name TEXT, machineId TEXT, isActive INTEGER DEFAULT 1, createdAt TEXT NOT NULL)''')
+    cur.execute('''CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY, data TEXT NOT NULL)''')
+    cur.execute('''INSERT OR IGNORE INTO apiKeys(id, key, name, machineId, isActive, createdAt) VALUES('f4eed923-e6c7-496f-843a-fc5848dc899b', 'sk-9router-master', 'Railway Master Key', 'railway', 1, datetime('now'))''')
+    cur.execute('''INSERT INTO settings(id, data) VALUES(1, ?) ON CONFLICT(id) DO UPDATE SET data = excluded.data''', [json.dumps({'requireApiKey': False, 'requireLogin': True})])
+    con.commit()
+    con.close()
+except Exception as e:
+    pass
+" 2>/dev/null || true
+
+if [ -f "/usr/local/lib/node_modules/9router/app/server.js" ]; then
+    msg "Starting 9Router AI Gateway on port 20128..." "Starting 9Router AI Gateway on port 20128..."
+    PORT=20128 HOST=0.0.0.0 nohup node /usr/local/lib/node_modules/9router/app/server.js >/var/log/9router.log 2>&1 &
+elif command -v 9router >/dev/null 2>&1; then
     msg "Starting 9Router AI Gateway on port 20128..." "Starting 9Router AI Gateway on port 20128..."
     nohup 9router --tray --skip-update -p 20128 >/var/log/9router.log 2>&1 &
 fi

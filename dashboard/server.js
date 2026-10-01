@@ -1766,10 +1766,103 @@ function createSession() {
   return token;
 }
 
+// -------------------------------------------------------------
+// 9Router AI Gateway Reverse Proxy
+// -------------------------------------------------------------
+function proxyTo9Router(req, res, targetPath) {
+  const destPath = targetPath || (req.url.startsWith('/') ? req.url : '/' + req.url);
+
+  // Setup CORS Headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, Accept, X-Requested-With, baggage, sentry-trace, x-api-key');
+  res.setHeader('Access-Control-Max-Age', '86400');
+
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    return res.end();
+  }
+
+  const clientHeaders = { ...req.headers };
+  clientHeaders.host = '127.0.0.1:20128';
+  clientHeaders['x-forwarded-host'] = req.headers.host || 'localhost';
+  clientHeaders['x-forwarded-proto'] = req.headers['x-forwarded-proto'] || 'https';
+  clientHeaders['x-forwarded-for'] = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+
+  // Inject default master key if no client authorization provided
+  if (!clientHeaders['authorization'] && !clientHeaders['x-api-key']) {
+    clientHeaders['authorization'] = 'Bearer sk-9router-master';
+  }
+
+  const options = {
+    hostname: '127.0.0.1',
+    port: 20128,
+    path: destPath,
+    method: req.method,
+    headers: clientHeaders,
+    timeout: 180000 // 3 min timeout for long reasoning models
+  };
+
+  const proxyReq = http.request(options, (proxyRes) => {
+    const resHeaders = { ...proxyRes.headers };
+    resHeaders['access-control-allow-origin'] = '*';
+    res.writeHead(proxyRes.statusCode, resHeaders);
+    proxyRes.pipe(res);
+  });
+
+  proxyReq.on('error', (err) => {
+    if (!res.headersSent) {
+      res.writeHead(502, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      res.end(JSON.stringify({
+        error: {
+          message: `9Router AI Gateway is offline or starting up on port 20128 (${err.message})`,
+          type: 'gateway_error',
+          code: 502
+        }
+      }));
+    }
+  });
+
+  proxyReq.on('timeout', () => {
+    proxyReq.destroy();
+    if (!res.headersSent) {
+      res.writeHead(504, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      res.end(JSON.stringify({
+        error: {
+          message: '9Router gateway timeout waiting for upstream model response.',
+          type: 'gateway_timeout',
+          code: 504
+        }
+      }));
+    }
+  });
+
+  req.pipe(proxyReq);
+}
+
 // HTTP Server
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+
+  // -------------------------------------------------------------
+  // 9Router Public Routes (/v1/*, /9router/*, /_next/*)
+  // -------------------------------------------------------------
+  // OpenAI & Anthropic compatible endpoints for Claude Code, Cursor, Aider, etc.
+  if (url.pathname.startsWith('/v1')) {
+    return proxyTo9Router(req, res, url.pathname + url.search);
+  }
+
+  // 9Router Web UI & Dashboard subpaths
+  if (url.pathname.startsWith('/9router')) {
+    const subPath = url.pathname.replace(/^\/9router/, '') || '/';
+    return proxyTo9Router(req, res, subPath + url.search);
+  }
+
+  // Next.js chunks & static files for 9Router Web UI
+  if (url.pathname.startsWith('/_next') || url.pathname === '/manifest.webmanifest' || url.pathname === '/favicon.svg') {
+    return proxyTo9Router(req, res, url.pathname + url.search);
+  }
 
   // Static Assets / HTML
   if (url.pathname === '/' || url.pathname === '/index.html') {
@@ -2069,6 +2162,125 @@ const server = http.createServer((req, res) => {
       } catch (e) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Bad request' }));
+      }
+    });
+    return;
+  }
+
+  // -------------------------------------------------------------
+  // 9Router Management & Playground APIs
+  // -------------------------------------------------------------
+  if (url.pathname === '/api/9router/status' && req.method === 'GET') {
+    if (!isAuthenticated(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ error: 'Unauthorized' }));
+    }
+    const publicUrl = `${req.headers['x-forwarded-proto'] || 'https'}://${req.headers.host || 'r-server-production-3b83.up.railway.app'}/v1`;
+    const checkReq = http.get('http://127.0.0.1:20128/v1/models', { timeout: 3000 }, (checkRes) => {
+      let data = '';
+      checkRes.on('data', chunk => data += chunk);
+      checkRes.on('end', () => {
+        try {
+          const parsed = JSON.parse(data);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({
+            online: true,
+            port: 20128,
+            publicUrl,
+            modelsCount: (parsed.data || []).length,
+            models: parsed.data || []
+          }));
+        } catch (e) {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ online: true, port: 20128, publicUrl, modelsCount: 0, models: [] }));
+        }
+      });
+    });
+    checkReq.on('error', () => {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ online: false, port: 20128, publicUrl, modelsCount: 0, models: [] }));
+    });
+    checkReq.on('timeout', () => {
+      checkReq.destroy();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ online: false, port: 20128, publicUrl, modelsCount: 0, models: [] }));
+    });
+    return;
+  }
+
+  if (url.pathname === '/api/9router/restart' && req.method === 'POST') {
+    if (!isAuthenticated(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ error: 'Unauthorized' }));
+    }
+    exec('pkill -f "9router" 2>/dev/null || true; nohup 9router --tray --skip-update -p 20128 >/var/log/9router.log 2>&1 &', (err) => {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ success: true, message: '9Router daemon restarted on port 20128' }));
+    });
+    return;
+  }
+
+  if (url.pathname === '/api/9router/test' && req.method === 'POST') {
+    if (!isAuthenticated(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ error: 'Unauthorized' }));
+    }
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const { model = 'tokenharbor/claude-sonnet-5', prompt = 'Halo! Ceritakan dalam 1 kalimat tentang dirimu.' } = JSON.parse(body || '{}');
+        const postData = JSON.stringify({
+          model,
+          messages: [{ role: 'user', content: prompt }],
+          stream: false,
+          max_tokens: 300
+        });
+
+        const testReq = http.request({
+          hostname: '127.0.0.1',
+          port: 20128,
+          path: '/v1/chat/completions',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(postData)
+          },
+          timeout: 45000
+        }, (testRes) => {
+          let resData = '';
+          testRes.on('data', chunk => resData += chunk);
+          testRes.on('end', () => {
+            try {
+              const jsonRes = JSON.parse(resData);
+              res.writeHead(testRes.statusCode, { 'Content-Type': 'application/json' });
+              return res.end(JSON.stringify({
+                statusCode: testRes.statusCode,
+                response: jsonRes
+              }));
+            } catch (e) {
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              return res.end(JSON.stringify({ statusCode: testRes.statusCode, raw: resData }));
+            }
+          });
+        });
+
+        testReq.on('error', (err) => {
+          res.writeHead(502, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ error: `9Router connection error: ${err.message}` }));
+        });
+
+        testReq.on('timeout', () => {
+          testReq.destroy();
+          res.writeHead(504, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ error: '9Router test request timed out.' }));
+        });
+
+        testReq.write(postData);
+        testReq.end();
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ error: 'Bad request' }));
       }
     });
     return;
