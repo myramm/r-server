@@ -1485,7 +1485,7 @@ function startToolUninstall(toolId, customCmd = null) {
   return currentInstall;
 }
 
-function startToolInstall(toolId, customCmd = null) {
+function startToolInstall(toolId, customCmd = null, version = null) {
   if (currentInstall && currentInstall.status === 'running') {
     throw new Error(`Instalasi lain sedang berjalan: ${currentInstall.toolName}`);
   }
@@ -1496,8 +1496,64 @@ function startToolInstall(toolId, customCmd = null) {
   if (toolId) {
     const tool = TOOLS_CATALOG.find(t => t.id === toolId);
     if (!tool) throw new Error(`Tool ID '${toolId}' tidak ditemukan.`);
-    commandToRun = tool.installScript;
-    toolName = tool.name;
+
+    if (toolId === 'nodejs' && version) {
+      toolName = `Node.js v${version}`;
+      commandToRun = `
+        export DEBIAN_FRONTEND=noninteractive
+        apt-get update -y && apt-get install -y nodejs npm curl wget
+        npm install -g n pnpm yarn pm2 typescript ts-node nodemon
+        n ${version}
+        node -v
+      `;
+    } else if (toolId === 'golang' && version) {
+      toolName = `Go (Golang) v${version}`;
+      let goTar = `go${version}.linux-amd64.tar.gz`;
+      if (version === '1.23') goTar = 'go1.23.1.linux-amd64.tar.gz';
+      else if (version === '1.22') goTar = 'go1.22.7.linux-amd64.tar.gz';
+      else if (version === '1.21') goTar = 'go1.21.13.linux-amd64.tar.gz';
+      else if (!version.includes('.')) goTar = `go${version}.0.linux-amd64.tar.gz`;
+
+      commandToRun = `
+        export DEBIAN_FRONTEND=noninteractive
+        apt-get update -y && apt-get install -y wget curl tar
+        rm -rf /usr/local/go
+        wget -qO- https://go.dev/dl/${goTar} | tar -C /usr/local -xzf -
+        ln -sf /usr/local/go/bin/go /usr/local/bin/go
+        ln -sf /usr/local/go/bin/gofmt /usr/local/bin/gofmt
+        go version
+      `;
+    } else if (toolId === 'python_dev' && version) {
+      toolName = `Python v${version}`;
+      commandToRun = `
+        export DEBIAN_FRONTEND=noninteractive
+        apt-get update -y && apt-get install -y build-essential curl wget python3-pip
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        /root/.local/bin/uv python install ${version}
+        ln -sf /root/.local/bin/uv /usr/local/bin/uv 2>/dev/null || true
+        pip3 install --break-system-packages poetry pipx uv requests fastapi uvicorn flask 2>/dev/null || true
+      `;
+    } else if (toolId === 'java_jdk' && version) {
+      toolName = `Java OpenJDK ${version}`;
+      commandToRun = `
+        export DEBIAN_FRONTEND=noninteractive
+        apt-get update -y && apt-get install -y openjdk-${version}-jdk maven gradle ant
+        java -version
+      `;
+    } else if (toolId === 'php_composer' && version) {
+      toolName = `PHP ${version} & Composer`;
+      commandToRun = `
+        export DEBIAN_FRONTEND=noninteractive
+        apt-get update -y && apt-get install -y software-properties-common
+        add-apt-repository -y ppa:ondrej/php 2>/dev/null || true
+        apt-get update -y
+        apt-get install -y php${version} php${version}-cli php${version}-fpm php${version}-curl php${version}-gd php${version}-mbstring php${version}-xml php${version}-mysql composer || apt-get install -y php php-cli composer
+        php -v
+      `;
+    } else {
+      commandToRun = tool.installScript;
+      toolName = tool.name;
+    }
   } else if (customCmd) {
     commandToRun = customCmd;
     toolName = `Custom: ${customCmd.substring(0, 30)}`;
@@ -1867,8 +1923,8 @@ const server = http.createServer((req, res) => {
     req.on('data', chunk => body += chunk);
     req.on('end', () => {
       try {
-        const { toolId, customCmd } = JSON.parse(body);
-        const installJob = startToolInstall(toolId, customCmd);
+        const { toolId, customCmd, version } = JSON.parse(body);
+        const installJob = startToolInstall(toolId, customCmd, version);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify({
           success: true,

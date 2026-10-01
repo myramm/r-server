@@ -772,6 +772,86 @@
       z-index: 2000;
       display: none;
     }
+
+    /* Version Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(5px);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.open {
+      display: flex;
+    }
+    .modal-card {
+      background: #0f131c;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.6), 0 10px 10px -5px rgba(0,0,0,0.1);
+      animation: modalFadeIn 0.15s ease-out;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .version-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .version-option:hover {
+      border-color: var(--primary);
+      background: rgba(56, 189, 248, 0.05);
+    }
+    .version-option.selected {
+      border-color: var(--primary);
+      background: rgba(56, 189, 248, 0.12);
+    }
+    .version-radio {
+      margin-top: 3px;
+      cursor: pointer;
+      accent-color: var(--primary);
+    }
+    .version-content {
+      flex: 1;
+    }
+    .version-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+    .version-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .version-desc {
+      font-size: 11.5px;
+      color: var(--text-dim);
+      line-height: 1.4;
+    }
   </style>
 </head>
 <body>
@@ -1594,6 +1674,24 @@ Ubuntu / Debian + XFCE4 Desktop + XRDP + Web Dashboard
 
   </main>
 
+  <!-- Version Selection Modal -->
+  <div class="modal-overlay" id="versionModalOverlay" onclick="closeVersionModal(event)">
+    <div class="modal-card" id="versionModalCard" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 id="versionModalTitle" style="font-size: 15px; font-weight: 700; color: #fff; margin: 0;">Pilih Versi</h3>
+        <button class="btn btn-ghost btn-sm" onclick="closeVersionModal()" style="padding: 2px 6px;">✕</button>
+      </div>
+      <p id="versionModalDesc" style="font-size: 12px; color: var(--text-muted); margin: 8px 0 14px;"></p>
+      <div id="versionOptionsList" style="display: flex; flex-direction: column; gap: 8px;">
+        <!-- Injected options -->
+      </div>
+      <div style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px;">
+        <button class="btn btn-ghost btn-sm" onclick="closeVersionModal()">Batal</button>
+        <button class="btn btn-primary btn-sm" id="versionConfirmBtn" onclick="confirmVersionInstall()">⚡ Install Versi Terpilih</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Live Output Drawer -->
   <div class="drawer" id="installDrawer">
     <div class="drawer-header">
@@ -1911,14 +2009,138 @@ Ubuntu / Debian + XFCE4 Desktop + XRDP + Web Dashboard
       `).join('');
     }
 
-    // 1-Click Install Tool
-    async function installTool(toolId) {
+    // Tool Version Specifications
+    const TOOL_VERSIONS = {
+      nodejs: {
+        title: '🟢 Pilih Versi Node.js',
+        desc: 'Pilih versi runtime Node.js yang ingin diinstal pada VPS:',
+        default: '22',
+        versions: [
+          { id: '22', name: 'Node.js 22 LTS (Active LTS)', badge: 'Recommended', desc: 'Rilis LTS terbaru dengan performa V8 optimal & built-in WebSocket/Fetch.' },
+          { id: '20', name: 'Node.js 20 LTS (Iron)', badge: 'Stable LTS', desc: 'Standar industri stabil yang kompatibel dengan seluruh library production.' },
+          { id: '18', name: 'Node.js 18 LTS (Hydrogen)', badge: 'Legacy LTS', desc: 'Untuk kompatibilitas proyek lama yang mensyaratkan Node 18.' },
+          { id: 'latest', name: 'Node.js 23 (Current / Bleeding Edge)', badge: 'Latest', desc: 'Fitur eksperimental JavaScript terbaru untuk pengujian.' }
+        ]
+      },
+      golang: {
+        title: '🐹 Pilih Versi Go (Golang)',
+        desc: 'Pilih versi compiler Go resmi dari Google:',
+        default: '1.23',
+        versions: [
+          { id: '1.23', name: 'Go 1.23 (Latest Stable)', badge: 'Recommended', desc: 'Rilis Go terbaru dengan loop iterator dan optimasi standard library.' },
+          { id: '1.22', name: 'Go 1.22 (Stable LTS)', badge: 'Stable', desc: 'Versi stabil dengan pembaruan routing HTTP & for-loop variable scope.' },
+          { id: '1.21', name: 'Go 1.21 (Legacy LTS)', badge: 'Legacy LTS', desc: 'Standar microservices production yang telah teruji.' }
+        ]
+      },
+      python_dev: {
+        title: '🐍 Pilih Versi Python 3',
+        desc: 'Pilih versi interpreter Python yang ingin dikonfigurasi via UV / APT:',
+        default: '3.12',
+        versions: [
+          { id: '3.12', name: 'Python 3.12 (Standard Stable)', badge: 'Recommended', desc: 'Standar Ubuntu 24.04 dengan peningkatan kecepatan 5-10% & error reporting lebih bersih.' },
+          { id: '3.11', name: 'Python 3.11 (Recommended for PyTorch & AI)', badge: 'AI & ML Ready', desc: 'Sangat stabil dan 100% kompatibel dengan PyTorch, CUDA, TensorFlow, dan Transformers.' },
+          { id: '3.10', name: 'Python 3.10 (Legacy Stable)', badge: 'Legacy', desc: 'Kompatibilitas maksimal untuk library lama yang belum mendukung Python 3.11+.' },
+          { id: '3.13', name: 'Python 3.13 (Latest Preview)', badge: 'Preview', desc: 'Fitur eksperimental no-GIL (free-threaded) dan JIT compiler awal.' }
+        ]
+      },
+      java_jdk: {
+        title: '☕ Pilih Versi Java OpenJDK',
+        desc: 'Pilih versi JDK compiler dan runtime Java:',
+        default: '21',
+        versions: [
+          { id: '21', name: 'OpenJDK 21 LTS (Modern Long-Term Support)', badge: 'Recommended', desc: 'Virtual Threads (Project Loom), Sequenced Collections, dan Record Patterns.' },
+          { id: '17', name: 'OpenJDK 17 LTS (Enterprise Standard)', badge: 'Enterprise LTS', desc: 'Standar industri enterprise untuk Spring Boot 3 dan cloud microservices.' },
+          { id: '11', name: 'OpenJDK 11 LTS (Legacy LTS)', badge: 'Legacy', desc: 'Untuk aplikasi enterprise lama.' },
+          { id: '8', name: 'OpenJDK 8 (Classic)', badge: 'Classic', desc: 'Untuk kompatibilitas Java 8 legacy.' }
+        ]
+      },
+      php_composer: {
+        title: '🐘 Pilih Versi PHP & Composer',
+        desc: 'Pilih versi PHP runtime & package manager:',
+        default: '8.3',
+        versions: [
+          { id: '8.3', name: 'PHP 8.3 (Latest Stable)', badge: 'Recommended', desc: 'Rilis PHP terbaru dengan typed class constants dan performa tinggi.' },
+          { id: '8.2', name: 'PHP 8.2 (Stable LTS)', badge: 'Stable LTS', desc: 'Readonly classes, standar Laravel 10/11 dan Symfony.' },
+          { id: '8.1', name: 'PHP 8.1 (Legacy)', badge: 'Legacy', desc: 'Enums, readonly properties, fibers.' }
+        ]
+      }
+    };
+
+    let pendingInstallToolId = null;
+    let selectedVersionId = null;
+
+    // 1-Click Install Tool with Version Dialog
+    function installTool(toolId) {
+      if (TOOL_VERSIONS[toolId]) {
+        openVersionModal(toolId);
+        return;
+      }
+      doInstall(toolId);
+    }
+
+    function openVersionModal(toolId) {
+      pendingInstallToolId = toolId;
+      const config = TOOL_VERSIONS[toolId];
+      selectedVersionId = config.default;
+
+      document.getElementById('versionModalTitle').innerText = config.title;
+      document.getElementById('versionModalDesc').innerText = config.desc;
+      
+      const list = document.getElementById('versionOptionsList');
+      list.innerHTML = config.versions.map(v => `
+        <div class="version-option ${v.id === selectedVersionId ? 'selected' : ''}" onclick="selectVersion('${v.id}')">
+          <input type="radio" name="toolVersion" value="${v.id}" class="version-radio" ${v.id === selectedVersionId ? 'checked' : ''}>
+          <div class="version-content">
+            <div class="version-title-row">
+              <span class="version-name">${v.name}</span>
+              <span class="tool-badge badge-ready">${v.badge}</span>
+            </div>
+            <div class="version-desc">${v.desc}</div>
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('versionModalOverlay').classList.add('open');
+    }
+
+    function selectVersion(versionId) {
+      selectedVersionId = versionId;
+      const options = document.querySelectorAll('.version-option');
+      options.forEach(opt => {
+        const radio = opt.querySelector('input[type="radio"]');
+        if (radio && radio.value === versionId) {
+          opt.classList.add('selected');
+          radio.checked = true;
+        } else {
+          opt.classList.remove('selected');
+          if (radio) radio.checked = false;
+        }
+      });
+    }
+
+    function closeVersionModal(e) {
+      if (e && e.target !== document.getElementById('versionModalOverlay') && !e.target.classList.contains('btn')) return;
+      document.getElementById('versionModalOverlay').classList.remove('open');
+      pendingInstallToolId = null;
+      selectedVersionId = null;
+    }
+
+    function confirmVersionInstall() {
+      if (!pendingInstallToolId) return;
+      const toolId = pendingInstallToolId;
+      const version = selectedVersionId;
+      document.getElementById('versionModalOverlay').classList.remove('open');
+      doInstall(toolId, version);
+    }
+
+    async function doInstall(toolId, version = null) {
       try {
-        openDrawer('📦 Memulai instalasi ' + toolId + '...');
+        const label = version ? `${toolId} (v${version})` : toolId;
+        openDrawer('📦 Memulai instalasi ' + label + '...');
         const res = await fetch('/api/tools/install', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ toolId })
+          body: JSON.stringify({ toolId, version })
         });
         const d = await res.json();
         if (d.success) {
