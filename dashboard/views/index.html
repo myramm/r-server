@@ -211,6 +211,32 @@
       color: var(--text-dim);
     }
 
+    /* Core Status Bar */
+    .core-status-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .core-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .pill-green { background: #10b981; box-shadow: 0 0 6px #10b981; }
+    .pill-gray { background: #64748b; }
+
     /* Metric Cards Grid */
     .metrics-grid {
       display: grid;
@@ -277,6 +303,31 @@
       display: flex;
       align-items: center;
       gap: 8px;
+    }
+
+    /* Budget Card */
+    .budget-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .budget-item {
+      background: #090b10;
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      border-radius: 6px;
+    }
+    .budget-item-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+    }
+    .budget-item-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
     }
 
     /* System Quick Controls */
@@ -411,7 +462,7 @@
       font-family: 'JetBrains Mono', monospace;
     }
     .terminal-output {
-      height: 220px;
+      height: 240px;
       overflow-y: auto;
       font-size: 11.5px;
       color: #38bdf8;
@@ -635,6 +686,27 @@
           <button class="btn btn-secondary btn-sm" onclick="refreshStats()">🔄 Refresh</button>
           <button class="btn btn-secondary btn-sm" onclick="serverAction('drop-caches', 'Flush RAM Cache')">🧹 Flush Cache</button>
           <button class="btn btn-secondary btn-sm" onclick="serverAction('restart-sshd', 'Reload SSHD')">🔑 Reload SSH</button>
+          <button class="btn btn-danger btn-sm" onclick="serverAction('restart', 'Restart Container')">⚠️ Restart Server</button>
+        </div>
+      </div>
+
+      <!-- Core Status Pill Bar -->
+      <div class="core-status-bar">
+        <div class="core-pill">
+          <span class="pill-dot pill-green" id="dotClaude"></span>
+          <span>Claude Code: <strong id="statusClaude">Ready</strong></span>
+        </div>
+        <div class="core-pill">
+          <span class="pill-dot pill-green" id="dotAgy"></span>
+          <span>Google Antigravity: <strong id="statusAgy">Ready</strong></span>
+        </div>
+        <div class="core-pill">
+          <span class="pill-dot pill-green" id="dotChrome"></span>
+          <span>Chrome Browser: <strong id="statusChrome">Ready</strong></span>
+        </div>
+        <div class="core-pill">
+          <span class="pill-dot pill-green" id="dotXrdp"></span>
+          <span>XRDP Server: <strong id="statusXrdp">Active (:3389)</strong></span>
         </div>
       </div>
 
@@ -676,8 +748,31 @@
             <span style="color: var(--emerald);">● Online</span>
           </div>
           <div class="metric-val" id="uptimeVal">--</div>
-          <div class="metric-sub" id="burnRateSub">Est. Budget: $5.00 / mo</div>
+          <div class="metric-sub" id="burnRateSub">Burn: $0.00 / mo</div>
           <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 100%; background: var(--emerald);"></div></div>
+        </div>
+      </div>
+
+      <!-- Cloud Budget & Usage Counter Card -->
+      <div class="card">
+        <div class="card-title">💰 Estimated Railway Usage & Budget Calculator</div>
+        <div class="budget-grid">
+          <div class="budget-item">
+            <div class="budget-item-label">Trial Budget Limit</div>
+            <div class="budget-item-val" style="color: #60a5fa;" id="budTrial">$5.00</div>
+          </div>
+          <div class="budget-item">
+            <div class="budget-item-label">Estimated Used Cost</div>
+            <div class="budget-item-val" style="color: #f59e0b;" id="budUsed">$0.00</div>
+          </div>
+          <div class="budget-item">
+            <div class="budget-item-label">Remaining Balance</div>
+            <div class="budget-item-val" style="color: #34d399;" id="budRemain">$5.00</div>
+          </div>
+          <div class="budget-item">
+            <div class="budget-item-label">Estimated Days Left</div>
+            <div class="budget-item-val" style="color: #a855f7;" id="budDays">-- Days</div>
+          </div>
         </div>
       </div>
 
@@ -856,6 +951,30 @@
             <button class="btn btn-primary btn-sm" onclick="installTool('copilot_cli')">1-Click Install</button>
           </div>
         </div>
+
+        <!-- OpenCode AI -->
+        <div class="tool-card">
+          <div class="tool-top">
+            <span class="tool-name">💻 OpenCode AI Agent</span>
+            <span class="tool-badge badge-off">● Open-Source</span>
+          </div>
+          <p class="tool-desc">Autonomous AI agent open-source untuk eksekusi workflow codebase.</p>
+          <div class="tool-footer">
+            <button class="btn btn-primary btn-sm" onclick="installTool('opencode')">1-Click Install</button>
+          </div>
+        </div>
+
+        <!-- Qwen Code Agent -->
+        <div class="tool-card">
+          <div class="tool-top">
+            <span class="tool-name">🔮 Qwen Code Assistant</span>
+            <span class="tool-badge badge-off">● Alibaba Cloud</span>
+          </div>
+          <p class="tool-desc">Qwen AI code assistant & tool calling framework.</p>
+          <div class="tool-footer">
+            <button class="btn btn-primary btn-sm" onclick="installTool('qwen_code')">1-Click Install</button>
+          </div>
+        </div>
       </div>
 
       <!-- Integrated Web Terminal Console -->
@@ -878,6 +997,7 @@
             <span class="quick-pill" onclick="runQuick('free -h')">free -h</span>
             <span class="quick-pill" onclick="runQuick('df -h')">df -h</span>
             <span class="quick-pill" onclick="runQuick('uptime')">uptime</span>
+            <span class="quick-pill" onclick="runQuick('ps aux | head -n 10')">ps aux</span>
           </div>
         </div>
       </div>
@@ -1131,9 +1251,39 @@
       // Runtime Card
       document.getElementById('uptimeVal').innerText = data.server.uptimeFormatted;
 
+      // Status badges
+      if (data.tools) {
+        setToolDot('dotClaude', 'statusClaude', data.tools.claude);
+        setToolDot('dotAgy', 'statusAgy', data.tools.agy);
+        setToolDot('dotChrome', 'statusChrome', data.tools.chrome);
+        setToolDot('dotXrdp', 'statusXrdp', data.tools.xrdp);
+      }
+
+      // Budget metrics
+      if (data.usage) {
+        document.getElementById('budTrial').innerText = '$' + data.usage.trial;
+        document.getElementById('budUsed').innerText = '$' + data.usage.used;
+        document.getElementById('budRemain').innerText = '$' + data.usage.remaining;
+        document.getElementById('budDays').innerText = data.usage.trialDaysLeft + ' Days Left';
+        document.getElementById('burnRateSub').innerText = `Burn: $${data.usage.burnRateHourly}/hr · Egress: ${data.usage.egressGb} GB`;
+      }
+
       // Processes
       if (data.processes && Array.isArray(data.processes)) {
         renderProcesses(data.processes);
+      }
+    }
+
+    function setToolDot(dotId, labelId, isReady) {
+      const dot = document.getElementById(dotId);
+      const label = document.getElementById(labelId);
+      if (!dot || !label) return;
+      if (isReady) {
+        dot.className = 'pill-dot pill-green';
+        label.innerText = 'Ready';
+      } else {
+        dot.className = 'pill-dot pill-gray';
+        label.innerText = 'Not Installed';
       }
     }
 
