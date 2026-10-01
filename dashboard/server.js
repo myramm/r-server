@@ -182,16 +182,86 @@ function getTopProcesses() {
 }
 
 // -------------------------------------------------------------
-// Comprehensive Tools Catalog (Browsers, AI, Remote Desktop, Dev)
+// XRDP LINUX DESKTOP - 40 CATEGORIES SOFTWARE CATALOG
 // -------------------------------------------------------------
 const TOOLS_CATALOG = [
-  // 1. Browsers for XRDP / GUI
+  // ==========================================
+  // SUPER BUNDLES (1-Click Multiple Tools)
+  // ==========================================
+  {
+    id: 'bundle_desktop_super',
+    name: 'Full Desktop Super Pack',
+    icon: '📦',
+    category: 'bundles',
+    categoryName: 'Super Bundles',
+    description: 'Instal paket lengkap: Chrome + Firefox + VS Code + LibreOffice + VLC + GIMP + Thunar + Desktop shortcuts.',
+    checkCmd: 'which google-chrome && which firefox-esr && which code-server && which libreoffice',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y
+      apt-get install -y wget curl ca-certificates libxss1 libappindicator1 libindicator7 libasound2 libgbm1 fonts-liberation xdg-utils firefox-esr libreoffice vlc gimp thunar dbus-x11
+      wget -q -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && (dpkg -i /tmp/chrome.deb || apt-get install -fy) && rm -f /tmp/chrome.deb
+      curl -fsSL https://code-server.dev/install.sh | sh
+      cat << 'EOF' > /usr/local/bin/google-chrome-stable
+#!/bin/bash
+exec /usr/bin/google-chrome-stable --no-sandbox --disable-dev-shm-usage --disable-gpu "$@"
+EOF
+      chmod +x /usr/local/bin/google-chrome-stable
+      cp /usr/local/bin/google-chrome-stable /usr/local/bin/chrome 2>/dev/null || true
+      mkdir -p /root/Desktop
+      cp /usr/share/applications/google-chrome.desktop /usr/share/applications/firefox-esr.desktop /usr/share/applications/libreoffice-startcenter.desktop /usr/share/applications/vlc.desktop /usr/share/applications/gimp.desktop /usr/share/applications/xfce4-terminal.desktop /root/Desktop/ 2>/dev/null || true
+      chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `
+  },
+  {
+    id: 'bundle_ai_ml',
+    name: 'AI & Data Science Super Pack',
+    icon: '🤖',
+    category: 'bundles',
+    categoryName: 'Super Bundles',
+    description: 'Claude Code + Google Antigravity + Aider + JupyterLab + PyTorch + Pandas + NumPy + OpenCV + HuggingFace.',
+    checkCmd: 'which claude && which agy && which jupyter',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y python3 python3-pip python3-venv python3-dev build-essential
+      npm install -g @anthropic-ai/claude-code
+      curl -fsSL https://antigravity.google/cli/install.sh | bash -s -- --dir /usr/local/bin
+      ln -sf /usr/local/bin/agy /usr/local/bin/antigravity 2>/dev/null || true
+      pip3 install --break-system-packages aider-chat jupyterlab ipython numpy pandas torch torchvision torchaudio transformers huggingface_hub opencv-python pillow rich
+    `
+  },
+  {
+    id: 'bundle_web_dev',
+    name: 'Full Stack Dev Super Pack',
+    icon: '⚡',
+    category: 'bundles',
+    categoryName: 'Super Bundles',
+    description: 'Node.js LTS + Bun + Deno + Python 3 Dev + Go + Rust + Docker CLI + Nginx + Redis + Git LFS + GitHub CLI.',
+    checkCmd: 'which node && which bun && which go && which rustc',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y nodejs npm git-lfs gh golang-go redis-tools nginx build-essential curl wget
+      npm install -g n pnpm yarn pm2 typescript ts-node nodemon
+      n lts
+      curl -fsSL https://bun.sh/install | bash
+      ln -sf /root/.bun/bin/bun /usr/local/bin/bun 2>/dev/null || true
+      curl -fsSL https://deno.land/install.sh | sh
+      ln -sf /root/.deno/bin/deno /usr/local/bin/deno 2>/dev/null || true
+      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+      ln -sf /root/.cargo/bin/rustc /usr/local/bin/rustc 2>/dev/null || true
+      ln -sf /root/.cargo/bin/cargo /usr/local/bin/cargo 2>/dev/null || true
+    `
+  },
+
+  // ==========================================
+  // 1. WEB BROWSERS
+  // ==========================================
   {
     id: 'chrome',
     name: 'Google Chrome',
     icon: '🌐',
     category: 'browsers',
-    categoryName: 'Web Browsers (XRDP)',
+    categoryName: 'Web Browsers',
     description: 'Browser resmi Google Chrome 64-bit lengkap dengan auto-wrapper --no-sandbox untuk root XRDP.',
     checkCmd: 'google-chrome --version || google-chrome-stable --version',
     installScript: `
@@ -220,7 +290,7 @@ EOF
     name: 'Chromium Browser',
     icon: '🧭',
     category: 'browsers',
-    categoryName: 'Web Browsers (XRDP)',
+    categoryName: 'Web Browsers',
     description: 'Browser open-source cepat & ringan berbasis engine Chromium dengan konfigurasi sandbox.',
     checkCmd: 'chromium --version || chromium-browser --version',
     installScript: `
@@ -234,35 +304,24 @@ EOF
       chmod +x /usr/local/bin/chromium-browser
       cp /usr/local/bin/chromium-browser /usr/local/bin/chromium 2>/dev/null || true
       mkdir -p /root/Desktop
-      if [ -f /usr/share/applications/chromium.desktop ]; then
-        cp /usr/share/applications/chromium.desktop /root/Desktop/
-        chmod +x /root/Desktop/chromium.desktop
-      elif [ -f /usr/share/applications/chromium-browser.desktop ]; then
-        cp /usr/share/applications/chromium-browser.desktop /root/Desktop/
-        chmod +x /root/Desktop/chromium-browser.desktop
-      fi
+      cp /usr/share/applications/chromium*.desktop /root/Desktop/ 2>/dev/null || true
+      chmod +x /root/Desktop/*.desktop 2>/dev/null || true
     `
   },
   {
     id: 'firefox',
-    name: 'Mozilla Firefox',
+    name: 'Mozilla Firefox ESR',
     icon: '🦊',
     category: 'browsers',
-    categoryName: 'Web Browsers (XRDP)',
+    categoryName: 'Web Browsers',
     description: 'Browser modern Mozilla Firefox ESR yang aman, stabil, dan ramah memory di remote desktop.',
     checkCmd: 'firefox --version || firefox-esr --version',
     installScript: `
       export DEBIAN_FRONTEND=noninteractive
-      apt-get update -y
-      apt-get install -y firefox-esr || apt-get install -y firefox
+      apt-get update -y && apt-get install -y firefox-esr || apt-get install -y firefox
       mkdir -p /root/Desktop
-      if [ -f /usr/share/applications/firefox-esr.desktop ]; then
-        cp /usr/share/applications/firefox-esr.desktop /root/Desktop/
-        chmod +x /root/Desktop/firefox-esr.desktop
-      elif [ -f /usr/share/applications/firefox.desktop ]; then
-        cp /usr/share/applications/firefox.desktop /root/Desktop/
-        chmod +x /root/Desktop/firefox.desktop
-      fi
+      cp /usr/share/applications/firefox*.desktop /root/Desktop/ 2>/dev/null || true
+      chmod +x /root/Desktop/*.desktop 2>/dev/null || true
     `
   },
   {
@@ -270,37 +329,210 @@ EOF
     name: 'Brave Browser',
     icon: '🦁',
     category: 'browsers',
-    categoryName: 'Web Browsers (XRDP)',
+    categoryName: 'Web Browsers',
     description: 'Browser privasi dengan built-in ad blocker dan perlindungan tracking.',
     checkCmd: 'brave-browser --version || brave --version',
     installScript: `
       export DEBIAN_FRONTEND=noninteractive
-      apt-get update -y
-      apt-get install -y curl ca-certificates
+      apt-get update -y && apt-get install -y curl ca-certificates
       curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
       echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" > /etc/apt/sources.list.d/brave-browser-release.list
-      apt-get update -y
-      apt-get install -y brave-browser
+      apt-get update -y && apt-get install -y brave-browser
       cat << 'EOF' > /usr/local/bin/brave-browser-stable
 #!/bin/bash
 exec /usr/bin/brave-browser-stable --no-sandbox --disable-dev-shm-usage "$@"
 EOF
       chmod +x /usr/local/bin/brave-browser-stable
       mkdir -p /root/Desktop
-      if [ -f /usr/share/applications/brave-browser.desktop ]; then
-        cp /usr/share/applications/brave-browser.desktop /root/Desktop/
-        chmod +x /root/Desktop/brave-browser.desktop
-      fi
+      cp /usr/share/applications/brave-browser.desktop /root/Desktop/ 2>/dev/null || true
+      chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `
+  },
+  {
+    id: 'edge',
+    name: 'Microsoft Edge',
+    icon: '🌊',
+    category: 'browsers',
+    categoryName: 'Web Browsers',
+    description: 'Microsoft Edge for Linux dengan integrasi Microsoft services & Chromium engine.',
+    checkCmd: 'microsoft-edge --version || microsoft-edge-stable --version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y curl ca-certificates gnupg
+      curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/microsoft.gpg
+      echo "deb [arch=amd64] https://packages.microsoft.com/repos/edge stable main" > /etc/apt/sources.list.d/microsoft-edge.list
+      apt-get update -y && apt-get install -y microsoft-edge-stable
+      cat << 'EOF' > /usr/local/bin/microsoft-edge-stable
+#!/bin/bash
+exec /usr/bin/microsoft-edge-stable --no-sandbox --disable-dev-shm-usage "$@"
+EOF
+      chmod +x /usr/local/bin/microsoft-edge-stable
+      cp /usr/share/applications/microsoft-edge.desktop /root/Desktop/ 2>/dev/null || true
+      chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `
+  },
+  {
+    id: 'midori',
+    name: 'Midori / Falkon Browser',
+    icon: '🕊️',
+    category: 'browsers',
+    categoryName: 'Web Browsers',
+    description: 'Browser ultra-ringan berbasis QtWebEngine cocok untuk server dengan RAM minimal.',
+    checkCmd: 'falkon --version || midori --version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y falkon || apt-get install -y midori
+      cp /usr/share/applications/org.kde.falkon.desktop /root/Desktop/ 2>/dev/null || true
+      chmod +x /root/Desktop/*.desktop 2>/dev/null || true
     `
   },
 
-  // 2. AI Coding Agents
+  // ==========================================
+  // 2. DESKTOP GUI APPS & OFFICE
+  // ==========================================
+  {
+    id: 'libreoffice',
+    name: 'LibreOffice Suite',
+    icon: '📊',
+    category: 'desktop_apps',
+    categoryName: 'Desktop & Office',
+    description: 'Full Office Suite: Writer (Word), Calc (Excel), Impress (PowerPoint) & Draw.',
+    checkCmd: 'libreoffice --version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y libreoffice libreoffice-gtk3
+      mkdir -p /root/Desktop
+      cp /usr/share/applications/libreoffice*.desktop /root/Desktop/ 2>/dev/null || true
+      chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `
+  },
+  {
+    id: 'vlc',
+    name: 'VLC Media Player',
+    icon: '🔶',
+    category: 'desktop_apps',
+    categoryName: 'Desktop & Office',
+    description: 'Player video & audio nomor satu di dunia yang mendukung semua format codec multimedia.',
+    checkCmd: 'vlc --version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y vlc
+      sed -i 's/geteuid/getppid/' /usr/bin/vlc 2>/dev/null || true
+      cp /usr/share/applications/vlc.desktop /root/Desktop/ 2>/dev/null || true
+      chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `
+  },
+  {
+    id: 'gimp',
+    name: 'GIMP Image Editor',
+    icon: '🎨',
+    category: 'desktop_apps',
+    categoryName: 'Desktop & Office',
+    description: 'Editor gambar & foto profesional open-source (alternatif Adobe Photoshop).',
+    checkCmd: 'gimp --version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y gimp
+      cp /usr/share/applications/gimp.desktop /root/Desktop/ 2>/dev/null || true
+      chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `
+  },
+  {
+    id: 'inkscape',
+    name: 'Inkscape Vector Graphics',
+    icon: '✒️',
+    category: 'desktop_apps',
+    categoryName: 'Desktop & Office',
+    description: 'Aplikasi desain grafis vektor SVG berkualitas profesional (alternatif Adobe Illustrator).',
+    checkCmd: 'inkscape --version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y inkscape
+      cp /usr/share/applications/org.inkscape.Inkscape.desktop /root/Desktop/ 2>/dev/null || true
+      chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `
+  },
+  {
+    id: 'vscode',
+    name: 'VS Code Server',
+    icon: '💻',
+    category: 'desktop_apps',
+    categoryName: 'Desktop & Office',
+    description: 'Visual Studio Code versi Web Server (code-server) dapat diakses via browser atau RDP.',
+    checkCmd: 'code-server --version || code --version',
+    installScript: `
+      curl -fsSL https://code-server.dev/install.sh | sh
+    `
+  },
+  {
+    id: 'geany',
+    name: 'Geany IDE & Editor',
+    icon: '💡',
+    category: 'desktop_apps',
+    categoryName: 'Desktop & Office',
+    description: 'IDE & text editor super ringan & cepat untuk C, C++, Python, HTML, PHP, Java.',
+    checkCmd: 'geany --version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y geany geany-plugins
+      cp /usr/share/applications/geany.desktop /root/Desktop/ 2>/dev/null || true
+      chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `
+  },
+  {
+    id: 'file_managers',
+    name: 'Thunar & Midnight Commander',
+    icon: '📁',
+    category: 'desktop_apps',
+    categoryName: 'Desktop & Office',
+    description: 'File Manager GUI Thunar + File Manager Terminal Midnight Commander (mc) & Double Commander.',
+    checkCmd: 'which thunar && which mc',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y thunar thunar-archive-plugin mc doublecmd-gtk ranger
+      cp /usr/share/applications/thunar.desktop /root/Desktop/ 2>/dev/null || true
+      chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `
+  },
+  {
+    id: 'pdf_tools',
+    name: 'Evince PDF & Document Tools',
+    icon: '📄',
+    category: 'desktop_apps',
+    categoryName: 'Desktop & Office',
+    description: 'Evince PDF viewer + Poppler utilities (pdftotext, pdftoppm, pdfunite) + Pandoc.',
+    checkCmd: 'which evince && which pandoc',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y evince poppler-utils pandoc qpdf
+      cp /usr/share/applications/org.gnome.Evince.desktop /root/Desktop/ 2>/dev/null || true
+      chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `
+  },
+  {
+    id: 'wine',
+    name: 'Wine & Windows Compatibility',
+    icon: '🍷',
+    category: 'desktop_apps',
+    categoryName: 'Desktop & Office',
+    description: 'Wine64 & Winetricks untuk menjalankan aplikasi Windows (.exe) di Linux.',
+    checkCmd: 'wine --version || which wine64',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      dpkg --add-architecture i386 2>/dev/null || true
+      apt-get update -y && apt-get install -y wine wine64 winetricks
+    `
+  },
+
+  // ==========================================
+  // 3. AI & MACHINE LEARNING
+  // ==========================================
   {
     id: 'claude',
     name: 'Claude Code CLI',
     icon: '🤖',
-    category: 'ai',
-    categoryName: 'AI Coding Agents',
+    category: 'ai_ml',
+    categoryName: 'AI & Machine Learning',
     description: 'Official terminal coding agent by Anthropic (perintah: claude / cl).',
     checkCmd: 'claude --version',
     installScript: `
@@ -311,8 +543,8 @@ EOF
     id: 'agy',
     name: 'Google Antigravity CLI',
     icon: '⚡',
-    category: 'ai',
-    categoryName: 'AI Coding Agents',
+    category: 'ai_ml',
+    categoryName: 'AI & Machine Learning',
     description: 'Google Antigravity autonomous developer & pair programming assistant (perintah: agy / ag).',
     checkCmd: 'agy --version',
     installScript: `
@@ -324,140 +556,236 @@ EOF
     id: 'aider',
     name: 'Aider AI Pair Programming',
     icon: '🤝',
-    category: 'ai',
-    categoryName: 'AI Coding Agents',
+    category: 'ai_ml',
+    categoryName: 'AI & Machine Learning',
     description: 'AI pair programmer langsung di git repo terminal (perintah: aider).',
     checkCmd: 'aider --version',
     installScript: `
       pip3 install --break-system-packages aider-chat || pip3 install aider-chat
     `
   },
-
-  // 3. Remote Desktop & Workstation
   {
-    id: 'xrdp',
-    name: 'XRDP + XFCE4 GUI',
-    icon: '🖥️',
-    category: 'desktop',
-    categoryName: 'Desktop & GUI',
-    description: 'Remote Desktop Protocol server & lightweight XFCE4 GUI environment (Port 3389).',
-    checkCmd: 'which xrdp && which xfce4-session',
+    id: 'jupyter',
+    name: 'JupyterLab & IPython',
+    icon: '🪐',
+    category: 'ai_ml',
+    categoryName: 'AI & Machine Learning',
+    description: 'Interactive web-based notebook development environment untuk Python data & ML.',
+    checkCmd: 'jupyter --version || jupyter-lab --version',
     installScript: `
-      export DEBIAN_FRONTEND=noninteractive
-      apt-get update -y
-      apt-get install -y xrdp xorgxrdp xfce4 xfce4-goodies dbus dbus-x11 x11-xserver-utils
-      mkdir -p /var/run/dbus /var/run/xrdp /var/log/xrdp /root/Desktop /etc/skel/Desktop
-      echo "startxfce4" > /root/.xsession
-      echo "startxfce4" > /etc/skel/.xsession
-      chmod 644 /root/.xsession /etc/skel/.xsession
-      adduser xrdp ssl-cert 2>/dev/null || true
-      service dbus start 2>/dev/null || true
-      /usr/sbin/xrdp-sesman 2>/dev/null || true
-      /usr/sbin/xrdp 2>/dev/null || true
+      pip3 install --break-system-packages jupyterlab ipython ipywidgets
     `
   },
   {
-    id: 'vscode',
-    name: 'VS Code Server',
-    icon: '💻',
-    category: 'desktop',
-    categoryName: 'Desktop & GUI',
-    description: 'Visual Studio Code versi Web Server (code-server) dapat diakses langsung via browser.',
-    checkCmd: 'code-server --version || code --version',
+    id: 'pytorch',
+    name: 'PyTorch & ML Core Libraries',
+    icon: '🔥',
+    category: 'ai_ml',
+    categoryName: 'AI & Machine Learning',
+    description: 'PyTorch, TorchVision, TorchAudio, Transformers, NumPy, Pandas, Scikit-learn.',
+    checkCmd: 'python3 -c "import torch; print(torch.__version__)"',
     installScript: `
-      curl -fsSL https://code-server.dev/install.sh | sh
+      pip3 install --break-system-packages torch torchvision torchaudio transformers numpy pandas scikit-learn scipy matplotlib
     `
   },
 
-  // 4. Developer & Media Tools
-  {
-    id: 'ffmpeg',
-    name: 'FFmpeg Suite',
-    icon: '🎬',
-    category: 'dev',
-    categoryName: 'Dev & Media Tools',
-    description: 'Media processing engine audio/video encoding, streaming, remuxing & subtitle handling.',
-    checkCmd: 'ffmpeg -version',
-    installScript: `
-      export DEBIAN_FRONTEND=noninteractive
-      apt-get update -y && apt-get install -y ffmpeg
-    `
-  },
-  {
-    id: 'ytdlp',
-    name: 'YT-DLP Downloader',
-    icon: '📥',
-    category: 'dev',
-    categoryName: 'Dev & Media Tools',
-    description: 'Downloader video/audio serbaguna berkecepatan tinggi dari YouTube & 1000+ website.',
-    checkCmd: 'yt-dlp --version',
-    installScript: `
-      curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
-      chmod a+rx /usr/local/bin/yt-dlp
-    `
-  },
-  {
-    id: 'python_dev',
-    name: 'Python 3 Dev & PIP',
-    icon: '🐍',
-    category: 'dev',
-    categoryName: 'Dev & Media Tools',
-    description: 'Python 3, PIP3, virtualenv, python-dev header & compiler build-essential.',
-    checkCmd: 'python3 --version && pip3 --version',
-    installScript: `
-      export DEBIAN_FRONTEND=noninteractive
-      apt-get update -y && apt-get install -y python3 python3-pip python3-venv python3-dev build-essential
-    `
-  },
+  // ==========================================
+  // 4. PROGRAMMING LANGUAGES & RUNTIMES
+  // ==========================================
   {
     id: 'nodejs',
-    name: 'Node.js LTS & NPM',
+    name: 'Node.js LTS & Package Managers',
     icon: '🟢',
-    category: 'dev',
-    categoryName: 'Dev & Media Tools',
-    description: 'Node.js JavaScript runtime environment & package manager NPM / n version manager.',
+    category: 'programming',
+    categoryName: 'Languages & Runtimes',
+    description: 'Node.js LTS, npm, pnpm, yarn, pm2, ts-node, typescript, nodemon.',
     checkCmd: 'node -v && npm -v',
     installScript: `
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -y && apt-get install -y nodejs npm
-      npm install -g n
+      npm install -g n pnpm yarn pm2 typescript ts-node nodemon
       n lts
     `
   },
   {
-    id: 'docker',
-    name: 'Docker CLI & Tools',
-    icon: '🐳',
-    category: 'dev',
-    categoryName: 'Dev & Media Tools',
-    description: 'Docker container CLI & Docker Compose untuk menjalankan multi-container app.',
-    checkCmd: 'docker --version || which docker',
+    id: 'bun_deno',
+    name: 'Bun & Deno Modern Runtimes',
+    icon: '🥟',
+    category: 'programming',
+    categoryName: 'Languages & Runtimes',
+    description: 'All-in-one JavaScript/TypeScript runtime berkecepatan tinggi Bun & Deno.',
+    checkCmd: 'which bun || which deno',
     installScript: `
-      export DEBIAN_FRONTEND=noninteractive
-      apt-get update -y && apt-get install -y docker.io docker-compose || (curl -fsSL https://get.docker.com | sh)
+      curl -fsSL https://bun.sh/install | bash
+      ln -sf /root/.bun/bin/bun /usr/local/bin/bun 2>/dev/null || true
+      curl -fsSL https://deno.land/install.sh | sh
+      ln -sf /root/.deno/bin/deno /usr/local/bin/deno 2>/dev/null || true
     `
   },
   {
-    id: 'nginx',
-    name: 'Nginx Web Server',
-    icon: '🌐',
-    category: 'dev',
-    categoryName: 'Dev & Media Tools',
-    description: 'High performance HTTP/Reverse Proxy server untuk host website & API.',
-    checkCmd: 'nginx -v',
+    id: 'python_dev',
+    name: 'Python 3 Full Dev & PIP',
+    icon: '🐍',
+    category: 'programming',
+    categoryName: 'Languages & Runtimes',
+    description: 'Python 3, pip, venv, poetry, uv, pipx, requests, fastapi, uvicorn, build-essential.',
+    checkCmd: 'python3 --version && pip3 --version',
     installScript: `
       export DEBIAN_FRONTEND=noninteractive
-      apt-get update -y && apt-get install -y nginx
-      service nginx start 2>/dev/null || true
+      apt-get update -y && apt-get install -y python3 python3-pip python3-venv python3-dev build-essential
+      pip3 install --break-system-packages poetry pipx uv requests fastapi uvicorn flask
+    `
+  },
+  {
+    id: 'rust_cargo',
+    name: 'Rust & Cargo Ecosystem',
+    icon: '🦀',
+    category: 'programming',
+    categoryName: 'Languages & Runtimes',
+    description: 'Rust compiler (rustc), Cargo package manager, dan toolchain rustup.',
+    checkCmd: 'rustc --version || which cargo',
+    installScript: `
+      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+      ln -sf /root/.cargo/bin/rustc /usr/local/bin/rustc 2>/dev/null || true
+      ln -sf /root/.cargo/bin/cargo /usr/local/bin/cargo 2>/dev/null || true
+      ln -sf /root/.cargo/bin/rustup /usr/local/bin/rustup 2>/dev/null || true
+    `
+  },
+  {
+    id: 'golang',
+    name: 'Go (Golang)',
+    icon: '🐹',
+    category: 'programming',
+    categoryName: 'Languages & Runtimes',
+    description: 'Bahasa pemrograman Go resmi dari Google untuk cloud microservices & backend.',
+    checkCmd: 'go version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y golang-go
+    `
+  },
+  {
+    id: 'java_jdk',
+    name: 'Java OpenJDK & Build Tools',
+    icon: '☕',
+    category: 'programming',
+    categoryName: 'Languages & Runtimes',
+    description: 'OpenJDK 17/21 LTS, Maven (mvn), Gradle, dan Ant runtime.',
+    checkCmd: 'java -version && javac -version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y default-jdk maven gradle ant
+    `
+  },
+  {
+    id: 'php_composer',
+    name: 'PHP & Composer',
+    icon: '🐘',
+    category: 'programming',
+    categoryName: 'Languages & Runtimes',
+    description: 'PHP CLI, PHP FPM, Composer package manager, curl, gd, mbstring, xml, mysql extensions.',
+    checkCmd: 'php -v && composer -V',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y php php-cli php-fpm php-curl php-gd php-mbstring php-xml php-mysql composer
+    `
+  },
+  {
+    id: 'c_cpp_compilers',
+    name: 'C/C++ Clang & LLVM Tools',
+    icon: '⚙️',
+    category: 'programming',
+    categoryName: 'Languages & Runtimes',
+    description: 'GCC, G++, Clang, LLVM, CMake, Ninja, Make, GDB debugger, Valgrind.',
+    checkCmd: 'gcc --version && clang --version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y gcc g++ clang llvm cmake ninja-build make gdb valgrind strace
+    `
+  },
+
+  // ==========================================
+  // 5. MEDIA, AUDIO & VIDEO
+  // ==========================================
+  {
+    id: 'ffmpeg',
+    name: 'FFmpeg & Multimedia Suite',
+    icon: '🎬',
+    category: 'media',
+    categoryName: 'Media & Video',
+    description: 'FFmpeg, ffprobe, HandBrake CLI, MediaInfo, Sox, Opus, FLAC, LAME audio tools.',
+    checkCmd: 'ffmpeg -version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y ffmpeg mediainfo handbrake-cli sox lame flac opus-tools
+    `
+  },
+  {
+    id: 'ytdlp',
+    name: 'YT-DLP & Gallery-DL',
+    icon: '📥',
+    category: 'media',
+    categoryName: 'Media & Video',
+    description: 'High-speed media downloader dari YouTube, TikTok, Twitter, Instagram & 1000+ sites.',
+    checkCmd: 'yt-dlp --version',
+    installScript: `
+      curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
+      chmod a+rx /usr/local/bin/yt-dlp
+      pip3 install --break-system-packages gallery-dl 2>/dev/null || true
+    `
+  },
+  {
+    id: 'mpv',
+    name: 'MPV Lightweight Player',
+    icon: '▶️',
+    category: 'media',
+    categoryName: 'Media & Video',
+    description: 'Media player open-source berbasis command-line & GUI yang sangat ringan.',
+    checkCmd: 'mpv --version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y mpv
+    `
+  },
+  {
+    id: 'imagemagick',
+    name: 'ImageMagick & Optimization',
+    icon: '🖼️',
+    category: 'media',
+    categoryName: 'Media & Video',
+    description: 'ImageMagick CLI, GraphicsMagick, WebP tools (cwebp/dwebp), optipng, jpegoptim, gifsicle, exiftool.',
+    checkCmd: 'which convert && which cwebp',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y imagemagick graphicsmagick webp optipng jpegoptim gifsicle libimage-exiftool-perl
+    `
+  },
+
+  // ==========================================
+  // 6. DATABASES & WEB SERVERS
+  // ==========================================
+  {
+    id: 'sqlite_gui',
+    name: 'SQLite & SQLiteBrowser GUI',
+    icon: '🗄️',
+    category: 'database_server',
+    categoryName: 'Databases & Servers',
+    description: 'Database SQLite3 engine + SQLite Database Browser GUI desktop application.',
+    checkCmd: 'sqlite3 --version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y sqlite3 sqlitebrowser
+      cp /usr/share/applications/sqlitebrowser.desktop /root/Desktop/ 2>/dev/null || true
+      chmod +x /root/Desktop/*.desktop 2>/dev/null || true
     `
   },
   {
     id: 'redis',
-    name: 'Redis Database',
-    icon: '🗄️',
-    category: 'dev',
-    categoryName: 'Dev & Media Tools',
-    description: 'In-memory data structure store & fast key-value caching server.',
+    name: 'Redis Database & CLI',
+    icon: '⚡',
+    category: 'database_server',
+    categoryName: 'Databases & Servers',
+    description: 'In-memory fast key-value data store & Redis CLI.',
     checkCmd: 'redis-cli --version',
     installScript: `
       export DEBIAN_FRONTEND=noninteractive
@@ -466,34 +794,144 @@ EOF
     `
   },
   {
+    id: 'postgresql_client',
+    name: 'PostgreSQL Client & Tools',
+    icon: '🐘',
+    category: 'database_server',
+    categoryName: 'Databases & Servers',
+    description: 'PostgreSQL CLI (`psql`), pg_dump, pg_restore, dan client tools.',
+    checkCmd: 'psql --version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y postgresql-client
+    `
+  },
+  {
+    id: 'mariadb_client',
+    name: 'MariaDB / MySQL Client',
+    icon: '🐬',
+    category: 'database_server',
+    categoryName: 'Databases & Servers',
+    description: 'MariaDB & MySQL client terminal tools (`mysql`, `mysqldump`, `mysqladmin`).',
+    checkCmd: 'mysql --version || mariadb --version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y mariadb-client || apt-get install -y mysql-client
+    `
+  },
+  {
+    id: 'nginx',
+    name: 'Nginx Web Server',
+    icon: '🌐',
+    category: 'database_server',
+    categoryName: 'Databases & Servers',
+    description: 'High performance HTTP Web Server & Reverse Proxy.',
+    checkCmd: 'nginx -v',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y nginx
+      service nginx start 2>/dev/null || true
+    `
+  },
+  {
+    id: 'docker',
+    name: 'Docker CLI & Compose',
+    icon: '🐳',
+    category: 'database_server',
+    categoryName: 'Databases & Servers',
+    description: 'Docker container client CLI & Docker Compose management.',
+    checkCmd: 'docker --version || which docker',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y docker.io docker-compose || (curl -fsSL https://get.docker.com | sh)
+    `
+  },
+
+  // ==========================================
+  // 7. DEVOPS, NETWORK & UTILITIES
+  // ==========================================
+  {
+    id: 'github_cli',
+    name: 'GitHub CLI (gh) & Git LFS',
+    icon: '🐙',
+    category: 'devops_tools',
+    categoryName: 'DevOps & Utilities',
+    description: 'Official GitHub command line tool (`gh`) & Git Large File Storage (`git-lfs`).',
+    checkCmd: 'gh --version && git-lfs --version',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y gh git-lfs
+      git lfs install 2>/dev/null || true
+    `
+  },
+  {
+    id: 'railway_cli',
+    name: 'Railway CLI',
+    icon: '🚂',
+    category: 'devops_tools',
+    categoryName: 'DevOps & Utilities',
+    description: 'Official Railway command line interface untuk manage deployments & variables.',
+    checkCmd: 'railway --version',
+    installScript: `
+      npm install -g @railway/cli || (curl -fsSL https://railway.com/install.sh | sh)
+    `
+  },
+  {
+    id: 'terraform_ansible',
+    name: 'Terraform & Ansible',
+    icon: '🏗️',
+    category: 'devops_tools',
+    categoryName: 'DevOps & Utilities',
+    description: 'Infrastructure as Code (IaC) Terraform & automation engine Ansible.',
+    checkCmd: 'which terraform || which ansible',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y ansible curl gnupg software-properties-common
+      curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+      echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" > /etc/apt/sources.list.d/hashicorp.list
+      apt-get update -y && apt-get install -y terraform 2>/dev/null || true
+    `
+  },
+  {
+    id: 'network_pentest',
+    name: 'Network & Security Tools',
+    icon: '🔍',
+    category: 'devops_tools',
+    categoryName: 'DevOps & Utilities',
+    description: 'Nmap port scanner, Wireshark/tshark, tcpdump, iperf3, aria2, rsync, rclone, mtr, socat.',
+    checkCmd: 'which nmap && which rclone',
+    installScript: `
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y && apt-get install -y nmap tshark tcpdump iperf3 aria2 rsync rclone mtr-tiny socat dnsutils netcat-openbsd whois iftop nethogs
+    `
+  },
+  {
     id: 'fastfetch',
     name: 'Fastfetch & Neofetch',
     icon: '📊',
-    category: 'dev',
-    categoryName: 'Dev & Media Tools',
+    category: 'devops_tools',
+    categoryName: 'DevOps & Utilities',
     description: 'System info tool untuk menampilkan ringkasan OS, hardware, logo, dan spec di terminal.',
     checkCmd: 'fastfetch --version || neofetch --version',
     installScript: `
       export DEBIAN_FRONTEND=noninteractive
-      apt-get update -y
-      apt-get install -y neofetch 2>/dev/null || true
-      curl -fsSL https://raw.githubusercontent.com/dylanaraps/neofetch/master/neofetch -o /usr/local/bin/neofetch
-      chmod +x /usr/local/bin/neofetch
+      apt-get update -y && apt-get install -y neofetch 2>/dev/null || true
+      curl -fsSL https://raw.githubusercontent.com/dylanaraps/neofetch/master/neofetch -o /usr/local/bin/neofetch && chmod +x /usr/local/bin/neofetch
       (curl -fsSL https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.deb -o /tmp/fastfetch.deb && dpkg -i /tmp/fastfetch.deb && rm -f /tmp/fastfetch.deb) 2>/dev/null || true
     `
   },
   {
-    id: 'dev_essentials',
-    name: 'Terminal Super Tools',
-    icon: '🛠️',
-    category: 'dev',
-    categoryName: 'Dev & Media Tools',
-    description: 'Kumpulan tool esensial: htop, btop, tmux, zsh, git, curl, wget, zip, unzip, nano, micro, vim, tree.',
-    checkCmd: 'which htop && which tmux && which zsh && which git',
+    id: 'terminal_super',
+    name: 'Terminal Productivity Pack',
+    icon: '💻',
+    category: 'devops_tools',
+    categoryName: 'DevOps & Utilities',
+    description: 'Htop, Btop, Glances, Ncdu, Tmux, Zsh, Fish, Starship prompt, FZF, Bat, Eza, Ripgrep, Zoxide.',
+    checkCmd: 'which htop && which btop && which fzf',
     installScript: `
       export DEBIAN_FRONTEND=noninteractive
-      apt-get update -y
-      apt-get install -y htop btop tmux screen zsh git curl wget zip unzip tar gzip bzip2 xz-utils p7zip-full nano vim micro tree jq bat ripgrep fd-find
+      apt-get update -y && apt-get install -y htop btop glances ncdu tmux zsh fish fzf bat ripgrep fd-find eza zoxide tree jq 2>/dev/null || apt-get install -y htop btop ncdu tmux zsh fzf tree jq
+      curl -sS https://starship.rs/install.sh | sh -s -- -y 2>/dev/null || true
     `
   }
 ];

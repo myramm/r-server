@@ -938,16 +938,23 @@
       <div id="tab-installer">
         <div class="installer-header">
           <div class="cat-pills">
-            <button class="cat-pill active" onclick="filterCategory('all', event)">✨ Semua Tool</button>
-            <button class="cat-pill" onclick="filterCategory('browsers', event)">🌐 Web Browsers (XRDP)</button>
-            <button class="cat-pill" onclick="filterCategory('ai', event)">🤖 AI Coding Agents</button>
-            <button class="cat-pill" onclick="filterCategory('desktop', event)">🖥️ Desktop & GUI</button>
-            <button class="cat-pill" onclick="filterCategory('dev', event)">⚙️ Dev & Media</button>
+            <button class="cat-pill active" onclick="filterCategory('all', event)">✨ Semua Software (60+)</button>
+            <button class="cat-pill" onclick="filterCategory('bundles', event)">📦 Super Bundles</button>
+            <button class="cat-pill" onclick="filterCategory('browsers', event)">🌐 Web Browsers</button>
+            <button class="cat-pill" onclick="filterCategory('desktop_apps', event)">🖥️ Desktop & Office</button>
+            <button class="cat-pill" onclick="filterCategory('ai_ml', event)">🤖 AI & ML</button>
+            <button class="cat-pill" onclick="filterCategory('programming', event)">💻 Languages & Runtimes</button>
+            <button class="cat-pill" onclick="filterCategory('media', event)">🎬 Media & Video</button>
+            <button class="cat-pill" onclick="filterCategory('database_server', event)">🗄️ Databases & Servers</button>
+            <button class="cat-pill" onclick="filterCategory('devops_tools', event)">☁️ DevOps & Utilities</button>
           </div>
-          <button class="btn-action btn-ghost" onclick="fetchToolsList()" style="padding: 6px 12px; font-size: 12px;">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
-            <span>Refresh Status</span>
-          </button>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="text" id="toolSearchInput" oninput="handleToolSearch(event)" placeholder="🔍 Cari tool (e.g. Chrome, VLC, Python, Rust)..." class="terminal-input" style="padding: 6px 12px; font-size: 12px; width: 230px;">
+            <button class="btn-action btn-ghost" onclick="fetchToolsList()" style="padding: 6px 12px; font-size: 12px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+              <span>Refresh</span>
+            </button>
+          </div>
         </div>
 
         <!-- Tool Cards Grid -->
@@ -1249,6 +1256,13 @@
       }
     }
 
+    let searchQuery = '';
+
+    function handleToolSearch(ev) {
+      searchQuery = (ev.target.value || '').trim().toLowerCase();
+      renderToolsGrid();
+    }
+
     function filterCategory(cat, ev) {
       currentCategory = cat;
       document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
@@ -1259,11 +1273,26 @@
     function renderToolsGrid() {
       const grid = document.getElementById('toolsGrid');
       if (!cachedTools || cachedTools.length === 0) {
-        grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:var(--text-dim);">Tidak ada tools yang tersedia.</div>';
+        grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding: 40px; color:var(--text-dim);">Tidak ada tools yang tersedia.</div>';
         return;
       }
 
-      const filtered = currentCategory === 'all' ? cachedTools : cachedTools.filter(t => t.category === currentCategory);
+      let filtered = currentCategory === 'all' ? cachedTools : cachedTools.filter(t => t.category === currentCategory);
+
+      if (searchQuery) {
+        filtered = filtered.filter(t => 
+          (t.name && t.name.toLowerCase().includes(searchQuery)) ||
+          (t.description && t.description.toLowerCase().includes(searchQuery)) ||
+          (t.categoryName && t.categoryName.toLowerCase().includes(searchQuery)) ||
+          (t.id && t.id.toLowerCase().includes(searchQuery))
+        );
+      }
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding: 40px; color:var(--text-muted);">Tidak ada software yang cocok dengan pencarian "' + searchQuery + '".</div>';
+        return;
+      }
+
       let html = '';
 
       filtered.forEach(tool => {
