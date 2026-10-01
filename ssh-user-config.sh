@@ -239,7 +239,7 @@ try:
     cur.execute('''CREATE TABLE IF NOT EXISTS apiKeys (id TEXT PRIMARY KEY, key TEXT UNIQUE NOT NULL, name TEXT, machineId TEXT, isActive INTEGER DEFAULT 1, createdAt TEXT NOT NULL)''')
     cur.execute('''CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY, data TEXT NOT NULL)''')
     cur.execute('''INSERT OR IGNORE INTO apiKeys(id, key, name, machineId, isActive, createdAt) VALUES('f4eed923-e6c7-496f-843a-fc5848dc899b', 'sk-9router-master', 'Railway Master Key', 'railway', 1, datetime('now'))''')
-    cur.execute('''INSERT INTO settings(id, data) VALUES(1, ?) ON CONFLICT(id) DO UPDATE SET data = excluded.data''', [json.dumps({'requireApiKey': False, 'requireLogin': True})])
+    cur.execute('''INSERT INTO settings(id, data) VALUES(1, ?) ON CONFLICT(id) DO UPDATE SET data = excluded.data''', [json.dumps({'requireApiKey': False, 'requireLogin': False})])
     con.commit()
     con.close()
 except Exception as e:

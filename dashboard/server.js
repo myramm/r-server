@@ -1783,8 +1783,8 @@ function proxyTo9Router(req, res, targetPath) {
   clientHeaders['x-forwarded-proto'] = req.headers['x-forwarded-proto'] || 'https';
   clientHeaders['x-forwarded-for'] = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
 
-  // Inject default master key if no client authorization provided
-  if (!clientHeaders['authorization'] && !clientHeaders['x-api-key']) {
+  // Inject default master key if no client authorization provided for API routes
+  if (destPath.startsWith('/v1') && !clientHeaders['authorization'] && !clientHeaders['x-api-key']) {
     clientHeaders['authorization'] = 'Bearer sk-9router-master';
   }
 
@@ -1840,29 +1840,41 @@ const server = http.createServer((req, res) => {
   const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
 
   // -------------------------------------------------------------
-  // 9Router Public Routes (/v1/*, /9router/*, /_next/*)
+  // 1. 9Router AI Gateway Public Endpoints (/v1/*)
   // -------------------------------------------------------------
-  // OpenAI & Anthropic compatible endpoints for Claude Code, Cursor, Aider, etc.
   if (url.pathname.startsWith('/v1')) {
     return proxyTo9Router(req, res, url.pathname + url.search);
   }
 
-  // 9Router Web UI & Dashboard subpaths
-  if (url.pathname.startsWith('/9router')) {
-    const subPath = url.pathname.replace(/^\/9router/, '') || '/';
-    return proxyTo9Router(req, res, subPath + url.search);
+  // -------------------------------------------------------------
+  // 2. 9Router Web UI & Dashboard (/9router, /dashboard, /_next, etc.)
+  // -------------------------------------------------------------
+  if (url.pathname === '/9router' || url.pathname === '/9router/') {
+    res.writeHead(302, { 'Location': '/dashboard' });
+    return res.end();
   }
 
-  // Next.js chunks & static files for 9Router Web UI
-  if (url.pathname.startsWith('/_next') || url.pathname === '/manifest.webmanifest' || url.pathname === '/favicon.svg') {
+  if (url.pathname.startsWith('/dashboard') ||
+      url.pathname.startsWith('/_next') ||
+      url.pathname.startsWith('/landing') ||
+      url.pathname.startsWith('/callback') ||
+      url.pathname === '/manifest.webmanifest' ||
+      url.pathname === '/favicon.svg' ||
+      url.pathname === '/favicon.ico') {
     return proxyTo9Router(req, res, url.pathname + url.search);
   }
 
-  // Static Assets / HTML
-  if (url.pathname === '/' || url.pathname === '/index.html') {
+  // -------------------------------------------------------------
+  // 3. R-SERVER Web Management Dashboard & Login Page
+  // -------------------------------------------------------------
+  if (url.pathname === '/' || url.pathname === '/index.html' || url.pathname === '/login') {
     if (!isAuthenticated(req)) {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       return res.end(LOGIN_HTML);
+    }
+    if (url.pathname === '/login') {
+      res.writeHead(302, { 'Location': '/' });
+      return res.end();
     }
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     return res.end(DASHBOARD_HTML);
@@ -1914,7 +1926,7 @@ const server = http.createServer((req, res) => {
   }
 
   // Metrics API (Requires Auth)
-  if (url.pathname === '/api/stats') {
+  if (url.pathname === '/api/stats' || url.pathname === '/api/status') {
     if (!isAuthenticated(req)) {
       res.writeHead(401, { 'Content-Type': 'application/json' });
       return res.end(JSON.stringify({ error: 'Unauthorized' }));
@@ -2314,9 +2326,14 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Fallback for any other 9Router API or static assets
+  if (url.pathname.startsWith('/api/') || url.pathname.match(/\.(png|jpg|jpeg|gif|svg|ico|css|js|woff|woff2|ttf|eot|webmanifest|json|map)$/i)) {
+    return proxyTo9Router(req, res, url.pathname + url.search);
+  }
+
   // Fallback 404
   res.writeHead(404, { 'Content-Type': 'text/plain' });
-  res.end('Not Found');
+  res.end('Not Found: ' + url.pathname);
 });
 
 server.listen(PORT, HOST, () => {
