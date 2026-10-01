@@ -28,6 +28,10 @@ RUN apt-get update \
         locales ncurses-term \
         dbus dbus-x11 x11-xserver-utils \
         xrdp xorgxrdp xfce4 xfce4-terminal \
+        chromium xdg-utils libgbm1 libnss3 fonts-liberation \
+    && (curl -fsSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o /tmp/chrome.deb \
+        && dpkg -i /tmp/chrome.deb || apt-get install -fy -y \
+        && rm -f /tmp/chrome.deb || true) \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
     && (curl -fsSL https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && chmod +x /usr/local/bin/yt-dlp || true) \
