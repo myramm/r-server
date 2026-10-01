@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>R-SERVER · Cloud Node Control</title>
+  <title>R-SERVER · Cloud Node Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -17,8 +17,8 @@
       --text: #f1f5f9;
       --text-muted: #94a3b8;
       --text-dim: #64748b;
-      --primary: #3b82f6;
-      --primary-hover: #2563eb;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
       --emerald: #10b981;
       --amber: #f59e0b;
       --rose: #ef4444;
@@ -36,34 +36,71 @@
       font-size: 13px;
       line-height: 1.5;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
-    /* Top Clean Navbar */
-    .navbar {
+    /* Top Navigation Bar */
+    .top-navbar {
       background: #0d1017;
       border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
       z-index: 100;
-      padding: 0 20px;
-    }
-    .nav-inner {
-      max-width: 1400px;
-      margin: 0 auto;
       height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+    }
+    .nav-wrapper {
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
     }
-    .brand {
+    .nav-left {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+    }
+
+    /* Hamburger Menu Button */
+    .hamburger-btn {
+      width: 36px;
+      height: 36px;
+      background: #141824;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .hamburger-btn:hover {
+      background: #1e2538;
+      border-color: var(--border-hover);
+    }
+    .hamburger-line {
+      width: 18px;
+      height: 2px;
+      background: #38bdf8;
+      border-radius: 2px;
+      transition: all 0.2s;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       text-decoration: none;
       color: inherit;
     }
-    .brand-box {
+    .brand-badge {
       width: 28px;
       height: 28px;
       background: #1e293b;
@@ -77,14 +114,13 @@
       font-size: 13px;
       color: #38bdf8;
     }
-    .brand-title {
+    .brand-name {
       font-family: 'JetBrains Mono', monospace;
       font-weight: 700;
       font-size: 14px;
-      letter-spacing: -0.3px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
     .status-dot {
       width: 6px;
@@ -95,42 +131,20 @@
       box-shadow: 0 0 6px var(--emerald);
     }
 
-    /* Tab Buttons */
-    .nav-tabs {
-      display: flex;
-      gap: 4px;
-      background: #090b10;
-      padding: 3px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      overflow-x: auto;
-    }
-    .tab-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      padding: 6px 12px;
-      border-radius: 6px;
+    /* Current Page Breadcrumb */
+    .page-indicator {
+      font-family: 'JetBrains Mono', monospace;
       font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
+      color: var(--text-dim);
       display: flex;
       align-items: center;
       gap: 6px;
-      white-space: nowrap;
-      transition: all 0.15s ease;
     }
-    .tab-btn:hover {
-      color: var(--text);
-      background: rgba(255, 255, 255, 0.04);
-    }
-    .tab-btn.active {
+    .page-indicator strong {
       color: #fff;
-      background: #1e293b;
-      font-weight: 600;
     }
 
-    .nav-actions {
+    .nav-right {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -146,6 +160,126 @@
     }
     .stat-pill strong {
       color: var(--text);
+    }
+
+    /* Sidebar Drawer (Hamburger Menu) */
+    .drawer-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s ease;
+    }
+    .drawer-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .sidebar-drawer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 280px;
+      background: #0d1017;
+      border-right: 1px solid var(--border);
+      z-index: 210;
+      transform: translateX(-100%);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+    }
+    .sidebar-drawer.open {
+      transform: translateX(0);
+    }
+
+    .sidebar-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sidebar-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .close-drawer-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .close-drawer-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .sidebar-menu {
+      padding: 12px;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .menu-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-dim);
+      padding: 8px 10px 4px;
+    }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 13px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+    .menu-item:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .menu-item.active {
+      color: #fff;
+      background: #1e293b;
+      border-color: rgba(56, 189, 248, 0.25);
+      font-weight: 600;
+    }
+    .menu-icon {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .sidebar-footer {
+      padding: 12px;
+      border-top: 1px solid var(--border);
+      background: #090a0f;
     }
 
     /* Buttons */
@@ -176,46 +310,57 @@
     .btn-success:hover { background: rgba(16, 185, 129, 0.25); }
     .btn-sm { padding: 4px 8px; font-size: 11px; }
 
-    /* Main Container */
-    .main {
+    /* Main Container & Modular Views */
+    .main-container {
       flex: 1;
       max-width: 1400px;
       width: 100%;
       margin: 0 auto;
-      padding: 20px;
+      padding: 20px 16px;
     }
 
-    /* View Pages */
-    .view {
+    /* Isolated Page Views (Non-1-Page) */
+    .page-view {
       display: none;
+      animation: fadeIn 0.2s ease-out;
     }
-    .view.active {
+    .page-view.active {
       display: block;
     }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-    .section-header {
-      margin-bottom: 16px;
+    .page-header {
+      margin-bottom: 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 14px;
+    }
+    .page-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
       gap: 8px;
     }
-    .section-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: #fff;
-    }
-    .section-desc {
+    .page-desc {
       font-size: 12px;
       color: var(--text-dim);
+      margin-top: 2px;
     }
 
     /* Core Status Bar */
     .core-status-bar {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
       margin-bottom: 16px;
     }
     .core-pill {
@@ -242,7 +387,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
     .metric-card {
       background: var(--surface);
@@ -305,12 +450,11 @@
       gap: 8px;
     }
 
-    /* Budget Card */
+    /* Budget Grid */
     .budget-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-      margin-top: 10px;
+      gap: 10px;
     }
     .budget-item {
       background: #090b10;
@@ -330,14 +474,14 @@
       color: #fff;
     }
 
-    /* System Quick Controls */
+    /* Actions Row */
     .actions-row {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }
 
-    /* Tools Search & Filters */
+    /* Search & Category Pills */
     .search-row {
       display: flex;
       gap: 8px;
@@ -385,7 +529,7 @@
       font-weight: 600;
     }
 
-    /* Tools Catalog Grid */
+    /* Tools Grid */
     .tools-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -443,9 +587,10 @@
       padding-top: 10px;
       border-top: 1px solid rgba(255, 255, 255, 0.04);
       gap: 6px;
+      flex-wrap: wrap;
     }
 
-    /* AI Agents Cards */
+    /* AI Agents Grid */
     .ai-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -462,7 +607,7 @@
       font-family: 'JetBrains Mono', monospace;
     }
     .terminal-output {
-      height: 240px;
+      height: 250px;
       overflow-y: auto;
       font-size: 11.5px;
       color: #38bdf8;
@@ -510,10 +655,10 @@
       border-color: rgba(56, 189, 248, 0.3);
     }
 
-    /* Table */
+    /* Table Box */
     .table-box {
       overflow-x: auto;
-      max-height: 480px;
+      max-height: 520px;
       border-radius: 8px;
       border: 1px solid var(--border);
     }
@@ -542,7 +687,7 @@
       background: rgba(255, 255, 255, 0.02);
     }
 
-    /* Remote Access Cards */
+    /* Access Cards */
     .access-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -566,9 +711,10 @@
       align-items: center;
       justify-content: space-between;
       margin: 8px 0;
+      word-break: break-all;
     }
 
-    /* Drawer / Live Console */
+    /* Live Output Drawer */
     .drawer {
       position: fixed;
       bottom: 20px;
@@ -626,23 +772,24 @@
       z-index: 2000;
       display: none;
     }
-
-    @media (max-width: 800px) {
-      .nav-inner { height: auto; padding: 10px 0; flex-direction: column; align-items: flex-start; }
-      .nav-tabs { width: 100%; overflow-x: auto; }
-      .main { padding: 12px; }
-    }
   </style>
 </head>
 <body>
 
-  <!-- Top Simple Navbar -->
-  <header class="navbar">
-    <div class="nav-inner">
-      <div style="display: flex; align-items: center; gap: 16px; width: 100%; justify-content: space-between;">
-        <div class="brand">
-          <div class="brand-box">R</div>
-          <div class="brand-title">
+  <!-- Top Navbar with Hamburger Toggle -->
+  <header class="top-navbar">
+    <div class="nav-wrapper">
+      <div class="nav-left">
+        <!-- Hamburger Button -->
+        <button class="hamburger-btn" onclick="toggleMenu()" title="Buka Menu Navigasi" aria-label="Menu">
+          <div class="hamburger-line"></div>
+          <div class="hamburger-line"></div>
+          <div class="hamburger-line"></div>
+        </button>
+
+        <div class="brand-group">
+          <div class="brand-badge">R</div>
+          <div class="brand-name">
             <span>R-SERVER</span>
             <span style="font-size: 11px; color: var(--emerald); font-weight: normal; display: inline-flex; align-items: center; gap: 4px;">
               <span class="status-dot"></span> SG Node
@@ -650,37 +797,79 @@
           </div>
         </div>
 
-        <!-- Navigation Tabs -->
-        <nav class="nav-tabs">
-          <button class="tab-btn active" onclick="switchTab('overview', event)">📊 Overview</button>
-          <button class="tab-btn" onclick="switchTab('apps', event)">🛠️ Tools (40+)</button>
-          <button class="tab-btn" onclick="switchTab('ai', event)">🤖 AI & Terminal</button>
-          <button class="tab-btn" onclick="switchTab('processes', event)">⚡ Processes</button>
-          <button class="tab-btn" onclick="switchTab('access', event)">🌐 Access</button>
-          <button class="tab-btn" onclick="switchTab('docs', event)">📖 Docs</button>
-        </nav>
-
-        <!-- Right System Info & Logout -->
-        <div class="nav-actions">
-          <div class="stat-pill" title="Live CPU">CPU <strong id="topCpu">0%</strong></div>
-          <div class="stat-pill" title="Live RAM">RAM <strong id="topRam">0%</strong></div>
-          <button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
+        <div class="page-indicator" style="margin-left: 12px;">
+          <span>/</span> <strong id="activePageName">Dashboard Overview</strong>
         </div>
+      </div>
+
+      <div class="nav-right">
+        <div class="stat-pill" title="Live CPU">CPU <strong id="topCpu">0%</strong></div>
+        <div class="stat-pill" title="Live RAM">RAM <strong id="topRam">0%</strong></div>
+        <button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
       </div>
     </div>
   </header>
 
-  <!-- Main Container -->
-  <main class="main">
+  <!-- Sliding Hamburger Drawer & Backdrop -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeMenu()"></div>
+
+  <aside class="sidebar-drawer" id="sidebarDrawer">
+    <div class="sidebar-header">
+      <div class="sidebar-title">
+        <span>🧭 MENU NAVIGASI</span>
+      </div>
+      <button class="close-drawer-btn" onclick="closeMenu()">✕</button>
+    </div>
+
+    <nav class="sidebar-menu">
+      <div class="menu-section-label">Halaman Utama</div>
+      <a class="menu-item active" onclick="navTo('overview', 'Dashboard Overview', event)">
+        <span class="menu-icon">📊</span>
+        <span>Dashboard Overview</span>
+      </a>
+      <a class="menu-item" onclick="navTo('apps', 'Tool Installer (40+)', event)">
+        <span class="menu-icon">🛠️</span>
+        <span>Tool Installer (40+)</span>
+      </a>
+      <a class="menu-item" onclick="navTo('ai', 'AI Agents & Terminal', event)">
+        <span class="menu-icon">🤖</span>
+        <span>AI Agents & Terminal</span>
+      </a>
+
+      <div class="menu-section-label">Server & System</div>
+      <a class="menu-item" onclick="navTo('processes', 'Live Process Monitor', event)">
+        <span class="menu-icon">⚡</span>
+        <span>Live Process Monitor</span>
+      </a>
+      <a class="menu-item" onclick="navTo('access', 'Remote Access & SSH', event)">
+        <span class="menu-icon">🌐</span>
+        <span>Remote Access & SSH</span>
+      </a>
+      <a class="menu-item" onclick="navTo('docs', 'Documentation & Cheatsheet', event)">
+        <span class="menu-icon">📖</span>
+        <span>Docs & Cheatsheet</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div style="font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; display: flex; flex-direction: column; gap: 2px;">
+        <span>Debian 12 · Singapore Node</span>
+        <span>Port SSH: 22 · XRDP: 3389</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Multi-View Content Container -->
+  <main class="main-container">
 
     <!-- ========================================================= -->
-    <!-- TAB 1: 📊 OVERVIEW                                        -->
+    <!-- VIEW 1: 📊 DASHBOARD OVERVIEW                             -->
     <!-- ========================================================= -->
-    <section id="view-overview" class="view active">
-      <div class="section-header">
+    <section id="view-overview" class="page-view active">
+      <div class="page-header">
         <div>
-          <h2 class="section-title">System Health & Resource Metrics</h2>
-          <p class="section-desc" id="osReleaseText">Debian 12 Bookworm · Uptime: -- · Node.js --</p>
+          <h2 class="page-title">📊 System Health & Resource Metrics</h2>
+          <p class="page-desc" id="osReleaseText">Debian 12 Bookworm · Uptime: -- · Node.js --</p>
         </div>
         <div style="display: flex; gap: 6px;">
           <button class="btn btn-secondary btn-sm" onclick="refreshStats()">🔄 Refresh</button>
@@ -690,7 +879,7 @@
         </div>
       </div>
 
-      <!-- Core Status Pill Bar -->
+      <!-- Core Status Pills -->
       <div class="core-status-bar">
         <div class="core-pill">
           <span class="pill-dot pill-green" id="dotClaude"></span>
@@ -753,7 +942,7 @@
         </div>
       </div>
 
-      <!-- Cloud Budget & Usage Counter Card -->
+      <!-- Cloud Budget Card -->
       <div class="card">
         <div class="card-title">💰 Estimated Railway Usage & Budget Calculator</div>
         <div class="budget-grid">
@@ -776,7 +965,7 @@
         </div>
       </div>
 
-      <!-- System Quick Action Buttons -->
+      <!-- Quick Diagnostics Row -->
       <div class="card">
         <div class="card-title">⚡ Quick Diagnostics & Tools</div>
         <div class="actions-row">
@@ -790,88 +979,22 @@
           <button class="btn btn-secondary btn-sm" onclick="runQuick('uv --version')">⚡ Astral UV Version</button>
         </div>
       </div>
-
-      <!-- Overview Quick AI Agents Section -->
-      <div class="card">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-          <div class="card-title" style="margin-bottom: 0;">🤖 AI Coding Agents (Quick Launch)</div>
-          <button class="btn btn-ghost btn-sm" onclick="switchTab('ai')">Lihat Semua 10 AI Agents &rarr;</button>
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-bottom: 14px;">
-          <div class="tool-card" style="padding: 10px 12px;">
-            <div class="tool-top">
-              <span class="tool-name" style="font-size: 12px;">🤖 Claude Code</span>
-              <span class="tool-badge badge-ready">● Ready</span>
-            </div>
-            <div style="display: flex; gap: 6px; margin-top: 8px;">
-              <button class="btn btn-primary btn-sm" style="flex: 1;" onclick="runQuick('cl')">Launch (cl)</button>
-              <button class="btn btn-ghost btn-sm" onclick="runQuick('claude --version')">v</button>
-            </div>
-          </div>
-          <div class="tool-card" style="padding: 10px 12px;">
-            <div class="tool-top">
-              <span class="tool-name" style="font-size: 12px;">⚡ Google Antigravity</span>
-              <span class="tool-badge badge-ready">● Ready</span>
-            </div>
-            <div style="display: flex; gap: 6px; margin-top: 8px;">
-              <button class="btn btn-primary btn-sm" style="flex: 1;" onclick="runQuick('ag')">Launch (ag)</button>
-              <button class="btn btn-ghost btn-sm" onclick="runQuick('agy --version')">v</button>
-            </div>
-          </div>
-          <div class="tool-card" style="padding: 10px 12px;">
-            <div class="tool-top">
-              <span class="tool-name" style="font-size: 12px;">🤝 Aider AI</span>
-              <span class="tool-badge badge-ready">● Ready</span>
-            </div>
-            <div style="display: flex; gap: 6px; margin-top: 8px;">
-              <button class="btn btn-primary btn-sm" style="flex: 1;" onclick="runQuick('ai')">Launch (ai)</button>
-              <button class="btn btn-ghost btn-sm" onclick="runQuick('aider --version')">v</button>
-            </div>
-          </div>
-          <div class="tool-card" style="padding: 10px 12px;">
-            <div class="tool-top">
-              <span class="tool-name" style="font-size: 12px;">⚡ Astral UV</span>
-              <span class="tool-badge badge-ready">● Ready</span>
-            </div>
-            <div style="display: flex; gap: 6px; margin-top: 8px;">
-              <button class="btn btn-secondary btn-sm" style="flex: 1;" onclick="runQuick('uv --version')">Check UV</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Overview Quick Tools Installer Section -->
-      <div class="card">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-          <div class="card-title" style="margin-bottom: 0;">🛠️ Software & Developer Tools Catalog</div>
-          <button class="btn btn-primary btn-sm" onclick="switchTab('apps')">Buka Katalog Lengkap (40+ Tools) &rarr;</button>
-        </div>
-        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
-          Tersedia 40+ paket software: Google Chrome, VS Code Server, GCC/Rust/Go Compilers, Ollama, Nginx, PostgreSQL, Docker CLI, dan Super Bundles.
-        </p>
-        <div class="actions-row">
-          <button class="btn btn-secondary btn-sm" onclick="switchTab('apps'); filterCategory('browsers');">🌐 Web Browsers</button>
-          <button class="btn btn-secondary btn-sm" onclick="switchTab('apps'); filterCategory('ai_ml');">🤖 AI & Coding Agents</button>
-          <button class="btn btn-secondary btn-sm" onclick="switchTab('apps'); filterCategory('programming');">💻 Compilers & Dev</button>
-          <button class="btn btn-secondary btn-sm" onclick="switchTab('apps'); filterCategory('bundles');">📦 Super Bundles</button>
-        </div>
-      </div>
     </section>
 
     <!-- ========================================================= -->
-    <!-- TAB 2: 🛠️ 1-CLICK TOOL INSTALLER (40+)                    -->
+    <!-- VIEW 2: 🛠️ 1-CLICK TOOL INSTALLER (40+)                    -->
     <!-- ========================================================= -->
-    <section id="view-apps" class="view">
-      <div class="section-header">
+    <section id="view-apps" class="page-view">
+      <div class="page-header">
         <div>
-          <h2 class="section-title">🛠️ Software & Developer Tools Pack (40+)</h2>
-          <p class="section-desc">Instal browser, compiler, database, media tools & AI framework dengan 1-klik.</p>
+          <h2 class="page-title">🛠️ Software & Developer Tools Pack (40+)</h2>
+          <p class="page-desc">Instal atau hapus (*uninstall*) browser, compiler, database, media tools & AI framework dengan 1-klik.</p>
         </div>
       </div>
 
       <!-- Search & Custom Command Input -->
       <div class="search-row">
-        <input type="text" id="toolSearch" class="search-input" placeholder="🔍 Cari software (Chrome, Python, Rust, Docker, Ollama, ffmpeg...)" oninput="filterTools()">
+        <input type="text" id="toolSearch" class="search-input" placeholder="🔍 Cari software (XRDP, Chrome, Git, Python, Rust, Docker, Ollama, ffmpeg...)" oninput="filterTools()">
         <form onsubmit="execCustomInstall(event)" style="display: flex; gap: 6px; flex: 1; min-width: 260px;">
           <input type="text" id="customCmdInput" class="search-input" placeholder="Atau perintah custom: apt-get install -y ..., pip install ...">
           <button type="submit" class="btn btn-primary btn-sm">⚡ Run</button>
@@ -900,13 +1023,13 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- TAB 3: 🤖 AI AGENTS & INTERACTIVE TERMINAL                -->
+    <!-- VIEW 3: 🤖 AI AGENTS & INTERACTIVE TERMINAL                -->
     <!-- ========================================================= -->
-    <section id="view-ai" class="view">
-      <div class="section-header">
+    <section id="view-ai" class="page-view">
+      <div class="page-header">
         <div>
-          <h2 class="section-title">🤖 AI Coding Agents & Web Terminal Console</h2>
-          <p class="section-desc">Jalankan dan kelola agen coding otonom langsung dari terminal web cloud.</p>
+          <h2 class="page-title">🤖 AI Coding Agents & Web Terminal Console</h2>
+          <p class="page-desc">Jalankan, kelola, instal, dan hapus agen coding otonom langsung dari terminal web cloud.</p>
         </div>
       </div>
 
@@ -1080,13 +1203,13 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- TAB 4: ⚡ PROCESSES & HEALTH                              -->
+    <!-- VIEW 4: ⚡ PROCESS MONITOR                                -->
     <!-- ========================================================= -->
-    <section id="view-processes" class="view">
-      <div class="section-header">
+    <section id="view-processes" class="page-view">
+      <div class="page-header">
         <div>
-          <h2 class="section-title">⚡ Live Process Monitor</h2>
-          <p class="section-desc">Daftar proses Linux aktif yang menggunakan RAM dan CPU tertinggi.</p>
+          <h2 class="page-title">⚡ Live Process Monitor</h2>
+          <p class="page-desc">Daftar proses Linux aktif yang menggunakan RAM dan CPU tertinggi.</p>
         </div>
         <button class="btn btn-secondary btn-sm" onclick="refreshStats()">🔄 Refresh Processes</button>
       </div>
@@ -1112,13 +1235,13 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- TAB 5: 🌐 REMOTE ACCESS & CREDENTIALS                     -->
+    <!-- VIEW 5: 🌐 REMOTE ACCESS & CREDENTIALS                     -->
     <!-- ========================================================= -->
-    <section id="view-access" class="view">
-      <div class="section-header">
+    <section id="view-access" class="page-view">
+      <div class="page-header">
         <div>
-          <h2 class="section-title">🌐 Remote Access & Connection Details</h2>
-          <p class="section-desc">Koneksi SSH root, Remote Desktop Windows (XRDP), dan Web endpoints.</p>
+          <h2 class="page-title">🌐 Remote Access & Connection Details</h2>
+          <p class="page-desc">Koneksi SSH root, Remote Desktop Windows (XRDP), dan Web endpoints.</p>
         </div>
       </div>
 
@@ -1165,13 +1288,13 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- TAB 6: 📖 CHEATSHEET & DOCS                               -->
+    <!-- VIEW 6: 📖 CHEATSHEET & DOCS                               -->
     <!-- ========================================================= -->
-    <section id="view-docs" class="view">
-      <div class="section-header">
+    <section id="view-docs" class="page-view">
+      <div class="page-header">
         <div>
-          <h2 class="section-title">📖 Linux & AI Agent Cheatsheet</h2>
-          <p class="section-desc">Panduan cepat baris perintah terminal untuk mengelola server.</p>
+          <h2 class="page-title">📖 Linux & AI Agent Cheatsheet</h2>
+          <p class="page-desc">Panduan cepat baris perintah terminal untuk mengelola server.</p>
         </div>
       </div>
 
@@ -1208,10 +1331,10 @@
 
   </main>
 
-  <!-- Live Installation Drawer -->
+  <!-- Live Output Drawer -->
   <div class="drawer" id="installDrawer">
     <div class="drawer-header">
-      <span id="drawerTitle">📦 Memasang software...</span>
+      <span id="drawerTitle">📦 Memproses...</span>
       <button class="btn btn-ghost btn-sm" onclick="closeDrawer()" style="padding: 2px 6px;">✕</button>
     </div>
     <div class="drawer-body">
@@ -1226,30 +1349,63 @@
     let currentCategory = 'all';
     let allToolsList = [];
 
-    // Navigation Tab Switching
-    function switchTab(tabId, event) {
-      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      
-      const targetView = document.getElementById('view-' + tabId);
-      if (targetView) targetView.classList.add('active');
-      
+    // Hamburger Menu Open/Close
+    function toggleMenu() {
+      const drawer = document.getElementById('sidebarDrawer');
+      const overlay = document.getElementById('drawerOverlay');
+      drawer.classList.toggle('open');
+      overlay.classList.toggle('open');
+    }
+
+    function closeMenu() {
+      document.getElementById('sidebarDrawer').classList.remove('open');
+      document.getElementById('drawerOverlay').classList.remove('open');
+    }
+
+    // Keyboard ESC closes drawer
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMenu();
+    });
+
+    // Navigation Switcher (Multi-View Routing)
+    function navTo(pageId, pageTitle, event) {
+      document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+
+      const target = document.getElementById('view-' + pageId);
+      if (target) target.classList.add('active');
+
       if (event && event.currentTarget) {
         event.currentTarget.classList.add('active');
       } else {
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-          if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(tabId)) {
-            btn.classList.add('active');
+        document.querySelectorAll('.menu-item').forEach(item => {
+          if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(pageId)) {
+            item.classList.add('active');
           }
         });
       }
-      window.location.hash = tabId;
+
+      const label = pageTitle || pageId.toUpperCase();
+      document.getElementById('activePageName').innerText = label;
+      window.location.hash = pageId;
+      closeMenu();
     }
+
+    const pageLabels = {
+      'overview': 'Dashboard Overview',
+      'apps': 'Tool Installer (40+)',
+      'ai': 'AI Agents & Terminal',
+      'processes': 'Live Process Monitor',
+      'access': 'Remote Access & SSH',
+      'docs': 'Docs & Cheatsheet'
+    };
 
     // Hash sync
     window.addEventListener('load', () => {
       const hash = window.location.hash.replace('#', '');
-      if (hash) switchTab(hash);
+      if (hash && pageLabels[hash]) {
+        navTo(hash, pageLabels[hash]);
+      }
       refreshStats();
       loadTools();
       connectSse();
@@ -1266,7 +1422,7 @@
     // Copy text
     function copyText(str) {
       navigator.clipboard.writeText(str);
-      showToast('Teks berhasil disalin: ' + str);
+      showToast('Teks disalin: ' + str);
     }
 
     // Fetch live metrics
@@ -1400,7 +1556,7 @@
 
     // Quick Command in Terminal
     function runQuick(cmd) {
-      switchTab('ai');
+      navTo('ai', 'AI Agents & Terminal');
       document.getElementById('termInput').value = cmd;
       execTerminal();
     }
@@ -1588,7 +1744,7 @@
             consoleBox.innerText += ev.text;
           } else if (ev.type === 'end') {
             consoleBox.innerText += `\n[Status]: Selesai (${ev.install.status})`;
-            showToast('Instalasi ' + ev.install.toolName + ' selesai!');
+            showToast('Proses ' + ev.install.toolName + ' selesai!');
             loadTools();
           }
           consoleBox.scrollTop = consoleBox.scrollHeight;
