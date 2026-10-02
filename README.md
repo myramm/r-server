@@ -86,8 +86,13 @@ Configure these in Railway (**Project → Service → Variables**):
 
 | Command | Action |
 |---|---|
+| `cmd` (or `cmds`) | Displays interactive cheat sheet of all AI agents, tools, and shortcuts. |
 | `claude` (or `cl`) | Launches Claude Code in a persistent tmux session. |
 | `agy` (or `ag`) | Launches Google Antigravity CLI in a persistent tmux session. |
+| `opencode` (or `oc`) | Launches OpenCode AI terminal assistant. |
+| `freebuff` (or `fb`) | Launches Freebuff AI assistant. |
+| `hermes` | Launches Nous Research Hermes Agent TUI. |
+| `aider` (or `ai`) | Launches Aider AI pair programmer. |
 | `usage` | Checks Railway trial credit usage, burn rate, and uptime remaining. |
 | `neofetch` / `fastfetch` | Displays system hardware and OS specs banner. |
 | `src-sync --status` | Checks status of the private GitHub backup repository. |

@@ -99,12 +99,5 @@ fi
 row "src" "│" "${_src}"
 
 printf '%s\n' "$line"
-printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}claude${C_RESET} ${C_DIM}(or ${C_RESET}${C_YELLOW}${C_BOLD}cl${C_RESET}${C_DIM}) to launch Claude Code in tmux${C_RESET}\n"
-printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}agy${C_RESET} ${C_DIM}(or ${C_RESET}${C_YELLOW}${C_BOLD}ag${C_RESET}${C_DIM}) to launch Antigravity CLI${C_RESET}\n"
-printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}hermes${C_RESET} ${C_DIM}to launch Hermes Agent TUI${C_RESET}\n"
-printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}opencode${C_RESET} ${C_DIM}(or ${C_RESET}${C_YELLOW}${C_BOLD}oc${C_RESET}${C_DIM}) to launch OpenCode AI${C_RESET}\n"
-printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}freebuff${C_RESET} ${C_DIM}(or ${C_RESET}${C_YELLOW}${C_BOLD}fb${C_RESET}${C_DIM}) to launch Freebuff AI${C_RESET}\n"
-printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}uv pip install <pkg>${C_RESET} ${C_DIM}to install Python packages instantly${C_RESET}\n"
-printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}usage${C_RESET} ${C_DIM}to check resource & uptime stats${C_RESET}\n"
-printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}src-sync --status${C_RESET} ${C_DIM}to see your private backup repo${C_RESET}\n"
+printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Type${C_RESET} ${C_YELLOW}${C_BOLD}cmd${C_RESET} ${C_DIM}to view all available AI agents, shortcuts & tools${C_RESET}\n"
 printf '\n'
