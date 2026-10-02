@@ -76,10 +76,14 @@ if [ -n "$SSH_USERNAME" ] && [ -n "$SSH_PASSWORD" ]; then
     else
         useradd -ms /bin/bash "$SSH_USERNAME"
         echo "$SSH_USERNAME:$SSH_PASSWORD" | chpasswd
-        # Add user to sudo group / افزودن کاربر به گروه sudo
-        usermod -aG sudo "$SSH_USERNAME"
-        msg "User $SSH_USERNAME created with the provided password and added to sudo group" \
-            "کاربر $SSH_USERNAME با رمز عبور داده‌شده ایجاد و به گروه sudo اضافه شد"
+        # Add user to sudo or wheel group
+        if getent group sudo >/dev/null 2>&1; then
+            usermod -aG sudo "$SSH_USERNAME"
+        elif getent group wheel >/dev/null 2>&1; then
+            usermod -aG wheel "$SSH_USERNAME"
+        fi
+        msg "User $SSH_USERNAME created with the provided password and added to sudo/wheel group" \
+            "User $SSH_USERNAME created and added to admin group"
     fi
     touch "/home/$SSH_USERNAME/.hushlogin" 2>/dev/null || true
     chown "$SSH_USERNAME:$SSH_USERNAME" "/home/$SSH_USERNAME/.hushlogin" 2>/dev/null || true
@@ -254,7 +258,17 @@ fi
 
 if [ -n "$EXTRA_PACKAGES" ]; then
     msg "Installing extra packages: $EXTRA_PACKAGES..." "Installing extra packages: $EXTRA_PACKAGES..."
-    apt-get update -y && apt-get install -y --no-install-recommends $EXTRA_PACKAGES 2>/dev/null || true
+    if command -v pacman >/dev/null 2>&1; then
+        pacman -Sy --noconfirm $EXTRA_PACKAGES 2>/dev/null || true
+    elif command -v apk >/dev/null 2>&1; then
+        apk add --no-cache $EXTRA_PACKAGES 2>/dev/null || true
+    elif command -v dnf >/dev/null 2>&1; then
+        dnf install -y $EXTRA_PACKAGES 2>/dev/null || true
+    elif command -v yum >/dev/null 2>&1; then
+        yum install -y $EXTRA_PACKAGES 2>/dev/null || true
+    elif command -v apt-get >/dev/null 2>&1; then
+        apt-get update -y && apt-get install -y --no-install-recommends $EXTRA_PACKAGES 2>/dev/null || true
+    fi
 fi
 
 if [[ "$INSTALL_AI" =~ "aider" ]]; then
@@ -271,16 +285,17 @@ fi
 # ---------------------------------------------------------------
 # START WEB MONITORING & MANAGEMENT DASHBOARD
 # ---------------------------------------------------------------
-msg "Starting Web Monitoring Dashboard on port ${PORT:-8080}..." "در حال راه‌اندازی داشبورد وب..."
+msg "Starting Web Monitoring Dashboard on port ${PORT:-8080}..." "Starting Web Monitoring Dashboard..."
 if [ -f "/opt/dashboard/server.js" ]; then
     nohup node /opt/dashboard/server.js >/var/log/dashboard.log 2>&1 &
 fi
 
 # ---------------------------------------------------------------
-# START SSH SERVER / راه‌اندازی سرور SSH
+# START SSH SERVER
 # ---------------------------------------------------------------
-msg "Starting SSH server on port 22..." "در حال راه‌اندازی سرور SSH..."
-# Generate host keys if missing (idempotent) / تولید کلیدهای میزبان در صورت نبود
+msg "Starting SSH server on port 22..." "Starting SSH server..."
+# Generate host keys if missing (idempotent)
 ssh-keygen -A 2>/dev/null || true
-exec /usr/sbin/sshd -D
+SSHD_BIN=$(command -v sshd || echo "/usr/sbin/sshd")
+exec "$SSHD_BIN" -D
 
