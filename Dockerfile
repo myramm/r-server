@@ -87,10 +87,8 @@ RUN curl -fsSL https://go.dev/dl/go1.23.1.linux-amd64.tar.gz | tar -C /usr/local
     && ln -sf /usr/local/go/bin/gofmt /usr/local/bin/gofmt
 
 # Install Astral uv, Aider AI, and Hermes Agent
-RUN (curl -LsSf https://astral.sh/uv/install.sh | sh \
-    && ln -sf /root/.local/bin/uv /usr/local/bin/uv \
-    && ln -sf /root/.local/bin/uvx /usr/local/bin/uvx || true) \
-    && (/root/.local/bin/uv pip install --system --break-system-packages aider-chat hermes-agent huggingface_hub rich click typer ipython 2>/dev/null || pip3 install --break-system-packages aider-chat hermes-agent huggingface_hub rich click typer ipython 2>/dev/null || true)
+RUN (curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR="/usr/local/bin" sh || true) \
+    && (uv pip install --system aider-chat hermes-agent huggingface_hub rich click typer ipython 2>/dev/null || true)
 
 # Copy ssh user config to configure the user's password and authorized keys
 COPY ssh-user-config.sh /usr/local/bin/
