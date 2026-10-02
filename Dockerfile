@@ -119,7 +119,8 @@ COPY serve-html /usr/local/bin/serve-html
 COPY tunnel /usr/local/bin/tunnel
 RUN chmod +x /usr/local/bin/cl /usr/local/bin/ag /usr/local/bin/ai /usr/local/bin/oc /usr/local/bin/fb /usr/local/bin/cmd /usr/local/bin/usage /usr/local/bin/serve-html /usr/local/bin/tunnel \
     && ln -sf /usr/local/bin/cmd /usr/local/bin/cmds 2>/dev/null || true \
-    && wget -q -O /usr/local/bin/cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 && chmod +x /usr/local/bin/cloudflared || true
+    && wget -q -O /usr/local/bin/cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 && chmod +x /usr/local/bin/cloudflared || true \
+    && curl -fsSL https://raw.githubusercontent.com/tj/n/master/bin/n -o /usr/local/bin/n && chmod +x /usr/local/bin/n || true
 
 # Copy Web Monitoring & Management Dashboard
 COPY dashboard /opt/dashboard

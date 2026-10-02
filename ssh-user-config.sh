@@ -284,7 +284,11 @@ fi
 # ---------------------------------------------------------------
 if [ -n "$NODE_VERSION" ] && [ "$NODE_VERSION" != "default" ]; then
     msg "Configuring Node.js version $NODE_VERSION..." "Configuring Node.js version $NODE_VERSION..."
-    n "$NODE_VERSION" 2>/dev/null || true
+    if ! command -v n >/dev/null 2>&1; then
+        curl -fsSL https://raw.githubusercontent.com/tj/n/master/bin/n -o /usr/local/bin/n 2>/dev/null && chmod +x /usr/local/bin/n 2>/dev/null || true
+    fi
+    n "$NODE_VERSION" 2>&1 || true
+    hash -r 2>/dev/null || true
 fi
 
 if [ -n "$EXTRA_PACKAGES" ]; then
