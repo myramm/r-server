@@ -169,6 +169,47 @@ configure_claude_settings() {
 configure_claude_settings
 
 # ---------------------------------------------------------------
+# OPTIONAL GOOGLE ANTIGRAVITY AUTH TOKEN & DB / توکن و دیتابیس Antigravity
+# ---------------------------------------------------------------
+: ${ANTIGRAVITY_AUTH_TOKEN:=""}
+: ${ANTIGRAVITY_TOKEN:=""}
+: ${GEMINI_API_KEY:=""}
+
+configure_antigravity_settings() {
+    local token="${ANTIGRAVITY_AUTH_TOKEN:-$ANTIGRAVITY_TOKEN}"
+    local homes="/root"
+    if [ -n "$SSH_USERNAME" ] && [ -d "/home/$SSH_USERNAME" ]; then
+        homes="$homes /home/$SSH_USERNAME"
+    fi
+    for home in $homes; do
+        local agy_dir="$home/.gemini/antigravity-cli"
+        mkdir -p "$agy_dir"
+        # 1. Apply token from environment variable if provided
+        if [ -n "$token" ]; then
+            echo "$token" > "$agy_dir/antigravity-oauth-token"
+            chmod 600 "$agy_dir/antigravity-oauth-token"
+        fi
+        # 2. Or fallback to restored persistent backup from src
+        if [ ! -f "$agy_dir/antigravity-oauth-token" ] && [ -f "/root/src/.gemini_state/antigravity-oauth-token" ]; then
+            cp -a /root/src/.gemini_state/* "$agy_dir/" 2>/dev/null || true
+            chmod 600 "$agy_dir/antigravity-oauth-token" 2>/dev/null || true
+        fi
+        # 3. Apply Gemini API key if provided
+        if [ -n "$GEMINI_API_KEY" ]; then
+            echo "{\"apiKey\":\"$GEMINI_API_KEY\"}" > "$agy_dir/settings.json" 2>/dev/null || true
+            chmod 600 "$agy_dir/settings.json" 2>/dev/null || true
+        fi
+        chown -R "$(stat -c '%U:%G' "$home" 2>/dev/null)" "$home/.gemini" 2>/dev/null || true
+    done
+    if [ -f "/root/.gemini/antigravity-cli/antigravity-oauth-token" ]; then
+        msg "Google Antigravity session & token loaded — no login needed" \
+            "نشست و توکن Antigravity بارگذاری شد — بدون نیاز به لاگین مجدد"
+    fi
+}
+
+configure_antigravity_settings
+
+# ---------------------------------------------------------------
 # SRC FOLDER ⇄ GITHUB SYNC / همگام‌سازی پوشه src با GitHub
 # ---------------------------------------------------------------
 # /root/src is auto-backed up to a PRIVATE repo (ara-tm-src-<id>) and restored

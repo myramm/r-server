@@ -2287,6 +2287,80 @@ const server = http.createServer((req, res) => {
   }
 
   // -------------------------------------------------------------
+  // Antigravity Persistent Token & Session API
+  // -------------------------------------------------------------
+  if (url.pathname === '/api/antigravity/token' && req.method === 'GET') {
+    if (!isAuthenticated(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ error: 'Unauthorized' }));
+    }
+    const tokenFile = '/root/.gemini/antigravity-cli/antigravity-oauth-token';
+    try {
+      if (fs.existsSync(tokenFile)) {
+        const raw = fs.readFileSync(tokenFile, 'utf8').trim();
+        let email = 'Google Account';
+        let expiry = null;
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.id_token) {
+            const parts = parsed.id_token.split('.');
+            if (parts.length === 3) {
+              const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
+              if (payload.email) email = payload.email;
+            }
+          }
+          if (parsed.token?.expiry) expiry = parsed.token.expiry;
+        } catch {}
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({
+          loggedIn: true,
+          email,
+          expiry,
+          token: raw
+        }));
+      }
+    } catch (e) {}
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({ loggedIn: false, token: '' }));
+  }
+
+  if (url.pathname === '/api/antigravity/token' && req.method === 'POST') {
+    if (!isAuthenticated(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ error: 'Unauthorized' }));
+    }
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const { token } = JSON.parse(body);
+        if (!token || typeof token !== 'string') {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ error: 'Token string is required' }));
+        }
+        const dir = '/root/.gemini/antigravity-cli';
+        fs.mkdirSync(dir, { recursive: true });
+        const tokenFile = path.join(dir, 'antigravity-oauth-token');
+        fs.writeFileSync(tokenFile, token.trim(), { mode: 0o600 });
+        
+        // Also save to src state backup for git sync
+        try {
+          const srcState = '/root/src/.gemini_state';
+          fs.mkdirSync(srcState, { recursive: true });
+          fs.writeFileSync(path.join(srcState, 'antigravity-oauth-token'), token.trim(), { mode: 0o600 });
+        } catch {}
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ success: true, message: 'Token Antigravity berhasil disimpan dan otomatis aktif!' }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ error: 'Format token tidak valid / Bad request' }));
+      }
+    });
+    return;
+  }
+
+  // -------------------------------------------------------------
   // 9Router Management & Playground APIs
   // -------------------------------------------------------------
   if (url.pathname === '/api/9router/status' && req.method === 'GET') {

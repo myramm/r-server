@@ -1773,6 +1773,42 @@ curl -s <span class="dyn-origin">https://r-server-production-3b83.up.railway.app
         </div>
       </div>
 
+      <!-- Antigravity Persistent Login & Session Database Box -->
+      <div class="card" style="border-left: 4px solid #10b981; background: linear-gradient(180deg, rgba(16, 185, 129, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%); margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+          <div>
+            <div class="card-title" style="color: #34d399; font-size: 15px; display: flex; align-items: center; gap: 8px;">
+              <span>⚡ Persistent Antigravity Login & SQLite Session</span>
+              <span id="agLoginBadge" class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 10.5px; font-weight: 600;">
+                ● Memeriksa Status...
+              </span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.4;">
+              Token OAuth & riwayat percakapan SQLite Antigravity tersimpan otomatis. Agar <strong>tidak perlu login ulang setiap restart/deploy</strong>, salin token aktif di bawah dan pasang di Railway Variables: <code>ANTIGRAVITY_AUTH_TOKEN</code>.
+            </p>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn btn-secondary btn-sm" onclick="checkAntigravityToken()">🔄 Refresh Status</button>
+            <button class="btn btn-primary btn-sm" onclick="copyAntigravityToken()">📋 Salin Token Aktif</button>
+          </div>
+        </div>
+
+        <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); padding: 12px; border-radius: 8px; margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-size: 11.5px; font-weight: 600; color: #e2e8f0;">🔑 Antigravity Token JSON</span>
+            <span id="agCopyStatus" style="font-size: 10.5px; color: #34d399; font-weight: 600;"></span>
+          </div>
+          <textarea id="agTokenInput" rows="3" style="width: 100%; background: #090d16; border: 1px solid rgba(255,255,255,0.12); color: #38bdf8; font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 8px; border-radius: 6px; resize: vertical;" placeholder="Paste JSON token Antigravity di sini jika ingin restore manual..."></textarea>
+          <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px;">
+            <button class="btn btn-success btn-sm" onclick="saveAntigravityToken()">💾 Simpan & Aktifkan Token</button>
+          </div>
+        </div>
+
+        <div style="font-size: 11.5px; color: var(--text-dim); line-height: 1.5; font-family: 'JetBrains Mono', monospace;">
+          💡 <strong>Tips Auto-Login Permanen:</strong> Pasang variable <code>ANTIGRAVITY_AUTH_TOKEN</code> di Railway Dashboard (Variables) dengan teks token di atas. Setiap server deploy baru, Antigravity akan langsung aktif tanpa pernah meminta login lagi!
+        </div>
+      </div>
+
       <!-- Hermes Agent Spotlight Card -->
       <div class="card" style="border-left: 3px solid #10b981; margin-bottom: 16px;">
         <div class="card-title" style="color: #34d399;">🧠 Hermes Agent (Nous Research)</div>
@@ -1963,6 +1999,7 @@ curl -s <span class="dyn-origin">https://r-server-production-3b83.up.railway.app
       connectSse();
       updateRailwayEndpoints();
       load9RouterInfo();
+      checkAntigravityToken();
     });
 
     // Toast
@@ -2595,6 +2632,83 @@ curl -s <span class="dyn-origin">https://r-server-production-3b83.up.railway.app
           btn.disabled = false;
           btn.innerText = '🚀 Kirim Test Request';
         }
+      }
+    }
+
+    // Antigravity Persistent Login & Token Management
+    async function checkAntigravityToken() {
+      const badge = document.getElementById('agLoginBadge');
+      const input = document.getElementById('agTokenInput');
+      try {
+        const res = await fetch('/api/antigravity/token');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.hasToken) {
+            if (badge) {
+              badge.innerText = `● Logged In (${data.email || 'Token Aktif'})`;
+              badge.style.background = 'rgba(16, 185, 129, 0.2)';
+              badge.style.color = '#34d399';
+              badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+            }
+            if (input && data.tokenString) {
+              input.value = data.tokenString;
+            }
+          } else {
+            if (badge) {
+              badge.innerText = '○ Belum Login';
+              badge.style.background = 'rgba(239, 68, 68, 0.2)';
+              badge.style.color = '#f87171';
+              badge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+            }
+          }
+        }
+      } catch (err) {
+        if (badge) badge.innerText = '○ Error Cek Status';
+      }
+    }
+
+    async function copyAntigravityToken() {
+      const input = document.getElementById('agTokenInput');
+      const text = input ? input.value.trim() : '';
+      if (!text) {
+        showToast('Token belum tersedia di server');
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(text);
+        const copyStatus = document.getElementById('agCopyStatus');
+        if (copyStatus) {
+          copyStatus.innerText = '✓ Berhasil Disalin!';
+          setTimeout(() => { copyStatus.innerText = ''; }, 3000);
+        }
+        showToast('Token Antigravity disalin ke clipboard! Pasang di ANTIGRAVITY_AUTH_TOKEN');
+      } catch (e) {
+        showToast('Gagal menyalin token ke clipboard');
+      }
+    }
+
+    async function saveAntigravityToken() {
+      const input = document.getElementById('agTokenInput');
+      const tokenVal = input ? input.value.trim() : '';
+      if (!tokenVal) {
+        showToast('Masukkan JSON token Antigravity terlebih dahulu');
+        return;
+      }
+      try {
+        const res = await fetch('/api/antigravity/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tokenJson: tokenVal })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast('Token Antigravity berhasil disimpan & diaktifkan!');
+          checkAntigravityToken();
+        } else {
+          showToast('Gagal menyimpan token: ' + (data.error || 'Unknown error'));
+        }
+      } catch (err) {
+        showToast('Error menyimpan token: ' + err.message);
       }
     }
 

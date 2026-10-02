@@ -119,11 +119,43 @@ do_restore() {
     git clone "$(remote_url "$u" "$name")" "$SRC" 2>&1 | tail -2
     cp -a "${SRC}.local"/. "$SRC"/ 2>/dev/null; rm -rf "${SRC}.local"
   fi
+
+  # Restore AI tool states & persistent login databases
+  if [ -d "$SRC/.gemini_state" ]; then
+    mkdir -p /root/.gemini/antigravity-cli
+    cp -a "$SRC/.gemini_state"/* /root/.gemini/antigravity-cli/ 2>/dev/null || true
+    chmod 600 /root/.gemini/antigravity-cli/antigravity-oauth-token 2>/dev/null || true
+  fi
+  if [ -d "$SRC/.9router_state" ]; then
+    mkdir -p /root/.9router/db
+    cp -a "$SRC/.9router_state"/* /root/.9router/db/ 2>/dev/null || true
+  fi
+  if [ -d "$SRC/.claude_state" ]; then
+    mkdir -p /root/.claude
+    cp -a "$SRC/.claude_state"/* /root/.claude/ 2>/dev/null || true
+  fi
 }
 
 do_push() {
   need
   [ -d "$SRC/.git" ] || do_init >/dev/null
+
+  # Backup AI tool states & persistent login databases into src
+  if [ -d "/root/.gemini/antigravity-cli" ]; then
+    mkdir -p "$SRC/.gemini_state"
+    [ -f "/root/.gemini/antigravity-cli/antigravity-oauth-token" ] && cp -a "/root/.gemini/antigravity-cli/antigravity-oauth-token" "$SRC/.gemini_state/" 2>/dev/null || true
+    [ -f "/root/.gemini/antigravity-cli/conversation_summaries.db" ] && cp -a "/root/.gemini/antigravity-cli/conversation_summaries.db" "$SRC/.gemini_state/" 2>/dev/null || true
+    [ -f "/root/.gemini/antigravity-cli/settings.json" ] && cp -a "/root/.gemini/antigravity-cli/settings.json" "$SRC/.gemini_state/" 2>/dev/null || true
+  fi
+  if [ -d "/root/.9router/db" ]; then
+    mkdir -p "$SRC/.9router_state"
+    [ -f "/root/.9router/db/data.sqlite" ] && cp -a "/root/.9router/db/data.sqlite" "$SRC/.9router_state/" 2>/dev/null || true
+  fi
+  if [ -d "/root/.claude" ]; then
+    mkdir -p "$SRC/.claude_state"
+    [ -f "/root/.claude/settings.json" ] && cp -a "/root/.claude/settings.json" "$SRC/.claude_state/" 2>/dev/null || true
+  fi
+
   git_ident
   git -C "$SRC" add -A
   git -C "$SRC" diff --cached --quiet && { echo "src: nothing to sync"; return 0; }
