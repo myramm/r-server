@@ -187,26 +187,6 @@ function getTopProcesses() {
 const TOOLS_CATALOG = [
   // Standalone Core Services
   {
-    id: 'nine_router',
-    name: '9Router AI Gateway',
-    icon: '🔀',
-    category: 'ai_llm',
-    categoryName: 'AI & LLM Tools',
-    description: 'AI router & gateway proxy cerdas (Port 20128) untuk Claude, OpenAI, Gemini, Qwen, DeepSeek & Ollama.',
-    checkCmd: 'which 9router',
-    installScript: `
-      export DEBIAN_FRONTEND=noninteractive
-      npm install -g 9router pnpm pm2
-      node -e 'try { require("/usr/local/lib/node_modules/9router/hooks/sqliteRuntime").ensureSqliteRuntime(); } catch(e) {}' 2>/dev/null || true
-      PORT=20128 HOST=0.0.0.0 HOSTNAME=0.0.0.0 pm2 start /usr/local/lib/node_modules/9router/app/server.js --name 9router 2>/dev/null || (PORT=20128 HOST=0.0.0.0 HOSTNAME=0.0.0.0 nohup node /usr/local/lib/node_modules/9router/app/server.js >/var/log/9router.log 2>&1 &)
-    `,
-    uninstallScript: `
-      pm2 delete 9router 2>/dev/null || true
-      pkill -f "9router" 2>/dev/null || true
-      npm uninstall -g 9router
-    `
-  },
-  {
     id: 'git',
     name: 'Git Version Control & LFS',
     icon: '🐙',
@@ -233,13 +213,13 @@ const TOOLS_CATALOG = [
     icon: '⚡',
     category: 'bundles',
     categoryName: 'Super Bundles',
-    description: 'Stack Cepat Siap Pakai: Git/GH + Python/Node + FFmpeg + Fastfetch/Btop + Claude/Antigravity/Hermes/9Router + Nginx + DB Clients.',
+    description: 'Stack Cepat Siap Pakai: Git/GH + Python/Node + FFmpeg + Fastfetch/Btop + Claude/Antigravity/Hermes + Nginx + DB Clients.',
     checkCmd: 'which git && which node && which python3 && which ffmpeg',
     installScript: `
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -y
       apt-get install -y wget curl ca-certificates git gh python3 python3-pip python3-venv python3-dev nodejs npm ffmpeg fastfetch htop btop tmux jq zsh nginx sqlite3 postgresql-client redis-tools
-      npm install -g n pnpm pm2 @anthropic-ai/claude-code 9router
+      npm install -g n pnpm pm2 @anthropic-ai/claude-code opencode-ai freebuff
       curl -fsSL https://antigravity.google/cli/install.sh | bash -s -- --dir /usr/local/bin || true
       ln -sf /usr/local/bin/agy /usr/local/bin/antigravity 2>/dev/null || true
       pip3 install --break-system-packages uv aider-chat hermes-agent
@@ -699,27 +679,6 @@ EOF
     uninstallScript: `
       pip3 uninstall -y hermes-agent 2>/dev/null || true
       rm -f /usr/local/bin/hermes /root/.local/bin/hermes /root/Desktop/hermes.desktop
-    `
-  },
-  {
-    id: '9router',
-    name: '9Router AI Gateway & Proxy',
-    icon: '🔀',
-    category: 'ai_ml',
-    categoryName: 'AI & Coding Agents',
-    description: 'AI Router/Proxy lokal (Port 20128) perantara Claude Code, Antigravity, Cursor, Aider, Codex, Gemini ke multiple providers (Claude, OpenAI, DeepSeek, Qwen, OpenRouter) dengan fallback & token saving.',
-    checkCmd: '9router --version || which 9router',
-    installScript: `
-      export DEBIAN_FRONTEND=noninteractive
-      echo "==> [9Router] Mengunduh dan menginstal 9router dari npm global..."
-      npm install -g 9router --foreground-scripts || npm install -g 9router
-      echo "==> [9Router] Verifikasi instalasi..."
-      which 9router && 9router --version || true
-      echo "==> [9Router] Berhasil terpasang! Ketik: 9router (Port 20128)"
-    `,
-    uninstallScript: `
-      pkill -f 9router 2>/dev/null || true
-      npm uninstall -g 9router
     `
   },
   {
@@ -1662,16 +1621,14 @@ function getToolsStatus() {
   let claude = false;
   let agy = false;
   let hermes = false;
-  let nineRouter = false;
   let opencode = false;
   let freebuff = false;
   try { execSync('which claude'); claude = true; } catch (e) {}
   try { execSync('which agy || which antigravity'); agy = true; } catch (e) {}
   try { execSync('which hermes'); hermes = true; } catch (e) {}
-  try { execSync('which 9router'); nineRouter = true; } catch (e) {}
   try { execSync('which opencode'); opencode = true; } catch (e) {}
   try { execSync('which freebuff'); freebuff = true; } catch (e) {}
-  return { claude, agy, hermes, nineRouter, opencode, freebuff };
+  return { claude, agy, hermes, opencode, freebuff };
 }
 
 // Usage & Credit metrics calculation
@@ -1806,179 +1763,13 @@ function createSession() {
   return token;
 }
 
-// -------------------------------------------------------------
-// 9Router AI Gateway Reverse Proxy
-// -------------------------------------------------------------
-// Helper to generate 9Router internal CLI auth token
-// -------------------------------------------------------------
-let cachedCliToken = null;
-function get9RouterCliToken() {
-  if (cachedCliToken) return cachedCliToken;
-  try {
-    const dataDir = path.join(os.homedir(), '.9router');
-    const machineIdFile = path.join(dataDir, 'machine-id');
-    const authDir = path.join(dataDir, 'auth');
-    const cliSecretFile = path.join(authDir, 'cli-secret');
-
-    let raw = '';
-    try { raw = fs.readFileSync(machineIdFile, 'utf8').trim(); } catch {}
-    if (!raw) {
-      try {
-        const { machineIdSync } = require('/usr/local/lib/node_modules/9router/node_modules/node-machine-id');
-        raw = machineIdSync();
-      } catch {}
-      if (!raw) raw = crypto.randomUUID();
-      try {
-        fs.mkdirSync(dataDir, { recursive: true });
-        fs.writeFileSync(machineIdFile, raw, { mode: 0o600 });
-      } catch {}
-    }
-
-    let secret = '';
-    try { secret = fs.readFileSync(cliSecretFile, 'utf8').trim(); } catch {}
-    if (!secret) {
-      secret = crypto.randomBytes(32).toString('hex');
-      try {
-        fs.mkdirSync(authDir, { recursive: true });
-        fs.writeFileSync(cliSecretFile, secret, { mode: 0o600 });
-      } catch {}
-    }
-
-    if (raw && secret) {
-      cachedCliToken = crypto.createHash('sha256').update(raw + '9r-cli-auth' + secret).digest('hex').substring(0, 16);
-      return cachedCliToken;
-    }
-  } catch (e) {}
-  return '';
-}
-
-// -------------------------------------------------------------
-// 9ROUTER REVERSE PROXY FORWARDER
-// -------------------------------------------------------------
-function proxyTo9Router(req, res, targetPath) {
-  const destPath = targetPath || (req.url.startsWith('/') ? req.url : '/' + req.url);
-
-  // Setup CORS Headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, Accept, X-Requested-With, baggage, sentry-trace, x-api-key, x-9r-cli-token');
-  res.setHeader('Access-Control-Max-Age', '86400');
-
-  if (req.method === 'OPTIONS') {
-    res.writeHead(204);
-    return res.end();
-  }
-
-  const clientHeaders = { ...req.headers };
-  clientHeaders.host = '127.0.0.1:20128';
-  clientHeaders['x-forwarded-host'] = req.headers.host || 'localhost';
-  clientHeaders['x-forwarded-proto'] = req.headers['x-forwarded-proto'] || 'https';
-  clientHeaders['x-forwarded-for'] = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
-  clientHeaders['x-9r-real-ip'] = '127.0.0.1';
-
-  // Always inject 9Router CLI token for internal API operations (CLI tools, MITM, Antigravity, etc.)
-  const cliToken = get9RouterCliToken();
-  if (cliToken) {
-    clientHeaders['x-9r-cli-token'] = cliToken;
-  }
-
-  // Inject default master key if no client authorization provided for API routes
-  if (destPath.startsWith('/v1') && !clientHeaders['authorization'] && !clientHeaders['x-api-key']) {
-    clientHeaders['authorization'] = 'Bearer sk-9router-master';
-  }
-
-  const options = {
-    hostname: '127.0.0.1',
-    port: 20128,
-    path: destPath,
-    method: req.method,
-    headers: clientHeaders,
-    timeout: 180000 // 3 min timeout for long reasoning models
-  };
-
-  const proxyReq = http.request(options, (proxyRes) => {
-    const resHeaders = { ...proxyRes.headers };
-    resHeaders['access-control-allow-origin'] = '*';
-    res.writeHead(proxyRes.statusCode, resHeaders);
-    proxyRes.pipe(res);
-  });
-
-  proxyReq.on('error', (err) => {
-    if (!res.headersSent) {
-      res.writeHead(502, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-      res.end(JSON.stringify({
-        error: {
-          message: `9Router AI Gateway is offline or starting up on port 20128 (${err.message})`,
-          type: 'gateway_error',
-          code: 502
-        }
-      }));
-    }
-  });
-
-  proxyReq.on('timeout', () => {
-    proxyReq.destroy();
-    if (!res.headersSent) {
-      res.writeHead(504, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-      res.end(JSON.stringify({
-        error: {
-          message: '9Router gateway timeout waiting for upstream model response.',
-          type: 'gateway_timeout',
-          code: 504
-        }
-      }));
-    }
-  });
-
-  req.pipe(proxyReq);
-}
-
 // HTTP Server
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
 
   // -------------------------------------------------------------
-  // OAuth Providers Fallback (e.g. Antigravity is a Client / MITM tool, not an OAuth provider)
-  // -------------------------------------------------------------
-  if (url.pathname.startsWith('/api/oauth/antigravity') || url.pathname.startsWith('/api/oauth/gemini-cli')) {
-    res.writeHead(400, {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-    });
-    return res.end(JSON.stringify({
-      error: 'Google Antigravity bukan OAuth Provider. Antigravity adalah Client/Coding Agent & MITM Tool. Cara pakai: 1) Gunakan menu MITM di /dashboard/mitm untuk DNS routing IDE, 2) Jalankan "agy" atau "ag" di terminal SSH, atau 3) Tambahkan Google Gemini API Key di menu Providers.',
-      success: false
-    }));
-  }
-
-  // -------------------------------------------------------------
-  // 1. 9Router AI Gateway Public Endpoints (/v1/*)
-  // -------------------------------------------------------------
-  if (url.pathname.startsWith('/v1')) {
-    return proxyTo9Router(req, res, url.pathname + url.search);
-  }
-
-  // -------------------------------------------------------------
-  // 2. 9Router Web UI & Dashboard (/9router, /dashboard, /_next, etc.)
-  // -------------------------------------------------------------
-  if (url.pathname === '/9router' || url.pathname === '/9router/') {
-    res.writeHead(302, { 'Location': '/dashboard' });
-    return res.end();
-  }
-
-  if (url.pathname.startsWith('/dashboard') ||
-      url.pathname.startsWith('/_next') ||
-      url.pathname.startsWith('/landing') ||
-      url.pathname.startsWith('/callback') ||
-      url.pathname === '/manifest.webmanifest' ||
-      url.pathname === '/favicon.svg' ||
-      url.pathname === '/favicon.ico') {
-    return proxyTo9Router(req, res, url.pathname + url.search);
-  }
-
-  // -------------------------------------------------------------
-  // 3. R-SERVER Web Management Dashboard & Login Page
+  // R-SERVER Web Management Dashboard & Login Page
   // -------------------------------------------------------------
   if (url.pathname === '/' || url.pathname === '/index.html' || url.pathname === '/login') {
     if (!isAuthenticated(req)) {
@@ -2360,129 +2151,6 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // -------------------------------------------------------------
-  // 9Router Management & Playground APIs
-  // -------------------------------------------------------------
-  if (url.pathname === '/api/9router/status' && req.method === 'GET') {
-    if (!isAuthenticated(req)) {
-      res.writeHead(401, { 'Content-Type': 'application/json' });
-      return res.end(JSON.stringify({ error: 'Unauthorized' }));
-    }
-    const publicUrl = `${req.headers['x-forwarded-proto'] || 'https'}://${req.headers.host || 'r-server-production-3b83.up.railway.app'}/v1`;
-    const checkReq = http.get('http://127.0.0.1:20128/v1/models', {
-      headers: { 'Authorization': 'Bearer sk-9router-master' },
-      timeout: 3000
-    }, (checkRes) => {
-      let data = '';
-      checkRes.on('data', chunk => data += chunk);
-      checkRes.on('end', () => {
-        try {
-          const parsed = JSON.parse(data);
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          return res.end(JSON.stringify({
-            online: true,
-            port: 20128,
-            publicUrl,
-            modelsCount: (parsed.data || []).length,
-            models: parsed.data || []
-          }));
-        } catch (e) {
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          return res.end(JSON.stringify({ online: true, port: 20128, publicUrl, modelsCount: 0, models: [] }));
-        }
-      });
-    });
-    checkReq.on('error', () => {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      return res.end(JSON.stringify({ online: false, port: 20128, publicUrl, modelsCount: 0, models: [] }));
-    });
-    checkReq.on('timeout', () => {
-      checkReq.destroy();
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      return res.end(JSON.stringify({ online: false, port: 20128, publicUrl, modelsCount: 0, models: [] }));
-    });
-    return;
-  }
-
-  if (url.pathname === '/api/9router/restart' && req.method === 'POST') {
-    if (!isAuthenticated(req)) {
-      res.writeHead(401, { 'Content-Type': 'application/json' });
-      return res.end(JSON.stringify({ error: 'Unauthorized' }));
-    }
-    const restartCmd = 'PORT=20128 HOST=0.0.0.0 HOSTNAME=0.0.0.0 pm2 restart 9router 2>/dev/null || (PORT=20128 HOST=0.0.0.0 HOSTNAME=0.0.0.0 pm2 start /usr/local/lib/node_modules/9router/app/server.js --name 9router 2>/dev/null || nohup 9router --tray --skip-update -p 20128 >/var/log/9router.log 2>&1 &)';
-    exec(restartCmd, (err) => {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      return res.end(JSON.stringify({ success: true, message: '9Router daemon restarted on port 20128 via PM2' }));
-    });
-    return;
-  }
-
-  if (url.pathname === '/api/9router/test' && req.method === 'POST') {
-    if (!isAuthenticated(req)) {
-      res.writeHead(401, { 'Content-Type': 'application/json' });
-      return res.end(JSON.stringify({ error: 'Unauthorized' }));
-    }
-    let body = '';
-    req.on('data', chunk => body += chunk);
-    req.on('end', () => {
-      try {
-        const { model = 'tokenharbor/claude-sonnet-5', prompt = 'Halo! Ceritakan dalam 1 kalimat tentang dirimu.' } = JSON.parse(body || '{}');
-        const postData = JSON.stringify({
-          model,
-          messages: [{ role: 'user', content: prompt }],
-          stream: false,
-          max_tokens: 300
-        });
-
-        const testReq = http.request({
-          hostname: '127.0.0.1',
-          port: 20128,
-          path: '/v1/chat/completions',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': Buffer.byteLength(postData)
-          },
-          timeout: 45000
-        }, (testRes) => {
-          let resData = '';
-          testRes.on('data', chunk => resData += chunk);
-          testRes.on('end', () => {
-            try {
-              const jsonRes = JSON.parse(resData);
-              res.writeHead(testRes.statusCode, { 'Content-Type': 'application/json' });
-              return res.end(JSON.stringify({
-                statusCode: testRes.statusCode,
-                response: jsonRes
-              }));
-            } catch (e) {
-              res.writeHead(200, { 'Content-Type': 'application/json' });
-              return res.end(JSON.stringify({ statusCode: testRes.statusCode, raw: resData }));
-            }
-          });
-        });
-
-        testReq.on('error', (err) => {
-          res.writeHead(502, { 'Content-Type': 'application/json' });
-          return res.end(JSON.stringify({ error: `9Router connection error: ${err.message}` }));
-        });
-
-        testReq.on('timeout', () => {
-          testReq.destroy();
-          res.writeHead(504, { 'Content-Type': 'application/json' });
-          return res.end(JSON.stringify({ error: '9Router test request timed out.' }));
-        });
-
-        testReq.write(postData);
-        testReq.end();
-      } catch (e) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        return res.end(JSON.stringify({ error: 'Bad request' }));
-      }
-    });
-    return;
-  }
-
   // Terminal Command Executor
   if (url.pathname === '/api/exec' && req.method === 'POST') {
     if (!isAuthenticated(req)) {
@@ -2511,11 +2179,6 @@ const server = http.createServer((req, res) => {
       }
     });
     return;
-  }
-
-  // Fallback for any other 9Router API or static assets
-  if (url.pathname.startsWith('/api/') || url.pathname.match(/\.(png|jpg|jpeg|gif|svg|ico|css|js|woff|woff2|ttf|eot|webmanifest|json|map)$/i)) {
-    return proxyTo9Router(req, res, url.pathname + url.search);
   }
 
   // Fallback 404

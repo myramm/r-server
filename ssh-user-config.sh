@@ -261,52 +261,12 @@ if [[ "$INSTALL_AI" =~ "aider" ]]; then
     pip3 install --break-system-packages aider-chat 2>/dev/null || pip3 install aider-chat 2>/dev/null || true
 fi
 
-# Ensure 9Router, Hermes Agent, OpenCode AI, and Freebuff exist across all restarts
+# Ensure Hermes Agent, OpenCode AI, and Freebuff exist across all restarts
 (
-    command -v 9router >/dev/null 2>&1 || npm install -g 9router 2>/dev/null || true
     command -v opencode >/dev/null 2>&1 || (npm install -g opencode-ai 2>/dev/null || curl -fsSL https://opencode.ai/install | bash -s -- --dir /usr/local/bin 2>/dev/null || true)
     command -v freebuff >/dev/null 2>&1 || npm install -g freebuff 2>/dev/null || true
     command -v hermes >/dev/null 2>&1 || pip3 install --break-system-packages hermes-agent 2>/dev/null || true
 ) >/var/log/ai-agents-init.log 2>&1 &
-
-# ---------------------------------------------------------------
-# START 9ROUTER AI GATEWAY (PORT 20128)
-# ---------------------------------------------------------------
-mkdir -p /root/.9router/db /root/.9router/runtime /root/.9router/auth
-node -e 'try { require("/usr/local/lib/node_modules/9router/hooks/sqliteRuntime").ensureSqliteRuntime(); } catch(e) {}' 2>/dev/null || true
-python3 -c "
-import os, sys, sqlite3, uuid, datetime, json, secrets
-try:
-    data_dir = '/root/.9router'
-    m_file = os.path.join(data_dir, 'machine-id')
-    s_file = os.path.join(data_dir, 'auth', 'cli-secret')
-    os.makedirs(os.path.join(data_dir, 'auth'), exist_ok=True)
-    if not os.path.exists(m_file):
-        with open(m_file, 'w') as f:
-            f.write(str(uuid.uuid4()))
-    if not os.path.exists(s_file):
-        with open(s_file, 'w') as f:
-            f.write(secrets.token_hex(32))
-    
-    con = sqlite3.connect('/root/.9router/db/data.sqlite')
-    cur = con.cursor()
-    cur.execute('''CREATE TABLE IF NOT EXISTS apiKeys (id TEXT PRIMARY KEY, key TEXT UNIQUE NOT NULL, name TEXT, machineId TEXT, isActive INTEGER DEFAULT 1, createdAt TEXT NOT NULL)''')
-    cur.execute('''CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY, data TEXT NOT NULL)''')
-    cur.execute('''INSERT OR IGNORE INTO apiKeys(id, key, name, machineId, isActive, createdAt) VALUES('f4eed923-e6c7-496f-843a-fc5848dc899b', 'sk-9router-master', 'Railway Master Key', 'railway', 1, datetime('now'))''')
-    cur.execute('''INSERT INTO settings(id, data) VALUES(1, ?) ON CONFLICT(id) DO UPDATE SET data = excluded.data''', [json.dumps({'requireApiKey': False, 'requireLogin': False})])
-    con.commit()
-    con.close()
-except Exception as e:
-    pass
-" 2>/dev/null || true
-
-if [ -f "/usr/local/lib/node_modules/9router/app/server.js" ]; then
-    msg "Starting 9Router AI Gateway on port 20128 (PM2)..." "Starting 9Router AI Gateway on port 20128 (PM2)..."
-    PORT=20128 HOST=0.0.0.0 HOSTNAME=0.0.0.0 pm2 start /usr/local/lib/node_modules/9router/app/server.js --name 9router 2>/dev/null || (PORT=20128 HOST=0.0.0.0 HOSTNAME=0.0.0.0 nohup node /usr/local/lib/node_modules/9router/app/server.js >/var/log/9router.log 2>&1 &)
-elif command -v 9router >/dev/null 2>&1; then
-    msg "Starting 9Router AI Gateway on port 20128..." "Starting 9Router AI Gateway on port 20128..."
-    nohup 9router --tray --skip-update -p 20128 >/var/log/9router.log 2>&1 &
-fi
 
 # ---------------------------------------------------------------
 # START WEB MONITORING & MANAGEMENT DASHBOARD

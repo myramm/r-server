@@ -598,30 +598,6 @@
       margin-bottom: 20px;
     }
 
-    /* 9Router Tab Styles */
-    .router-tab {
-      background: transparent;
-      border: 1px solid transparent;
-      color: var(--text-muted);
-      font-size: 11px;
-      font-weight: 500;
-      padding: 4px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-    }
-    .router-tab:hover {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.06);
-    }
-    .router-tab.active {
-      color: #818cf8;
-      background: rgba(99, 102, 241, 0.18);
-      border-color: rgba(99, 102, 241, 0.35);
-      font-weight: 600;
-    }
-
     /* Terminal Console */
     .terminal-box {
       background: #050608;
@@ -958,7 +934,7 @@
     <div class="sidebar-footer">
       <div style="font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; display: flex; flex-direction: column; gap: 2px;">
         <span>Debian 12 · Singapore Node</span>
-        <span>Port SSH: 22 · HTTP: 8080 · 9Router: 20128</span>
+        <span>Port SSH: 22 · HTTP: 8080</span>
       </div>
     </div>
   </aside>
@@ -996,10 +972,6 @@
         <div class="core-pill">
           <span class="pill-dot pill-green" id="dotHermes"></span>
           <span>Hermes Agent: <strong id="statusHermes">Ready</strong></span>
-        </div>
-        <div class="core-pill">
-          <span class="pill-dot pill-green" id="dot9Router"></span>
-          <span>9Router Gateway: <strong id="status9Router">Online (:20128)</strong></span>
         </div>
         <div class="core-pill">
           <span class="pill-dot pill-green" id="dotOpenCode"></span>
@@ -1189,21 +1161,6 @@
             <button class="btn btn-primary btn-sm" onclick="runQuick('hermes')">Launch</button>
             <button class="btn btn-secondary btn-sm" onclick="installTool('hermes')">Install</button>
             <button class="btn btn-danger btn-sm" onclick="uninstallTool('hermes', 'Hermes Agent')">🗑️ Hapus</button>
-          </div>
-        </div>
-
-        <!-- 9Router AI Gateway -->
-        <div class="tool-card">
-          <div class="tool-top">
-            <span class="tool-name">🔀 9Router AI Gateway</span>
-            <span class="tool-badge badge-ready">● Port 20128</span>
-          </div>
-          <p class="tool-desc">AI proxy & router multi-provider (Claude, OpenAI, DeepSeek, Qwen) dengan automatic fallback & token saving.</p>
-          <div class="tool-footer">
-            <button class="btn btn-ghost btn-sm" onclick="runQuick('9router --version || which 9router')">Version</button>
-            <button class="btn btn-primary btn-sm" onclick="runQuick('9router')">Start 9Router</button>
-            <button class="btn btn-secondary btn-sm" onclick="installTool('9router')">Install</button>
-            <button class="btn btn-danger btn-sm" onclick="uninstallTool('9router', '9Router')">🗑️ Hapus</button>
           </div>
         </div>
 
@@ -1484,7 +1441,7 @@
         <div class="terminal-box">
           <div class="terminal-output" id="termOutput">R-SERVER Interactive Terminal Ready. Ketik perintah bash dan tekan Enter...&#10;</div>
           <form onsubmit="execTerminal(event)" class="terminal-form">
-            <input type="text" id="termInput" class="terminal-input" placeholder="e.g. 9router, hermes, claude, agy, aider, goose, interpreter, sgpt, free -h, df -h..." autocomplete="off">
+            <input type="text" id="termInput" class="terminal-input" placeholder="e.g. opencode, freebuff, hermes, claude, agy, aider, goose, free -h, df -h..." autocomplete="off">
             <button type="submit" class="btn btn-primary btn-sm">⚡ Run</button>
           </form>
           <div class="quick-cmd-bar">
@@ -1493,7 +1450,6 @@
             <span class="quick-pill" onclick="runQuick('hermes --version || which hermes')">hermes</span>
             <span class="quick-pill" onclick="runQuick('opencode --version || which opencode')">opencode</span>
             <span class="quick-pill" onclick="runQuick('freebuff --version || which freebuff')">freebuff</span>
-            <span class="quick-pill" onclick="runQuick('9router --version || which 9router')">9router</span>
             <span class="quick-pill" onclick="runQuick('aider --version')">aider</span>
             <span class="quick-pill" onclick="runQuick('goose --version || which goose')">goose</span>
             <span class="quick-pill" onclick="runQuick('interpreter --version || which interpreter')">interpreter</span>
@@ -1548,8 +1504,8 @@
     <section id="view-access" class="page-view">
       <div class="page-header">
         <div>
-          <h2 class="page-title">🌐 Remote Access, Domain Proxy & Endpoints</h2>
-          <p class="page-desc">Koneksi SSH root, Domain Proxy (HTTPS/TCP), dan 9Router API Gateway endpoints.</p>
+          <h2 class="page-title">🌐 Remote Access & Endpoints</h2>
+          <p class="page-desc">Koneksi SSH root dan Web Dashboard HTTPS URL.</p>
         </div>
       </div>
 
@@ -1564,20 +1520,6 @@
           </div>
           <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px;">
             Port Container: <strong>22</strong> · User: <strong>root</strong> · TCP Proxy: <strong>Railway</strong>
-          </div>
-        </div>
-
-        <!-- Domain Proxy & Custom Domains Card -->
-        <div class="access-card" style="border-top: 3px solid #6366f1;">
-          <div class="card-title" style="color: #a5b4fc;">🔀 Domain Proxy & Custom Domains</div>
-          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Reverse proxy HTTPS terintegrasi ke 9Router & Web Dashboard:</p>
-          <div class="code-box">
-            <span id="gatewayProxyUrl">https://r-server-production-3b83.up.railway.app/v1</span>
-            <button class="btn btn-ghost btn-sm" onclick="copyText(document.getElementById('gatewayProxyUrl').innerText)">Copy</button>
-          </div>
-          <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px; line-height: 1.5;">
-            • <strong>HTTPS Domain</strong>: Otomatis proxy <code>/v1/*</code> ke Port 20128<br>
-            • <strong>Custom Domain</strong>: CNAME di Railway Settings (contoh: <code>api.domain.com</code>)
           </div>
         </div>
 
@@ -1603,173 +1545,23 @@
       <div class="page-header">
         <div>
           <h2 class="page-title">📖 AI Coding Agents Master List — V3 & System Docs</h2>
-          <p class="page-desc">Dokumentasi lengkap ekosistem AI coding agents, Hermes Agent, 9Router, and VPS architecture.</p>
+          <p class="page-desc">Dokumentasi lengkap ekosistem AI coding agents, Hermes Agent, and VPS architecture.</p>
         </div>
       </div>
 
       <!-- Quick AI Architecture Diagram -->
       <div class="card" style="margin-bottom: 16px;">
-        <div class="card-title">🌐 AI Workstation Workflow & Routing Diagram</div>
+        <div class="card-title">🌐 AI Workstation Workflow & Architecture Diagram</div>
         <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; background: rgba(0,0,0,0.5); padding: 14px; border-radius: 8px; border: 1px solid var(--border); overflow-x: auto; color: #a5b4fc; line-height: 1.6;">
 Windows / Mac / Linux / Android / iOS
       │
       │ HTTPS Public / Custom Domain (Port 8080)   OR   SSH (TCP Proxy :22000)
       ▼
-Debian 12 Cloud Workstation (No XRDP / Ultra-Lean & Fast)
+Debian 12 Cloud Workstation (Ultra-Lean & Fast)
       │
-      ├── CLI AI Agents: Claude Code, Antigravity (agy), Hermes Agent, Aider, UV
-      ├── Web Management Dashboard (Port 8080)
-      │
-      ▼
-9Router AI Proxy & Gateway (Port 20128 / Endpoint: /v1)
-      │
-      ├── Anthropic Claude (Claude 3.5 Sonnet / 3.7 Sonnet)
-      ├── OpenAI (GPT-4o, Codex, o1, o3-mini)
-      ├── Google Gemini (Gemini 2.0 Flash / Pro)
-      ├── Qwen & DeepSeek Coder
-      └── OpenRouter / Ollama
-        </div>
-      </div>
-
-      <!-- 9Router Railway Public Gateway Hub -->
-      <div class="card" style="border-left: 4px solid #6366f1; background: linear-gradient(180deg, rgba(99, 102, 241, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%); margin-bottom: 16px;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
-          <div>
-            <div class="card-title" style="color: #a5b4fc; font-size: 15px; display: flex; align-items: center; gap: 8px;">
-              <span>🔀 9Router AI Gateway</span>
-              <span class="badge badge-ready" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 10.5px; font-weight: 600;">
-                ● Live Railway HTTPS Domain
-              </span>
-            </div>
-            <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.4;">
-              Reverse proxy langsung dari domain publik Railway ke 9Router (Port 20128). Mendukung standard OpenAI & Anthropic API format untuk semua AI coding agents.
-            </p>
-          </div>
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button class="btn btn-secondary btn-sm" onclick="restart9Router()">🔄 Restart Daemon</button>
-            <a href="/9router" target="_blank" class="btn btn-primary btn-sm" style="text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">🌐 9Router Web UI ↗</a>
-          </div>
-        </div>
-
-        <!-- Endpoints & Keys Box -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; margin-bottom: 14px;">
-          <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); padding: 10px 12px; border-radius: 8px;">
-            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px; display: flex; justify-content: space-between;">
-              <span>🌐 Railway OpenAI Base URL</span>
-              <span id="endpointCopyStatus" style="color: #34d399; font-size: 10px; font-weight: 600;"></span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <code id="railwayEndpointUrl" style="flex: 1; font-size: 11px; color: #38bdf8; word-break: break-all;">https://r-server-production-3b83.up.railway.app/v1</code>
-              <button class="btn btn-ghost btn-sm" onclick="copyRailwayEndpoint()" style="padding: 3px 8px; font-size: 11px;">📋 Salin</button>
-            </div>
-          </div>
-
-          <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); padding: 10px 12px; border-radius: 8px;">
-            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px; display: flex; justify-content: space-between;">
-              <span>🔑 Master API Key</span>
-              <span id="keyCopyStatus" style="color: #34d399; font-size: 10px; font-weight: 600;"></span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <code id="railwayMasterKey" style="flex: 1; font-size: 11px; color: #f472b6;">sk-9router-master</code>
-              <button class="btn btn-ghost btn-sm" onclick="copyMasterKey()" style="padding: 3px 8px; font-size: 11px;">📋 Salin</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Client Setup Guide Tabs -->
-        <div style="margin-bottom: 14px;">
-          <div style="display: flex; gap: 6px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; margin-bottom: 10px; overflow-x: auto;">
-            <button class="router-tab active" onclick="switchRouterTab('claude')">Claude Code</button>
-            <button class="router-tab" onclick="switchRouterTab('cursor')">Cursor / VS Code</button>
-            <button class="router-tab" onclick="switchRouterTab('aider')">Aider AI</button>
-            <button class="router-tab" onclick="switchRouterTab('opencode')">OpenCode & Hermes</button>
-            <button class="router-tab" onclick="switchRouterTab('python')">Python SDK</button>
-            <button class="router-tab" onclick="switchRouterTab('curl')">cURL API</button>
-          </div>
-
-          <div id="routerTab-claude" class="router-tab-content">
-            <pre style="background: #090d16; border: 1px solid rgba(255,255,255,0.06); padding: 10px; border-radius: 6px; font-size: 11px; color: #cbd5e1; margin: 0; overflow-x: auto;"><code># Cara 1 (Auto Connect via 9Router CLI):
-npx 9router connect <span class="dyn-origin">https://r-server-production-3b83.up.railway.app</span>
-
-# Cara 2 (Set Environment Variable Langsung):
-export ANTHROPIC_BASE_URL="<span class="dyn-origin">https://r-server-production-3b83.up.railway.app</span>/v1"
-claude</code></pre>
-          </div>
-
-          <div id="routerTab-cursor" class="router-tab-content" style="display: none;">
-            <pre style="background: #090d16; border: 1px solid rgba(255,255,255,0.06); padding: 10px; border-radius: 6px; font-size: 11px; color: #cbd5e1; margin: 0; overflow-x: auto;"><code>// Cursor / Continue.dev / Cline Settings:
-Provider : OpenAI Compatible
-Base URL : <span class="dyn-origin">https://r-server-production-3b83.up.railway.app</span>/v1
-API Key  : sk-9router-master (atau token pilihan Anda)
-Model    : tokenharbor/claude-sonnet-5 / tokenharbor/deepseek-v4.1-flash:free</code></pre>
-          </div>
-
-          <div id="routerTab-aider" class="router-tab-content" style="display: none;">
-            <pre style="background: #090d16; border: 1px solid rgba(255,255,255,0.06); padding: 10px; border-radius: 6px; font-size: 11px; color: #cbd5e1; margin: 0; overflow-x: auto;"><code>aider --openai-api-base <span class="dyn-origin">https://r-server-production-3b83.up.railway.app</span>/v1 \
-      --openai-api-key sk-9router-master \
-      --model openai/tokenharbor/claude-sonnet-5</code></pre>
-          </div>
-
-          <div id="routerTab-opencode" class="router-tab-content" style="display: none;">
-            <pre style="background: #090d16; border: 1px solid rgba(255,255,255,0.06); padding: 10px; border-radius: 6px; font-size: 11px; color: #cbd5e1; margin: 0; overflow-x: auto;"><code># OpenCode AI:
-OPENAI_BASE_URL="<span class="dyn-origin">https://r-server-production-3b83.up.railway.app</span>/v1" \
-OPENAI_API_KEY="sk-9router-master" \
-opencode  # atau perintah cepat: oc
-
-# Freebuff AI:
-freebuff  # atau perintah cepat: fb
-
-# Hermes Agent:
-hermes</code></pre>
-          </div>
-
-          <div id="routerTab-python" class="router-tab-content" style="display: none;">
-            <pre style="background: #090d16; border: 1px solid rgba(255,255,255,0.06); padding: 10px; border-radius: 6px; font-size: 11px; color: #cbd5e1; margin: 0; overflow-x: auto;"><code>from openai import OpenAI
-
-client = OpenAI(
-    base_url="<span class="dyn-origin">https://r-server-production-3b83.up.railway.app</span>/v1",
-    api_key="sk-9router-master"
-)
-
-response = client.chat.completions.create(
-    model="tokenharbor/claude-sonnet-5",
-    messages=[{"role": "user", "content": "Halo 9Router via Railway!"}]
-)
-print(response.choices[0].message.content)</code></pre>
-          </div>
-
-          <div id="routerTab-curl" class="router-tab-content" style="display: none;">
-            <pre style="background: #090d16; border: 1px solid rgba(255,255,255,0.06); padding: 10px; border-radius: 6px; font-size: 11px; color: #cbd5e1; margin: 0; overflow-x: auto;"><code># Tes Daftar Model yang Tersedia:
-curl -s <span class="dyn-origin">https://r-server-production-3b83.up.railway.app</span>/v1/models | jq .</code></pre>
-          </div>
-        </div>
-
-        <!-- Interactive AI Model Playground / Tester -->
-        <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px;">
-          <div style="font-weight: 600; font-size: 12px; color: #e2e8f0; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
-            <span>🧪 Interactive 9Router Playground & Model Tester</span>
-            <span id="testerModelsBadge" style="font-size: 10.5px; color: #34d399; font-weight: 600;">● Menghubungkan ke 9Router...</span>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 8px;">
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <select id="routerTestModelSelect" style="flex: 1; min-width: 220px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); color: #f8fafc; font-size: 11px; border-radius: 6px; padding: 6px 10px;">
-                <option value="tokenharbor/claude-sonnet-5">tokenharbor/claude-sonnet-5 (Claude 3.7 Sonnet)</option>
-                <option value="tokenharbor/claude-opus-5.5">tokenharbor/claude-opus-5.5 (Claude Opus)</option>
-                <option value="tokenharbor/gpt-6-astra">tokenharbor/gpt-6-astra (GPT-6)</option>
-                <option value="tokenharbor/deepseek-v4.1-flash:free">tokenharbor/deepseek-v4.1-flash:free (DeepSeek Free)</option>
-                <option value="alitp-intl/deepseek-v4-pro">alitp-intl/deepseek-v4-pro (DeepSeek V4 Pro)</option>
-                <option value="dahl/zai-org/GLM-5.3-Flash">dahl/zai-org/GLM-5.3-Flash (GLM 5.3 Flash)</option>
-                <option value="tokenharbor/grok-4.7">tokenharbor/grok-4.7 (xAI Grok 4.7)</option>
-                <option value="dahl/MiniMaxAI/MiniMax-M2.7">dahl/MiniMaxAI/MiniMax-M2.7 (MiniMax M2.7)</option>
-              </select>
-              <button class="btn btn-primary btn-sm" id="btnRun9RouterTest" onclick="run9RouterTest()">🚀 Kirim Test Request</button>
-            </div>
-
-            <textarea id="routerTestPrompt" rows="2" style="width: 100%; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); color: #f8fafc; font-size: 11px; border-radius: 6px; padding: 6px 10px; resize: vertical;" placeholder="Tulis prompt untuk diuji melalui Railway domain...">Halo! Jelaskan secara singkat apa keuntungan memakai 9Router AI Gateway.</textarea>
-          </div>
-
-          <div id="routerTestResultBox" style="display: none; background: #050811; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 10px; font-family: 'JetBrains Mono', monospace; font-size: 11px; max-height: 180px; overflow-y: auto; color: #a7f3d0; white-space: pre-wrap;"></div>
+      ├── 🤖 CLI AI Agents: Claude Code, Google Antigravity, OpenCode AI, Freebuff, Hermes Agent
+      ├── 🌐 Web Management Dashboard (Port 8080)
+      └── 📁 Persistent State & Workspace: /root/src ⇄ GitHub Private Sync
         </div>
       </div>
 
@@ -1891,8 +1683,8 @@ curl -s <span class="dyn-origin">https://r-server-production-3b83.up.railway.app
         <div class="card">
           <div class="card-title">6. ⚡ Hardware & Planning Notes</div>
           <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px;">
-            <div>• <strong>2 vCPU / 4 GB RAM:</strong> CLI AI agents (Claude, agy, Aider, Hermes).</div>
-            <div>• <strong>4 vCPU / 8 GB RAM:</strong> Desktop GUI (XRDP) + Chrome + VS Code + 9Router + Agents.</div>
+            <div>• <strong>2 vCPU / 4 GB RAM:</strong> CLI AI agents (Claude, agy, OpenCode, Freebuff, Aider, Hermes).</div>
+            <div>• <strong>4 vCPU / 8 GB RAM:</strong> Desktop GUI + Chrome + VS Code + Multi-Agents.</div>
             <div>• <strong>8+ GB RAM:</strong> Local Ollama model inference + Heavy Multi-Agent stacks.</div>
           </div>
         </div>
@@ -1997,8 +1789,6 @@ curl -s <span class="dyn-origin">https://r-server-production-3b83.up.railway.app
       refreshStats();
       loadTools();
       connectSse();
-      updateRailwayEndpoints();
-      load9RouterInfo();
       checkAntigravityToken();
     });
 
@@ -2079,7 +1869,6 @@ curl -s <span class="dyn-origin">https://r-server-production-3b83.up.railway.app
         setToolDot('dotClaude', 'statusClaude', data.tools.claude);
         setToolDot('dotAgy', 'statusAgy', data.tools.agy);
         setToolDot('dotHermes', 'statusHermes', data.tools.hermes);
-        setToolDot('dot9Router', 'status9Router', data.tools.nineRouter, 'Online (:20128)');
         setToolDot('dotOpenCode', 'statusOpenCode', data.tools.opencode);
         setToolDot('dotFreebuff', 'statusFreebuff', data.tools.freebuff);
       }
@@ -2512,126 +2301,6 @@ curl -s <span class="dyn-origin">https://r-server-production-3b83.up.railway.app
         refreshStats();
       } catch (e) {
         showToast('Error');
-      }
-    }
-
-    // -------------------------------------------------------------
-    // 9Router AI Gateway Railway Hub Functions
-    // -------------------------------------------------------------
-    function updateRailwayEndpoints() {
-      const origin = window.location.origin;
-      const endpoint = origin + '/v1';
-      const endpointEl = document.getElementById('railwayEndpointUrl');
-      if (endpointEl) endpointEl.innerText = endpoint;
-      document.querySelectorAll('.dyn-origin').forEach(el => el.innerText = origin);
-    }
-
-    function copyRailwayEndpoint() {
-      const endpoint = window.location.origin + '/v1';
-      navigator.clipboard.writeText(endpoint);
-      const status = document.getElementById('endpointCopyStatus');
-      if (status) {
-        status.innerText = '✓ Disalin!';
-        setTimeout(() => { status.innerText = ''; }, 2500);
-      }
-      showToast('Railway Endpoint /v1 disalin ke clipboard!');
-    }
-
-    function copyMasterKey() {
-      const key = document.getElementById('railwayMasterKey').innerText.trim();
-      navigator.clipboard.writeText(key);
-      const status = document.getElementById('keyCopyStatus');
-      if (status) {
-        status.innerText = '✓ Disalin!';
-        setTimeout(() => { status.innerText = ''; }, 2500);
-      }
-      showToast('Master API Key disalin ke clipboard!');
-    }
-
-    function switchRouterTab(tabId) {
-      document.querySelectorAll('.router-tab').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.router-tab-content').forEach(c => c.style.display = 'none');
-      const target = document.getElementById('routerTab-' + tabId);
-      if (target) target.style.display = 'block';
-      if (window.event && window.event.currentTarget) {
-        window.event.currentTarget.classList.add('active');
-      }
-    }
-
-    async function restart9Router() {
-      try {
-        showToast('Merestart 9Router daemon...');
-        const res = await fetch('/api/9router/restart', { method: 'POST' });
-        const d = await res.json();
-        showToast(d.message || '9Router berhasil direstart!');
-        setTimeout(load9RouterInfo, 2000);
-      } catch (e) {
-        showToast('Gagal merestart 9Router');
-      }
-    }
-
-    async function load9RouterInfo() {
-      try {
-        const res = await fetch('/api/9router/status');
-        if (res.ok) {
-          const data = await res.json();
-          const badge = document.getElementById('testerModelsBadge');
-          if (badge) {
-            badge.innerText = `● ${data.modelsCount || 0} Models Tersedia`;
-            badge.style.color = '#34d399';
-          }
-          if (data.models && data.models.length > 0) {
-            const select = document.getElementById('routerTestModelSelect');
-            if (select) {
-              const currentVal = select.value;
-              select.innerHTML = data.models.map(m => `<option value="${m.id}">${m.id}</option>`).join('');
-              if (currentVal && data.models.some(m => m.id === currentVal)) {
-                select.value = currentVal;
-              }
-            }
-          }
-        }
-      } catch (e) {}
-    }
-
-    async function run9RouterTest() {
-      const select = document.getElementById('routerTestModelSelect');
-      const model = select ? select.value : 'tokenharbor/claude-sonnet-5';
-      const promptEl = document.getElementById('routerTestPrompt');
-      const prompt = promptEl ? promptEl.value.trim() : '';
-      const btn = document.getElementById('btnRun9RouterTest');
-      const resBox = document.getElementById('routerTestResultBox');
-      if (!prompt) return showToast('Masukkan prompt terlebih dahulu');
-
-      if (btn) {
-        btn.disabled = true;
-        btn.innerText = '⏳ Mengirim...';
-      }
-      if (resBox) {
-        resBox.style.display = 'block';
-        resBox.innerText = `[Mengirim request ke ${window.location.origin}/v1/chat/completions (Model: ${model})...]\n`;
-      }
-
-      const startTime = Date.now();
-      try {
-        const res = await fetch('/api/9router/test', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model, prompt })
-        });
-        const data = await res.json();
-        const duration = Date.now() - startTime;
-        if (resBox) {
-          resBox.innerText = `[Response HTTP ${data.statusCode || 200} dalam ${duration}ms]:\n\n` +
-            (data.response ? JSON.stringify(data.response, null, 2) : (data.raw || JSON.stringify(data, null, 2)));
-        }
-      } catch (err) {
-        if (resBox) resBox.innerText = `[Error]: ${err.message}`;
-      } finally {
-        if (btn) {
-          btn.disabled = false;
-          btn.innerText = '🚀 Kirim Test Request';
-        }
       }
     }
 

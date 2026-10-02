@@ -74,9 +74,6 @@ fi
 if command -v freebuff >/dev/null 2>&1; then
   row "Freebuff" "│" "${C_GREEN}● ready (freebuff / fb)${C_RESET}"
 fi
-if command -v 9router >/dev/null 2>&1; then
-  row "9Router" "│" "${C_GREEN}● active (port 20128 / /v1)${C_RESET}"
-fi
 
 # src ⇄ GitHub sync status (reads the local repo mark; no network call)
 # وضعیت همگام‌سازی src با GitHub (نشانگر محلی مخزن را می‌خواند؛ بدون فراخوانی شبکه)
@@ -94,7 +91,6 @@ printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}agy$
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}hermes${C_RESET} ${C_DIM}to launch Hermes Agent TUI${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}opencode${C_RESET} ${C_DIM}(or ${C_RESET}${C_YELLOW}${C_BOLD}oc${C_RESET}${C_DIM}) to launch OpenCode AI${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}freebuff${C_RESET} ${C_DIM}(or ${C_RESET}${C_YELLOW}${C_BOLD}fb${C_RESET}${C_DIM}) to launch Freebuff AI${C_RESET}\n"
-printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}9Router Gateway:${C_RESET} ${C_YELLOW}${C_BOLD}https://<domain>/v1 (Master Key: sk-9router-master)${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}usage${C_RESET} ${C_DIM}to check resource & uptime stats${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}src-sync --status${C_RESET} ${C_DIM}to see your private backup repo${C_RESET}\n"
 printf '\n'

@@ -19,10 +19,6 @@
 
 ## ✨ Features
 
-- 🔀 **Integrated 9Router AI Gateway**:
-  - Reverse proxy on public HTTPS domain (`https://<domain>/v1`) and localhost (`:20128`).
-  - Unified OpenAI & Anthropic compatible API routing for Claude, OpenAI, Gemini, Qwen, DeepSeek, and Ollama.
-  - Pre-configured Master Key (`sk-9router-master`) for instant agent setup.
 - 🌐 **Interactive Web Monitoring & Control Dashboard**:
   - Live RAM (Used, Free, Buffers/Cache) with dynamic progress bars.
   - Live CPU Load, Cores, and Disk Storage gauges.
@@ -33,6 +29,8 @@
 - 🤖 **Pre-Installed AI Coding Agents**:
   - **Anthropic Claude Code CLI** (`claude` / `cl` helper).
   - **Google Antigravity CLI** (`agy` / `ag` helper).
+  - **OpenCode AI** (`opencode` / `oc` helper).
+  - **Freebuff AI** (`freebuff` / `fb` helper).
   - **Hermes Agent** (`hermes`).
   - **Aider AI** (`aider` / `ai` helper).
 - 🔑 **Full Root Access**:
@@ -60,14 +58,7 @@ ssh -p 22000 root@altaria.proxy.rlwy.net
 ssh -p 22000 root@66.33.22.220
 ```
 
-### 2. 9Router AI Gateway API Endpoint
-Access 9Router from any local or remote coding agent (Cursor, Aider, OpenCode, Python SDK):
-
-* **OpenAI Base URL:** `https://r-server-production-3b83.up.railway.app/v1`
-* **Master API Key:** `sk-9router-master`
-* **Web UI (Config & Keys):** `https://r-server-production-3b83.up.railway.app/9router`
-
-### 3. Web Dashboard Access
+### 2. Web Dashboard Access
 Open your Railway public HTTP URL in any browser:
 
 * **URL:** `https://r-server-production-3b83.up.railway.app`

@@ -126,10 +126,6 @@ do_restore() {
     cp -a "$SRC/.gemini_state"/* /root/.gemini/antigravity-cli/ 2>/dev/null || true
     chmod 600 /root/.gemini/antigravity-cli/antigravity-oauth-token 2>/dev/null || true
   fi
-  if [ -d "$SRC/.9router_state" ]; then
-    mkdir -p /root/.9router/db
-    cp -a "$SRC/.9router_state"/* /root/.9router/db/ 2>/dev/null || true
-  fi
   if [ -d "$SRC/.claude_state" ]; then
     mkdir -p /root/.claude
     cp -a "$SRC/.claude_state"/* /root/.claude/ 2>/dev/null || true
@@ -146,10 +142,6 @@ do_push() {
     [ -f "/root/.gemini/antigravity-cli/antigravity-oauth-token" ] && cp -a "/root/.gemini/antigravity-cli/antigravity-oauth-token" "$SRC/.gemini_state/" 2>/dev/null || true
     [ -f "/root/.gemini/antigravity-cli/conversation_summaries.db" ] && cp -a "/root/.gemini/antigravity-cli/conversation_summaries.db" "$SRC/.gemini_state/" 2>/dev/null || true
     [ -f "/root/.gemini/antigravity-cli/settings.json" ] && cp -a "/root/.gemini/antigravity-cli/settings.json" "$SRC/.gemini_state/" 2>/dev/null || true
-  fi
-  if [ -d "/root/.9router/db" ]; then
-    mkdir -p "$SRC/.9router_state"
-    [ -f "/root/.9router/db/data.sqlite" ] && cp -a "/root/.9router/db/data.sqlite" "$SRC/.9router_state/" 2>/dev/null || true
   fi
   if [ -d "/root/.claude" ]; then
     mkdir -p "$SRC/.claude_state"

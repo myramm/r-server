@@ -72,10 +72,9 @@ ARG ANTHROPIC_AUTH_TOKEN=""
 COPY claude-settings.json /root/.claude/settings.json
 RUN sed -i "s|__ANTHROPIC_AUTH_TOKEN__|${ANTHROPIC_AUTH_TOKEN}|g" /root/.claude/settings.json
 
-# Install Claude Code, 9Router, OpenCode AI, Freebuff, pnpm & pm2 globally
-RUN npm install -g @anthropic-ai/claude-code 9router opencode-ai freebuff pnpm pm2 2>/dev/null || npm install -g @anthropic-ai/claude-code 9router \
-    && (curl -fsSL https://opencode.ai/install | bash -s -- --dir /usr/local/bin 2>/dev/null || true) \
-    && (node -e 'try { require("/usr/local/lib/node_modules/9router/hooks/sqliteRuntime").ensureSqliteRuntime(); } catch(e) {}' 2>/dev/null || true)
+# Install Claude Code, OpenCode AI, Freebuff, pnpm & pm2 globally
+RUN npm install -g @anthropic-ai/claude-code opencode-ai freebuff pnpm pm2 2>/dev/null || npm install -g @anthropic-ai/claude-code \
+    && (curl -fsSL https://opencode.ai/install | bash -s -- --dir /usr/local/bin 2>/dev/null || true)
 
 # Install Google Antigravity CLI (agy) globally
 RUN curl -fsSL https://antigravity.google/cli/install.sh | bash -s -- --dir /usr/local/bin \
@@ -107,7 +106,7 @@ RUN chmod +x /usr/local/bin/cl /usr/local/bin/ag /usr/local/bin/ai /usr/local/bi
 COPY dashboard /opt/dashboard
 RUN chmod -R 755 /opt/dashboard
 
-# Expose port 22 (SSH) and 8080 (Web Dashboard & 9Router Reverse Proxy)
+# Expose port 22 (SSH) and 8080 (Web Dashboard)
 EXPOSE 22
 EXPOSE 8080
 
