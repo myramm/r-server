@@ -7,27 +7,42 @@
 ARG BASE_IMAGE=archlinux:latest
 FROM ${BASE_IMAGE}
 
-# Initialize pacman keys and update system
-RUN pacman-key --init \
-    && pacman-key --populate archlinux \
-    && pacman -Syu --noconfirm \
-    && pacman -S --noconfirm --needed \
-        ca-certificates \
-        openssh sudo \
-        curl wget \
-        iproute2 iputils net-tools traceroute bind whois nmap \
-        vim nano micro \
-        htop btop ncdu \
-        tmux screen less tree bat ripgrep fd jq zsh \
-        unzip zip tar gzip bzip2 xz p7zip \
-        git base-devel cmake pkg-config gcc \
-        python python-pip python-virtualenv \
-        nodejs npm ffmpeg \
-        glibc-locales which procps-ng shadow fastfetch \
+# Distro-adaptive package installation
+RUN if command -v pacman >/dev/null 2>&1; then \
+        pacman-key --init \
+        && pacman-key --populate archlinux \
+        && pacman -Syu --noconfirm \
+        && pacman -S --noconfirm --needed \
+            ca-certificates openssh sudo curl wget \
+            iproute2 iputils net-tools traceroute bind whois nmap \
+            vim nano micro htop btop ncdu \
+            tmux screen less tree bat ripgrep fd jq zsh \
+            unzip zip tar gzip bzip2 xz p7zip \
+            git base-devel cmake pkg-config gcc \
+            python python-pip python-virtualenv \
+            nodejs npm ffmpeg glibc-locales which procps-ng shadow fastfetch; \
+    elif command -v apt-get >/dev/null 2>&1; then \
+        (userdel -r debian 2>/dev/null || userdel -r ubuntu 2>/dev/null || true); \
+        apt-get update \
+        && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            ca-certificates gnupg apt-transport-https openssh-server sudo curl wget \
+            iproute2 iputils-ping net-tools dnsutils traceroute whois telnet nmap \
+            vim nano micro htop btop ncdu tmux screen less tree bat ripgrep fd-find jq zsh \
+            unzip zip tar gzip bzip2 xz-utils p7zip-full \
+            git build-essential cmake pkg-config autoconf automake libtool gcc g++ \
+            python3 python3-pip python3-venv python3-dev nodejs npm ffmpeg locales ncurses-term \
+        && (curl -fsSL https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.deb -o /tmp/fastfetch.deb && dpkg -i /tmp/fastfetch.deb && rm -f /tmp/fastfetch.deb || true) \
+        && apt-get clean && rm -rf /var/lib/apt/lists/*; \
+    elif command -v apk >/dev/null 2>&1; then \
+        apk update && apk add --no-cache \
+            bash shadow sudo openssh curl wget git python3 py3-pip nodejs npm ffmpeg fastfetch; \
+    elif command -v dnf >/dev/null 2>&1; then \
+        dnf install -y openssh-server sudo curl wget git python3 nodejs npm ffmpeg fastfetch 2>/dev/null || true; \
+    fi \
     && (curl -fsSL https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && chmod +x /usr/local/bin/yt-dlp || true) \
     && mkdir -p /run/sshd /var/empty \
     && chmod 755 /run/sshd /var/empty \
-    && chown root:root /var/empty \
+    && chown root:root /var/empty 2>/dev/null || true \
     && ssh-keygen -A \
     && echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config \
     && echo "PermitRootLogin yes" >> /etc/ssh/sshd_config \
@@ -36,7 +51,7 @@ RUN pacman-key --init \
     && touch /root/.hushlogin /etc/skel/.hushlogin
 
 # Generate English locale
-RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen en_US.UTF-8
+RUN (echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen en_US.UTF-8 2>/dev/null || true)
 
 # Install neofetch
 RUN curl -fsSL https://raw.githubusercontent.com/dylanaraps/neofetch/master/neofetch -o /usr/local/bin/neofetch \
