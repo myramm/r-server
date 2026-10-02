@@ -1939,6 +1939,20 @@ const server = http.createServer((req, res) => {
   const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
 
   // -------------------------------------------------------------
+  // OAuth Providers Fallback (e.g. Antigravity is a Client / MITM tool, not an OAuth provider)
+  // -------------------------------------------------------------
+  if (url.pathname.startsWith('/api/oauth/antigravity') || url.pathname.startsWith('/api/oauth/gemini-cli')) {
+    res.writeHead(400, {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    });
+    return res.end(JSON.stringify({
+      error: 'Google Antigravity bukan OAuth Provider. Antigravity adalah Client/Coding Agent & MITM Tool. Cara pakai: 1) Gunakan menu MITM di /dashboard/mitm untuk DNS routing IDE, 2) Jalankan "agy" atau "ag" di terminal SSH, atau 3) Tambahkan Google Gemini API Key di menu Providers.',
+      success: false
+    }));
+  }
+
+  // -------------------------------------------------------------
   // 1. 9Router AI Gateway Public Endpoints (/v1/*)
   // -------------------------------------------------------------
   if (url.pathname.startsWith('/v1')) {
