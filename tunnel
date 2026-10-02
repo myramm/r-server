@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Expose any local port to a public HTTPS URL using Cloudflare Quick Tunnel (No account required)
+
+PORT=${1:-8080}
+
+if ! command -v cloudflared &>/dev/null; then
+    echo -e "\033[1;33m⏳ Installing cloudflared...\033[0m"
+    if [ "$(id -u)" -eq 0 ]; then
+        wget -q --show-progress -O /usr/local/bin/cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 && chmod +x /usr/local/bin/cloudflared
+    else
+        mkdir -p "$HOME/.local/bin"
+        wget -q --show-progress -O "$HOME/.local/bin/cloudflared" https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 && chmod +x "$HOME/.local/bin/cloudflared"
+        export PATH="$HOME/.local/bin:$PATH"
+    fi
+fi
+
+echo -e "\033[1;36m🌐 Exposing local port $PORT to public HTTPS URL via Cloudflare Quick Tunnel...\033[0m"
+echo -e "\033[1;33m⏳ Generating public URL, please wait...\033[0m\n"
+
+cloudflared tunnel --url http://127.0.0.1:$PORT

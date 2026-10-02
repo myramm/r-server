@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# Quick HTML / Web Server with Instant Public HTTPS URL (Cloudflare Quick Tunnel)
+
+DIR=${1:-$(pwd)}
+PORT=${2:-8080}
+
+if [ ! -d "$DIR" ] && [ -f "$DIR" ]; then
+    DIR=$(dirname "$DIR")
+fi
+
+echo -e "\033[1;36m=====================================================\033[0m"
+echo -e "\033[1;32m🚀 Starting Web Server for: \033[1;37m$DIR\033[0m"
+echo -e "\033[1;32m🔌 Local Port: \033[1;37m$PORT\033[0m"
+echo -e "\033[1;36m=====================================================\033[0m"
+
+# Ensure cloudflared is installed
+if ! command -v cloudflared &>/dev/null; then
+    echo -e "\033[1;33m⏳ Installing cloudflared...\033[0m"
+    if [ "$(id -u)" -eq 0 ]; then
+        wget -q --show-progress -O /usr/local/bin/cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 && chmod +x /usr/local/bin/cloudflared
+    else
+        mkdir -p "$HOME/.local/bin"
+        wget -q --show-progress -O "$HOME/.local/bin/cloudflared" https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 && chmod +x "$HOME/.local/bin/cloudflared"
+        export PATH="$HOME/.local/bin:$PATH"
+    fi
+fi
+
+# Kill previous instances on this port if any
+fuser -k ${PORT}/tcp 2>/dev/null || true
+
+# Start python http server in background
+cd "$DIR"
+python3 -m http.server $PORT > /dev/null 2>&1 &
+SERVER_PID=$!
+
+# Trap Ctrl+C to clean up
+cleanup() {
+    echo -e "\n\033[1;33m🛑 Stopping web server and tunnel...\033[0m"
+    kill $SERVER_PID 2>/dev/null || true
+    kill $TUNNEL_PID 2>/dev/null || true
+    exit 0
+}
+trap cleanup SIGINT SIGTERM EXIT
+
+LOG_FILE=$(mktemp)
+touch "$LOG_FILE"
+
+echo -e "\033[1;33m⏳ Menghubungkan ke Cloudflare Tunnel (Tanpa Akun)...\033[0m"
+cloudflared tunnel --url http://127.0.0.1:$PORT > "$LOG_FILE" 2>&1 &
+TUNNEL_PID=$!
+
+# Wait for tunnel URL to appear in log
+for i in {1..20}; do
+    URL=$(grep -o 'https://[-a-zA-Z0-9@:%._\+~#=]\+\.trycloudflare\.com' "$LOG_FILE" | head -n 1)
+    if [ -n "$URL" ]; then
+        echo -e "\n\033[1;32m🎉 WEB HTML ANDA SUDAH LIVE DI INTERNET!\033[0m"
+        echo -e "\033[1;36m👉 Buka Link HTTPS: \033[1;37m\033[4m$URL\033[0m"
+        echo -e "\033[1;33m📱 Link ini bisa dibuka dari HP, Laptop, atau siapa saja!\033[0m"
+        echo -e "\033[1;30m(Tekan Ctrl+C jika ingin mematikan server)\033[0m\n"
+        break
+    fi
+    sleep 1
+done
+
+# Keep script running
+wait $TUNNEL_PID

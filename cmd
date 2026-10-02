@@ -36,6 +36,10 @@ row "freebuff (or fb)" "Freebuff AI Assistant" "(Terminal AI Agent)"
 row "hermes" "Hermes Agent TUI" "(Autonomous AI Agent)"
 row "aider (or ai)" "Aider Pair Programming" "(Terminal Git Pair)"
 
+header "🌐 WEB HOSTING & TUNNELING (NO PUBLIC IP NEEDED)"
+row "serve-html [folder]" "Host HTML + Public HTTPS URL" "(Instant Cloudflare Tunnel)"
+row "tunnel <port>" "Expose any port to HTTPS" "(Port forward to Internet)"
+
 header "🐍 PYTHON & NODE.JS RUNTIMES"
 row "uv pip install <pkg>" "Astral UV Installer" "(10-100x faster pip)"
 row "uv venv" "Instant Python Virtualenv" "(Blazing fast)"
