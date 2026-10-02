@@ -42,6 +42,16 @@ RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen en_US.UTF-8
 RUN curl -fsSL https://raw.githubusercontent.com/dylanaraps/neofetch/master/neofetch -o /usr/local/bin/neofetch \
     && chmod +x /usr/local/bin/neofetch
 
+# Copy custom fastfetch and neofetch config with root@server title
+COPY assets/fastfetch.jsonc /etc/fastfetch/config.jsonc
+COPY assets/neofetch.conf /etc/neofetch/config.conf
+RUN mkdir -p /root/.config/fastfetch /root/.config/neofetch /etc/skel/.config/fastfetch /etc/skel/.config/neofetch \
+    && cp /etc/fastfetch/config.jsonc /root/.config/fastfetch/config.jsonc \
+    && cp /etc/fastfetch/config.jsonc /etc/skel/.config/fastfetch/config.jsonc \
+    && cp /etc/neofetch/config.conf /root/.config/neofetch/config.conf \
+    && cp /etc/neofetch/config.conf /etc/skel/.config/neofetch/config.conf \
+    && echo "server" > /etc/hostname 2>/dev/null || true
+
 # Welcome banner shown on interactive SSH login
 COPY ara-welcome.sh /etc/profile.d/ara-welcome.sh
 RUN chmod +x /etc/profile.d/ara-welcome.sh \
