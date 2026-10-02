@@ -310,11 +310,16 @@ if [[ "$INSTALL_AI" =~ "aider" ]]; then
     pip3 install --break-system-packages aider-chat 2>/dev/null || pip3 install aider-chat 2>/dev/null || true
 fi
 
-# Ensure Hermes Agent, OpenCode AI, and Freebuff exist across all restarts
+# Ensure Hermes Agent, OpenCode AI, Freebuff, and PM2 background services exist across all restarts
 (
     command -v opencode >/dev/null 2>&1 || (npm install -g opencode-ai 2>/dev/null || curl -fsSL https://opencode.ai/install | bash -s -- --dir /usr/local/bin 2>/dev/null || true)
     command -v freebuff >/dev/null 2>&1 || npm install -g freebuff 2>/dev/null || true
-    command -v hermes >/dev/null 2>&1 || pip3 install --break-system-packages hermes-agent 2>/dev/null || true
+    command -v hermes >/dev/null 2>&1 || pip3 install --break-system-packages hermes-agent python-telegram-bot==22.8 2>/dev/null || true
+    if [ -f "/etc/init.d/pm2-root" ]; then
+        /etc/init.d/pm2-root start 2>/dev/null || true
+    else
+        pm2 resurrect 2>/dev/null || true
+    fi
 ) >/var/log/ai-agents-init.log 2>&1 &
 
 # ---------------------------------------------------------------
