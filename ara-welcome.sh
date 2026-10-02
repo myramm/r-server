@@ -27,16 +27,6 @@ _cores="$(nproc 2>/dev/null)"; : "${_cpu:=CPU}"
 _mem="$(free -h 2>/dev/null | awk '/^Mem:/ {print $3 " / " $2}')"
 _disk="$(df -h / 2>/dev/null | awk 'NR==2 {print $3 " / " $2 " (" $5 ")"}')"
 _ip="$(hostname -I 2>/dev/null | awk '{print $1}')"; : "${_ip:=n/a}"
-if command -v claude >/dev/null 2>&1; then
-  _claude="${C_GREEN}● ready${C_RESET}"
-else
-  _claude="${C_RED}● not installed${C_RESET}"
-fi
-if command -v agy >/dev/null 2>&1 || command -v antigravity >/dev/null 2>&1; then
-  _antigravity="${C_GREEN}● ready${C_RESET}"
-else
-  _antigravity="${C_RED}● not installed${C_RESET}"
-fi
 
 # ---- Render / نمایش ----
 printf '\n'
@@ -61,19 +51,7 @@ row "CPU" "│" "${C_WHITE}${_cpu} ${C_GREY}(${_cores} cores)${C_RESET}"
 row "Memory" "│" "${C_WHITE}${_mem}${C_RESET}"
 row "Disk" "│" "${C_WHITE}${_disk}${C_RESET}"
 row "IP" "│" "${C_WHITE}${_ip}${C_RESET}"
-row "Claude" "│" "${_claude}"
-if command -v agy >/dev/null 2>&1 || command -v antigravity >/dev/null 2>&1; then
-  row "AGY" "│" "${_antigravity}"
-fi
-if command -v hermes >/dev/null 2>&1; then
-  row "Hermes" "│" "${C_GREEN}● ready (hermes)${C_RESET}"
-fi
-if command -v opencode >/dev/null 2>&1; then
-  row "OpenCode" "│" "${C_GREEN}● ready (opencode / oc)${C_RESET}"
-fi
-if command -v freebuff >/dev/null 2>&1; then
-  row "Freebuff" "│" "${C_GREEN}● ready (freebuff / fb)${C_RESET}"
-fi
+row "Ai agent" "│" "${C_WHITE}Claude, Antigravity, Hermes, OpenCode, Freebuff${C_RESET}"
 if command -v python3 >/dev/null 2>&1; then
   _py_ver="$(python3 -V 2>&1 | awk '{print $2}')"
   _python="${C_GREEN}● v${_py_ver}${C_RESET}"
