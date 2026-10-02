@@ -3,9 +3,13 @@
 # R-SERVER — "oc" command: open a tmux session running OpenCode AI
 # ============================================================
 SESSION="opencode"
+WORK_DIR="/root/src"
+
+mkdir -p "$WORK_DIR"
+cd "$WORK_DIR" 2>/dev/null || true
 
 if tmux has-session -t "$SESSION" 2>/dev/null; then
     tmux attach -t "$SESSION"
 else
-    tmux new-session -s "$SESSION" "opencode"
+    tmux new-session -s "$SESSION" -c "$WORK_DIR" "opencode $WORK_DIR"
 fi
