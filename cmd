@@ -46,6 +46,11 @@ row "uv venv" "Instant Python Virtualenv" "(Blazing fast)"
 row "python / pip" "Python 3 & PIP toolchain" "(Pre-configured)"
 row "node / npm / pnpm" "Node.js & Package Managers" "(Active runtime)"
 
+header "💾 AI LOGIN BACKUP & PERSISTENCE"
+row "ai-backup" "Save AI Agent Login Data" "(Claude, AGY, Hermes, OpenCode)"
+row "ai-restore" "Restore AI Login Sessions" "(Instant auto-relogin)"
+row "ai-sync status" "Check AI Auth & Backups" "(Status of all logins)"
+
 header "📊 SYSTEM METRICS & UTILITIES"
 row "usage" "Railway Credit & Uptime" "(Live burn rate & stats)"
 row "fastfetch / neofetch" "System & OS Banner" "(Hardware & Kernel info)"

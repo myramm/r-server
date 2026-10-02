@@ -266,15 +266,19 @@ fi
 if [ -n "$GITHUB_TOKEN" ]; then
     # Create/link the private ARA TM repo immediately, then restore any
     # existing content from a previous server, then keep it in sync.
-    # مخزن خصوصی ARA TM را بلافاصله ایجاد/پیوند می‌دهیم، سپس محتوای موجود
-    # را از سرور قبلی بازیابی کرده و سپس همگام نگه می‌داریم.
     repo=$(/usr/local/bin/src-sync --init 2>/dev/null)
     /usr/local/bin/src-sync --restore 2>&1 | while IFS= read -r l; do msg "$l" "$l"; done
     msg "src sync ON — /root/src ⇄ private GitHub repo: $repo" \
         "همگام‌سازی src روشن — پوشه src ⇄ مخزن خصوصی GitHub: $repo"
-    # background watcher survives the exec below
     nohup /usr/local/bin/src-sync --watch >/var/log/src-sync.log 2>&1 &
+
+    # Restore and auto-sync AI Agent login sessions and credentials
+    ai_repo=$(/usr/local/bin/ai-sync --init 2>/dev/null || true)
+    /usr/local/bin/ai-sync restore 2>&1 | while IFS= read -r l; do msg "$l" "$l"; done
+    nohup /usr/local/bin/ai-sync --watch >/var/log/ai-sync.log 2>&1 &
 else
+    # Local restore if backup exists
+    /usr/local/bin/ai-sync restore >/dev/null 2>&1 || true
     msg "GitHub token not set — /root/src won't sync (set GITHUB_TOKEN to enable)" \
         "توکن GitHub ست نشده — پوشه src همگام‌سازی نمی‌شود (برای فعال‌سازی GITHUB_TOKEN را تنظیم کنید)"
 fi

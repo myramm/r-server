@@ -1,0 +1,307 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# AI-SYNC & AI-BACKUP — Universal AI Agent Login & Session Persistence
+# Supports: Claude Code, Antigravity (AGY), Hermes Agent, OpenCode, Freebuff, Aider
+# ==============================================================================
+
+set -u
+
+BACKUP_DIR="/var/lib/ara/ai-backup"
+STATE_DIR="/var/lib/ara"
+MARK="$STATE_DIR/ai-repo"
+API="https://api.github.com"
+TOKEN="${GITHUB_TOKEN:-}"
+
+[ -z "$TOKEN" ] && [ -f /var/lib/ara/github-token ] \
+    && TOKEN="$(cat /var/lib/ara/github-token 2>/dev/null)"
+
+INTERVAL="${AI_SYNC_INTERVAL:-180}"
+ARCHIVE_FILE="$BACKUP_DIR/ai-agent-auth.tar.gz"
+
+# List of files and directories to backup/restore
+AUTH_PATHS=(
+    ".claude.json"
+    ".claude"
+    ".gemini"
+    ".hermes"
+    ".config/antigravity"
+    ".config/antigravity-cli"
+    ".config/opencode"
+    ".opencode"
+    ".freebuff"
+    ".config/freebuff"
+    ".aider.conf.yml"
+    ".aider"
+    ".gitconfig"
+    ".ssh"
+    ".antislop"
+)
+
+# Colors
+C_RESET=$'\e[0m'
+C_BOLD=$'\e[1m'
+C_GREEN=$'\e[38;5;46m'
+C_CYAN=$'\e[38;5;51m'
+C_YELLOW=$'\e[38;5;220m'
+C_RED=$'\e[38;5;196m'
+C_GREY=$'\e[38;5;245m'
+C_WHITE=$'\e[38;5;231m'
+
+mkdir -p "$BACKUP_DIR" "$STATE_DIR"
+
+git_ident() {
+    git config --global user.email "${GITHUB_SYNC_EMAIL:-sync@ara.tm}" 2>/dev/null
+    git config --global user.name  "${GITHUB_SYNC_NAME:-ARA TM AI Sync}" 2>/dev/null
+    git config --global init.defaultBranch main 2>/dev/null
+    git config --global push.autoSetupRemote true 2>/dev/null
+}
+
+repo_name() {
+    [ -f "$MARK" ] && { cat "$MARK"; return; }
+    local id="${RAILWAY_PROJECT_ID:-}"
+    [ -z "$id" ] && id="$(hostname)"
+    echo "$id" | tr -c 'A-Za-z0-9' '-' | tr '[:upper:]' '[:lower:]' | cut -c1-35 \
+        | sed 's/-*$//' | sed 's/^/ara-ai-auth-/'
+}
+
+gh_user() {
+    [ -n "$TOKEN" ] || return 1
+    curl -s --max-time 12 -H "Authorization: Bearer $TOKEN" "$API/user" \
+        | jq -r '.login // empty' 2>/dev/null
+}
+
+repo_exists() {
+    local u="$1" n="$2"
+    curl -s --max-time 12 -H "Authorization: Bearer $TOKEN" "$API/repos/$u/$n" \
+        | jq -r '.id // empty' 2>/dev/null
+}
+
+create_repo() {
+    local n="$1"
+    curl -s --max-time 20 -X POST "$API/user/repos" \
+        -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+        -d "{\"name\":\"$n\",\"private\":true,\"description\":\"ARA TM — Encrypted AI Agent Login & Auth Backup\",\"auto_init\":false}" \
+        | jq -r '.id // empty' 2>/dev/null
+}
+
+remote_url() { echo "https://$TOKEN@github.com/$1/$2.git"; }
+
+init_github_repo() {
+    [ -n "$TOKEN" ] || return 1
+    git_ident
+    local name; name=$(repo_name); echo "$name" > "$MARK"
+    local u; u=$(gh_user); [ -n "$u" ] || return 1
+    
+    if [ -z "$(repo_exists "$u" "$name")" ]; then
+        create_repo "$name" >/dev/null 2>&1
+    fi
+    
+    if [ ! -d "$BACKUP_DIR/.git" ]; then
+        git -C "$BACKUP_DIR" init -q
+    fi
+    git -C "$BACKUP_DIR" remote set-url origin "$(remote_url "$u" "$name")" 2>/dev/null \
+        || git -C "$BACKUP_DIR" remote add origin "$(remote_url "$u" "$name")"
+}
+
+# ------------------------------------------------------------------------------
+# BACKUP ACTION
+# ------------------------------------------------------------------------------
+do_backup() {
+    echo -e "${C_CYAN}${C_BOLD}💾 [AI-BACKUP] Scanning and archiving AI agent credentials...${C_RESET}"
+    local count=0
+    local found_items=()
+
+    cd /root
+    for item in "${AUTH_PATHS[@]}"; do
+        if [ -e "$item" ]; then
+            found_items+=("$item")
+            ((count++))
+            echo -e "  ${C_GREEN}✓${C_RESET} Found login/config: ${C_WHITE}$item${C_RESET}"
+        fi
+    done
+
+    if [ ${#found_items[@]} -eq 0 ]; then
+        echo -e "  ${C_YELLOW}⚠ No AI login data found to backup yet.${C_RESET}"
+        return 0
+    fi
+
+    # Create optimized lightweight tar archive (excludes giant log and cache directories)
+    tar -czf "$ARCHIVE_FILE" \
+        --exclude='.gemini/antigravity-cli/brain' \
+        --exclude='.gemini/antigravity-cli/.system_generated' \
+        --exclude='*.log' \
+        --exclude='*.tmp' \
+        --exclude='__pycache__' \
+        --exclude='node_modules' \
+        "${found_items[@]}" 2>/dev/null
+
+    local size; size=$(du -h "$ARCHIVE_FILE" 2>/dev/null | cut -f1)
+    echo -e "${C_GREEN}✓ Archive created successfully:${C_RESET} ${C_WHITE}$ARCHIVE_FILE${C_RESET} (${size}, ${count} items)"
+    echo "$(date '+%Y-%m-%d %H:%M:%S')" > "$BACKUP_DIR/last_backup.txt"
+
+    # Push to GitHub if GITHUB_TOKEN is available
+    if [ -n "$TOKEN" ]; then
+        init_github_repo 2>/dev/null || true
+        if [ -d "$BACKUP_DIR/.git" ]; then
+            git -C "$BACKUP_DIR" add -A
+            if ! git -C "$BACKUP_DIR" diff --cached --quiet; then
+                git -C "$BACKUP_DIR" commit -qm "auto: backup AI agent credentials [$(date '+%Y-%m-%d %H:%M:%S')]"
+                git -C "$BACKUP_DIR" push -q -u origin main >/dev/null 2>&1 \
+                    && echo -e "  ${C_GREEN}✓ Synced to private GitHub repo:${C_RESET} ${C_YELLOW}$(repo_name)${C_RESET}" \
+                    || echo -e "  ${C_YELLOW}⚠ Could not push to GitHub repo (check token write permissions)${C_RESET}"
+            fi
+        fi
+    fi
+
+    echo -e "${C_GREEN}${C_BOLD}🎉 Backup AI Agent Data Selesai!${C_RESET}\n"
+}
+
+# ------------------------------------------------------------------------------
+# RESTORE ACTION
+# ------------------------------------------------------------------------------
+do_restore() {
+    echo -e "${C_CYAN}${C_BOLD}🔄 [AI-RESTORE] Restoring AI agent login & session data...${C_RESET}"
+    
+    # Pull from GitHub first if token is available
+    if [ -n "$TOKEN" ]; then
+        init_github_repo 2>/dev/null || true
+        if [ -d "$BACKUP_DIR/.git" ]; then
+            git -C "$BACKUP_DIR" pull -q origin main >/dev/null 2>&1 || true
+        fi
+    fi
+
+    if [ ! -f "$ARCHIVE_FILE" ]; then
+        echo -e "  ${C_YELLOW}⚠ No backup archive found at $ARCHIVE_FILE${C_RESET}"
+        return 1
+    fi
+
+    cd /root
+    tar -xzf "$ARCHIVE_FILE" -C /root 2>/dev/null
+    
+    # Ensure proper permissions
+    chmod 600 /root/.claude.json 2>/dev/null || true
+    chmod 700 /root/.ssh 2>/dev/null || true
+    chmod 600 /root/.ssh/id_* 2>/dev/null || true
+    chmod 600 /root/.ssh/authorized_keys 2>/dev/null || true
+
+    echo -e "${C_GREEN}✓ All AI agent login data restored to /root!${C_RESET}"
+    if [ -f "$BACKUP_DIR/last_backup.txt" ]; then
+        echo -e "  ${C_GREY}Last backup timestamp: $(cat "$BACKUP_DIR/last_backup.txt")${C_RESET}"
+    fi
+    echo -e "${C_GREEN}${C_BOLD}🎉 Login AI Agent Aktif Tanpa Perlu Login Ulang!${C_RESET}\n"
+}
+
+# ------------------------------------------------------------------------------
+# STATUS ACTION
+# ------------------------------------------------------------------------------
+do_status() {
+    echo -e "\n${C_CYAN}${C_BOLD}📊 AI AGENT LOGIN & BACKUP STATUS${C_RESET}"
+    echo -e "${C_GREY}───────────────────────────────────────────────────────────────${C_RESET}"
+
+    check_status() {
+        local name="$1"
+        local file="$2"
+        local desc="$3"
+        if [ -e "/root/$file" ]; then
+            printf "  ${C_GREEN}● Logged In${C_RESET}   │ ${C_YELLOW}%-18s${C_RESET} ${C_GREY}│${C_RESET} %s\n" "$name" "$desc"
+        else
+            printf "  ${C_RED}○ Not Logged In${C_RESET} │ ${C_YELLOW}%-18s${C_RESET} ${C_GREY}│${C_RESET} %s\n" "$name" "$desc"
+        fi
+    }
+
+    check_status "Claude Code" ".claude.json" "Anthropic Claude Token"
+    check_status "Antigravity" ".gemini" "Google AGY CLI Credentials"
+    check_status "Hermes Agent" ".hermes" "Hermes Config & Sessions"
+    check_status "OpenCode AI" ".config/opencode" "OpenCode Login Tokens"
+    check_status "Freebuff AI" ".freebuff" "Freebuff Credentials"
+    check_status "Aider Chat" ".aider.conf.yml" "Aider Config & History"
+    check_status "Git Config" ".gitconfig" "GitHub User & Email"
+    check_status "SSH Keys" ".ssh/authorized_keys" "SSH Keypairs & Auth"
+
+    echo -e "${C_GREY}───────────────────────────────────────────────────────────────${C_RESET}"
+    if [ -f "$ARCHIVE_FILE" ]; then
+        local size; size=$(du -h "$ARCHIVE_FILE" | cut -f1)
+        local time; time=$(cat "$BACKUP_DIR/last_backup.txt" 2>/dev/null || stat -c %y "$ARCHIVE_FILE" 2>/dev/null || echo "Unknown")
+        echo -e "  ${C_GREEN}💾 Local Backup Archive:${C_RESET} $ARCHIVE_FILE (${size})"
+        echo -e "  ${C_GREY}🕒 Last Backup Time:${C_RESET}    $time"
+    else
+        echo -e "  ${C_YELLOW}⚠ Belum ada backup lokal.${C_RESET} Jalankan ${C_YELLOW}ai-backup${C_RESET} untuk membuat backup."
+    fi
+
+    if [ -n "$TOKEN" ]; then
+        echo -e "  ${C_GREEN}☁️ Cloud GitHub Sync:${C_RESET}   Private repo $(repo_name) (${C_GREEN}Connected${C_RESET})"
+    else
+        echo -e "  ${C_YELLOW}☁️ Cloud GitHub Sync:${C_RESET}   ${C_GREY}Set GITHUB_TOKEN to enable automatic cloud sync${C_RESET}"
+    fi
+    echo ""
+}
+
+# ------------------------------------------------------------------------------
+# EXPORT / IMPORT / BASE64
+# ------------------------------------------------------------------------------
+do_export() {
+    local out="${1:-/root/ai-agent-backup-$(date +%Y%m%d_%H%M%S).tar.gz}"
+    do_backup >/dev/null 2>&1
+    if [ -f "$ARCHIVE_FILE" ]; then
+        cp -f "$ARCHIVE_FILE" "$out"
+        echo -e "${C_GREEN}✓ AI Backup exported successfully to:${C_RESET} ${C_YELLOW}$out${C_RESET}"
+    else
+        echo -e "${C_RED}❌ Failed to create backup archive.${C_RESET}"
+    fi
+}
+
+do_import() {
+    local src="$1"
+    if [ ! -f "$src" ]; then
+        echo -e "${C_RED}❌ File not found: $src${C_RESET}"
+        return 1
+    fi
+    cp -f "$src" "$ARCHIVE_FILE"
+    do_restore
+}
+
+# ------------------------------------------------------------------------------
+# WATCH MODE (Background auto-backup daemon)
+# ------------------------------------------------------------------------------
+do_watch() {
+    echo -e "${C_CYAN}[AI-SYNC] Starting background watcher (Interval: ${INTERVAL}s)...${C_RESET}"
+    while true; do
+        do_backup >/dev/null 2>&1 || true
+        sleep "$INTERVAL"
+    done
+}
+
+# ------------------------------------------------------------------------------
+# CLI ROUTER
+# ------------------------------------------------------------------------------
+case "${1:-status}" in
+    backup|--backup|save)
+        do_backup
+        ;;
+    restore|--restore|load)
+        do_restore
+        ;;
+    status|--status)
+        do_status
+        ;;
+    init|--init)
+        init_github_repo && echo "initialized $(repo_name)"
+        ;;
+    export|--export)
+        do_export "${2:-}"
+        ;;
+    import|--import)
+        if [ -z "${2:-}" ]; then
+            echo "Usage: ai-backup import <path-to-tar.gz>"
+            exit 1
+        fi
+        do_import "$2"
+        ;;
+    watch|--watch)
+        do_watch
+        ;;
+    *)
+        echo "Usage: ai-sync {backup|restore|status|export|import|--watch}"
+        exit 1
+        ;;
+esac

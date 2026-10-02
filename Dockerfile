@@ -117,8 +117,11 @@ COPY cmd /usr/local/bin/cmd
 COPY usage /usr/local/bin/usage
 COPY serve-html /usr/local/bin/serve-html
 COPY tunnel /usr/local/bin/tunnel
-RUN chmod +x /usr/local/bin/cl /usr/local/bin/ag /usr/local/bin/ai /usr/local/bin/oc /usr/local/bin/fb /usr/local/bin/cmd /usr/local/bin/usage /usr/local/bin/serve-html /usr/local/bin/tunnel \
+COPY ai-sync /usr/local/bin/ai-sync
+RUN chmod +x /usr/local/bin/cl /usr/local/bin/ag /usr/local/bin/ai /usr/local/bin/oc /usr/local/bin/fb /usr/local/bin/cmd /usr/local/bin/usage /usr/local/bin/serve-html /usr/local/bin/tunnel /usr/local/bin/ai-sync \
     && ln -sf /usr/local/bin/cmd /usr/local/bin/cmds 2>/dev/null || true \
+    && ln -sf /usr/local/bin/ai-sync /usr/local/bin/ai-backup 2>/dev/null || true \
+    && ln -sf /usr/local/bin/ai-sync /usr/local/bin/ai-restore 2>/dev/null || true \
     && wget -q -O /usr/local/bin/cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 && chmod +x /usr/local/bin/cloudflared || true \
     && curl -fsSL https://raw.githubusercontent.com/tj/n/master/bin/n -o /usr/local/bin/n && chmod +x /usr/local/bin/n || true
 
