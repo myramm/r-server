@@ -74,6 +74,19 @@ fi
 if command -v freebuff >/dev/null 2>&1; then
   row "Freebuff" "│" "${C_GREEN}● ready (freebuff / fb)${C_RESET}"
 fi
+if command -v python3 >/dev/null 2>&1; then
+  _py_ver="$(python3 -V 2>&1 | awk '{print $2}')"
+  _python="${C_GREEN}● v${_py_ver}${C_RESET}"
+  if command -v uv >/dev/null 2>&1; then
+    _uv_ver="$(uv --version 2>&1 | awk '{print $2}')"
+    _python="${_python} ${C_GREY}(uv ${_uv_ver})${C_RESET}"
+  fi
+  row "Python" "│" "${_python}"
+fi
+if command -v node >/dev/null 2>&1; then
+  _node_ver="$(node -v 2>&1)"
+  row "Node.js" "│" "${C_GREEN}● ${_node_ver}${C_RESET}"
+fi
 
 # src ⇄ GitHub sync status (reads the local repo mark; no network call)
 # وضعیت همگام‌سازی src با GitHub (نشانگر محلی مخزن را می‌خواند؛ بدون فراخوانی شبکه)
@@ -91,6 +104,7 @@ printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}agy$
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}hermes${C_RESET} ${C_DIM}to launch Hermes Agent TUI${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}opencode${C_RESET} ${C_DIM}(or ${C_RESET}${C_YELLOW}${C_BOLD}oc${C_RESET}${C_DIM}) to launch OpenCode AI${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}freebuff${C_RESET} ${C_DIM}(or ${C_RESET}${C_YELLOW}${C_BOLD}fb${C_RESET}${C_DIM}) to launch Freebuff AI${C_RESET}\n"
+printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}uv pip install <pkg>${C_RESET} ${C_DIM}to install Python packages instantly${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}usage${C_RESET} ${C_DIM}to check resource & uptime stats${C_RESET}\n"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Run${C_RESET} ${C_YELLOW}${C_BOLD}src-sync --status${C_RESET} ${C_DIM}to see your private backup repo${C_RESET}\n"
 printf '\n'
