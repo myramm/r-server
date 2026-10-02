@@ -1406,18 +1406,7 @@
           </div>
         </div>
 
-        <!-- OpenCode AI -->
-        <div class="tool-card">
-          <div class="tool-top">
-            <span class="tool-name">💻 OpenCode AI Agent</span>
-            <span class="tool-badge badge-off">● Open-Source</span>
-          </div>
-          <p class="tool-desc">Autonomous AI agent open-source untuk eksekusi workflow codebase.</p>
-          <div class="tool-footer">
-            <button class="btn btn-primary btn-sm" onclick="installTool('opencode')">Install</button>
-            <button class="btn btn-danger btn-sm" onclick="uninstallTool('opencode', 'OpenCode AI')">🗑️ Hapus</button>
-          </div>
-        </div>
+
 
         <!-- Qwen Code Agent -->
         <div class="tool-card">
@@ -1911,8 +1900,8 @@ Debian 12 Cloud Workstation (Ultra-Lean & Fast)
         <tr>
           <td><strong>${p.pid}</strong></td>
           <td>${p.user}</td>
-          <td style="color: ${p.cpu > 50 ? '#ef4444' : '#38bdf8'}">${p.cpu}%</td>
-          <td>${p.mem}%</td>
+          <td style="color: ${parseFloat(p.cpu) > 50 ? '#ef4444' : '#38bdf8'}">${p.cpu}</td>
+          <td>${p.mem}</td>
           <td>${p.rssFormatted || p.rss}</td>
           <td style="max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${p.command}">${p.command}</td>
           <td>
