@@ -76,6 +76,13 @@ else
 fi
 row "src" "│" "${_src}"
 
+if [ -f /var/lib/ara/ai-backup/ai-agent-auth.tar.gz ]; then
+  _ai_auth="${C_GREEN}● active (auto-restored)${C_RESET}"
+else
+  _ai_auth="${C_GREY}● ready (type ai-backup to save)${C_RESET}"
+fi
+row "Ai login" "│" "${_ai_auth}"
+
 printf '%s\n' "$line"
 printf "  ${C_GREEN}➜${C_RESET} ${C_DIM}Type${C_RESET} ${C_YELLOW}${C_BOLD}cmd${C_RESET} ${C_DIM}to view all available AI agents, shortcuts & tools${C_RESET}\n"
 printf '\n'
