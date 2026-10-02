@@ -1123,13 +1123,13 @@
         <div class="tool-card">
           <div class="tool-top">
             <span class="tool-name">🤖 Anthropic Claude Code</span>
-            <span class="tool-badge badge-ready">● Official CLI</span>
+            <span class="tool-badge badge-ready" id="badge_claude">● Ready</span>
           </div>
           <p class="tool-desc">AI agent otonom resmi Anthropic untuk terminal. Menulis kode, refactor, bug fixing, test.</p>
           <div class="tool-footer">
             <button class="btn btn-ghost btn-sm" onclick="runQuick('claude --version')">Version</button>
             <button class="btn btn-primary btn-sm" onclick="runQuick('cl')">Launch</button>
-            <button class="btn btn-secondary btn-sm" onclick="installTool('claude')">Install</button>
+            <button class="btn btn-secondary btn-sm" id="btn_install_claude" onclick="installTool('claude')">Install</button>
             <button class="btn btn-danger btn-sm" onclick="uninstallTool('claude', 'Claude Code')">🗑️ Hapus</button>
           </div>
         </div>
@@ -1138,13 +1138,13 @@
         <div class="tool-card">
           <div class="tool-top">
             <span class="tool-name">⚡ Google Antigravity CLI</span>
-            <span class="tool-badge badge-ready">● Google AI</span>
+            <span class="tool-badge badge-ready" id="badge_agy">● Ready</span>
           </div>
           <p class="tool-desc">Google autonomous coding assistant (agy) dengan fitur multi-agent workflows.</p>
           <div class="tool-footer">
             <button class="btn btn-ghost btn-sm" onclick="runQuick('agy --version')">Version</button>
             <button class="btn btn-primary btn-sm" onclick="runQuick('ag')">Launch</button>
-            <button class="btn btn-secondary btn-sm" onclick="installTool('agy')">Install</button>
+            <button class="btn btn-secondary btn-sm" id="btn_install_agy" onclick="installTool('agy')">Install</button>
             <button class="btn btn-danger btn-sm" onclick="uninstallTool('agy', 'Google Antigravity')">🗑️ Hapus</button>
           </div>
         </div>
@@ -1153,13 +1153,13 @@
         <div class="tool-card">
           <div class="tool-top">
             <span class="tool-name">🧠 Hermes Agent</span>
-            <span class="tool-badge badge-ready">● Nous Research</span>
+            <span class="tool-badge badge-ready" id="badge_hermes">● Ready</span>
           </div>
           <p class="tool-desc">Autonomous AI agent terminal TUI by Nous Research. Git workflows, MCP tools, skills, persistent sessions.</p>
           <div class="tool-footer">
             <button class="btn btn-ghost btn-sm" onclick="runQuick('hermes --version || which hermes')">Version</button>
             <button class="btn btn-primary btn-sm" onclick="runQuick('hermes')">Launch</button>
-            <button class="btn btn-secondary btn-sm" onclick="installTool('hermes')">Install</button>
+            <button class="btn btn-secondary btn-sm" id="btn_install_hermes" onclick="installTool('hermes')">Install</button>
             <button class="btn btn-danger btn-sm" onclick="uninstallTool('hermes', 'Hermes Agent')">🗑️ Hapus</button>
           </div>
         </div>
@@ -1168,13 +1168,13 @@
         <div class="tool-card">
           <div class="tool-top">
             <span class="tool-name">⚡ OpenCode AI Terminal</span>
-            <span class="tool-badge badge-ready">● Open Source</span>
+            <span class="tool-badge badge-ready" id="badge_opencode">● Ready</span>
           </div>
           <p class="tool-desc">Autonomous AI agent untuk terminal (OpenCode AI). Refactoring, smart code edits, multi-file agents & tools (oc).</p>
           <div class="tool-footer">
             <button class="btn btn-ghost btn-sm" onclick="runQuick('opencode --version || which opencode')">Version</button>
             <button class="btn btn-primary btn-sm" onclick="runQuick('oc')">Launch</button>
-            <button class="btn btn-secondary btn-sm" onclick="installTool('opencode')">Install</button>
+            <button class="btn btn-secondary btn-sm" id="btn_install_opencode" onclick="installTool('opencode')">Install</button>
             <button class="btn btn-danger btn-sm" onclick="uninstallTool('opencode', 'OpenCode AI')">🗑️ Hapus</button>
           </div>
         </div>
@@ -1183,13 +1183,13 @@
         <div class="tool-card">
           <div class="tool-top">
             <span class="tool-name">🛡️ Freebuff AI Assistant</span>
-            <span class="tool-badge badge-ready">● Multi-Agent</span>
+            <span class="tool-badge badge-ready" id="badge_freebuff">● Ready</span>
           </div>
           <p class="tool-desc">Ad-supported multi-agent coding assistant CLI dengan AI models gratis dan akses tool otomatis (fb).</p>
           <div class="tool-footer">
             <button class="btn btn-ghost btn-sm" onclick="runQuick('freebuff --version || which freebuff')">Version</button>
             <button class="btn btn-primary btn-sm" onclick="runQuick('fb')">Launch</button>
-            <button class="btn btn-secondary btn-sm" onclick="installTool('freebuff')">Install</button>
+            <button class="btn btn-secondary btn-sm" id="btn_install_freebuff" onclick="installTool('freebuff')">Install</button>
             <button class="btn btn-danger btn-sm" onclick="uninstallTool('freebuff', 'Freebuff AI')">🗑️ Hapus</button>
           </div>
         </div>
@@ -1198,13 +1198,13 @@
         <div class="tool-card">
           <div class="tool-top">
             <span class="tool-name">🤝 Aider AI Pair Programmer</span>
-            <span class="tool-badge badge-ready">● Git Ready</span>
+            <span class="tool-badge badge-ready" id="badge_aider">● Ready</span>
           </div>
           <p class="tool-desc">AI pair programmer terminal langsung terintegrasi dengan Git repository.</p>
           <div class="tool-footer">
             <button class="btn btn-ghost btn-sm" onclick="runQuick('aider --version')">Version</button>
             <button class="btn btn-primary btn-sm" onclick="runQuick('ai')">Launch</button>
-            <button class="btn btn-secondary btn-sm" onclick="installTool('aider')">Install</button>
+            <button class="btn btn-secondary btn-sm" id="btn_install_aider" onclick="installTool('aider')">Install</button>
             <button class="btn btn-danger btn-sm" onclick="uninstallTool('aider', 'Aider AI')">🗑️ Hapus</button>
           </div>
         </div>
@@ -1713,9 +1713,12 @@ Debian 12 Cloud Workstation (Ultra-Lean & Fast)
 
   <!-- Live Output Drawer -->
   <div class="drawer" id="installDrawer">
-    <div class="drawer-header">
-      <span id="drawerTitle">📦 Memproses...</span>
-      <button class="btn btn-ghost btn-sm" onclick="closeDrawer()" style="padding: 2px 6px;">✕</button>
+    <div class="drawer-header" style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+      <span id="drawerTitle" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">📦 Memproses...</span>
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <button class="btn btn-danger btn-sm" id="btnCancelJob" onclick="cancelInstallJob()" style="padding: 2px 8px; font-size: 11px;">🛑 Batalkan</button>
+        <button class="btn btn-ghost btn-sm" onclick="closeDrawer()" style="padding: 2px 6px;">✕</button>
+      </div>
     </div>
     <div class="drawer-body">
       <div class="drawer-console" id="drawerConsole">Menghubungkan live log output...</div>
@@ -1977,6 +1980,20 @@ Debian 12 Cloud Workstation (Ultra-Lean & Fast)
         const data = await res.json();
         allToolsList = data.tools || [];
         renderToolsGrid();
+
+        // Update static AI agent cards status badges & buttons
+        allToolsList.forEach(t => {
+          const badge = document.getElementById('badge_' + t.id);
+          const btn = document.getElementById('btn_install_' + t.id);
+          if (badge) {
+            badge.innerText = t.installed ? '● Ready' : '○ Not Installed';
+            badge.className = 'tool-badge ' + (t.installed ? 'badge-ready' : 'badge-off');
+          }
+          if (btn) {
+            btn.innerText = t.installed ? 'Reinstall' : 'Install';
+            btn.className = 'btn ' + (t.installed ? 'btn-secondary' : 'btn-primary') + ' btn-sm';
+          }
+        });
       } catch (e) {}
     }
 
@@ -2090,6 +2107,8 @@ Debian 12 Cloud Workstation (Ultra-Lean & Fast)
     let pendingInstallToolId = null;
     let selectedVersionId = null;
 
+        let activeJobId = null;
+
     // 1-Click Install Tool with Version Dialog
     function installTool(toolId) {
       if (TOOL_VERSIONS[toolId]) {
@@ -2164,8 +2183,9 @@ Debian 12 Cloud Workstation (Ultra-Lean & Fast)
           body: JSON.stringify({ toolId, version })
         });
         const d = await res.json();
-        if (d.success) {
-          listenInstallLogs();
+        if (d.success && d.install) {
+          activeJobId = d.install.jobId;
+          listenInstallLogs(activeJobId);
         } else {
           showToast(d.error || 'Gagal memulai instalasi');
         }
@@ -2185,11 +2205,29 @@ Debian 12 Cloud Workstation (Ultra-Lean & Fast)
           body: JSON.stringify({ toolId })
         });
         const d = await res.json();
-        if (d.success) {
-          listenInstallLogs();
+        if (d.success && d.install) {
+          activeJobId = d.install.jobId;
+          listenInstallLogs(activeJobId);
         } else {
           showToast(d.error || 'Gagal menghapus software');
         }
+      } catch (err) {
+        showToast('Error: ' + err.message);
+      }
+    }
+
+    // Cancel running install/uninstall job
+    async function cancelInstallJob() {
+      if (!confirm('Yakin ingin membatalkan proses instalasi / penghapusan yang sedang berjalan?')) return;
+      try {
+        const res = await fetch('/api/tools/cancel', { method: 'POST' });
+        const d = await res.json();
+        showToast(d.message || 'Proses dibatalkan');
+        if (installSse) { installSse.close(); installSse = null; }
+        if (installPollTimer) { clearInterval(installPollTimer); installPollTimer = null; }
+        activeJobId = null;
+        loadTools();
+        refreshStats();
       } catch (err) {
         showToast('Error: ' + err.message);
       }
@@ -2210,8 +2248,9 @@ Debian 12 Cloud Workstation (Ultra-Lean & Fast)
           body: JSON.stringify({ customCmd })
         });
         const d = await res.json();
-        if (d.success) {
-          listenInstallLogs();
+        if (d.success && d.install) {
+          activeJobId = d.install.jobId;
+          listenInstallLogs(activeJobId);
         } else {
           showToast(d.error || 'Gagal');
         }
@@ -2236,10 +2275,12 @@ Debian 12 Cloud Workstation (Ultra-Lean & Fast)
       document.getElementById('installDrawer').style.display = 'none';
       if (installSse) { installSse.close(); installSse = null; }
       if (installPollTimer) { clearInterval(installPollTimer); installPollTimer = null; }
+      activeJobId = null;
       loadTools();
+      refreshStats();
     }
 
-    function listenInstallLogs() {
+    function listenInstallLogs(expectedJobId) {
       if (installSse) { installSse.close(); installSse = null; }
       if (installPollTimer) { clearInterval(installPollTimer); installPollTimer = null; }
 
@@ -2254,18 +2295,20 @@ Debian 12 Cloud Workstation (Ultra-Lean & Fast)
               consoleBox.innerText = ev.logs || '';
             } else if (ev.type === 'data') {
               consoleBox.innerText += ev.text;
+              consoleBox.scrollTop = consoleBox.scrollHeight;
             } else if (ev.type === 'end') {
-              consoleBox.innerText += `\n[Status]: Selesai (${ev.install.status})`;
-              showToast('Proses ' + ev.install.toolName + ' selesai!');
+              if (expectedJobId && ev.install && ev.install.jobId && ev.install.jobId !== expectedJobId) return;
+              consoleBox.innerText = ev.install ? ev.install.logs : consoleBox.innerText;
+              showToast('Proses ' + (ev.install ? ev.install.toolName : '') + ' selesai!');
               if (installPollTimer) { clearInterval(installPollTimer); installPollTimer = null; }
+              activeJobId = null;
               loadTools();
+              refreshStats();
             }
             consoleBox.scrollTop = consoleBox.scrollHeight;
           } catch (err) {}
         };
-        installSse.onerror = () => {
-          // SSE reconnecting or blocked, fallback interval handles it
-        };
+        installSse.onerror = () => {};
       } catch (err) {}
 
       // Polling fallback every 1000ms
@@ -2275,15 +2318,20 @@ Debian 12 Cloud Workstation (Ultra-Lean & Fast)
           if (res.ok) {
             const data = await res.json();
             if (data && data.install) {
-              if (data.install.logs && data.install.logs.length >= consoleBox.innerText.length) {
+              if (expectedJobId && data.install.jobId && data.install.jobId !== expectedJobId) {
+                return; // Older job, skip
+              }
+              if (data.install.logs) {
                 consoleBox.innerText = data.install.logs;
                 consoleBox.scrollTop = consoleBox.scrollHeight;
               }
               if (data.install.status === 'success' || data.install.status === 'failed') {
                 clearInterval(installPollTimer);
                 installPollTimer = null;
-                showToast('Proses ' + data.install.toolName + ' selesai!');
+                activeJobId = null;
+                showToast(`Proses ${data.install.toolName} ${data.install.status === 'success' ? 'selesai! ✅' : 'gagal! ❌'}`);
                 loadTools();
+                refreshStats();
               }
             }
           }
@@ -2312,15 +2360,15 @@ Debian 12 Cloud Workstation (Ultra-Lean & Fast)
         const res = await fetch('/api/antigravity/token');
         if (res.ok) {
           const data = await res.json();
-          if (data.hasToken) {
+          if (data.loggedIn || data.hasToken) {
             if (badge) {
               badge.innerText = `● Logged In (${data.email || 'Token Aktif'})`;
               badge.style.background = 'rgba(16, 185, 129, 0.2)';
               badge.style.color = '#34d399';
               badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
             }
-            if (input && data.tokenString) {
-              input.value = data.tokenString;
+            if (input && (data.token || data.tokenString)) {
+              input.value = data.token || data.tokenString;
             }
           } else {
             if (badge) {
@@ -2350,7 +2398,7 @@ Debian 12 Cloud Workstation (Ultra-Lean & Fast)
           copyStatus.innerText = '✓ Berhasil Disalin!';
           setTimeout(() => { copyStatus.innerText = ''; }, 3000);
         }
-        showToast('Token Antigravity disalin ke clipboard! Pasang di ANTIGRAVITY_AUTH_TOKEN');
+        showToast('Token Antigravity disalin ke clipboard!');
       } catch (e) {
         showToast('Gagal menyalin token ke clipboard');
       }
@@ -2367,7 +2415,7 @@ Debian 12 Cloud Workstation (Ultra-Lean & Fast)
         const res = await fetch('/api/antigravity/token', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tokenJson: tokenVal })
+          body: JSON.stringify({ token: tokenVal, tokenJson: tokenVal })
         });
         const data = await res.json();
         if (data.success) {

@@ -13,6 +13,8 @@ const activeSessions = new Set();
 const failedAttempts = new Map();
 const installEmitter = new EventEmitter();
 let currentInstall = null;
+let activeChild = null;
+const DEV_PATH = '/root/.gemini/antigravity-cli/bin:/root/.local/bin:/root/.cargo/bin:/root/.bun/bin:/root/.deno/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:' + (process.env.PATH || '');
 
 const LOGIN_HTML = fs.readFileSync(path.join(__dirname, 'views/login.html'), 'utf8');
 const DASHBOARD_HTML = fs.readFileSync(path.join(__dirname, 'views/index.html'), 'utf8');
@@ -223,6 +225,11 @@ const TOOLS_CATALOG = [
       curl -fsSL https://antigravity.google/cli/install.sh | bash -s -- --dir /usr/local/bin || true
       ln -sf /usr/local/bin/agy /usr/local/bin/antigravity 2>/dev/null || true
       pip3 install --break-system-packages uv aider-chat hermes-agent
+    `,
+    uninstallScript: `
+      apt-get remove -y nginx redis-server redis-tools postgresql-client 2>/dev/null || true
+      npm uninstall -g @anthropic-ai/claude-code opencode-ai freebuff 2>/dev/null || true
+      pip3 uninstall -y aider-chat hermes-agent 2>/dev/null || true
     `
   },
   {
@@ -248,6 +255,11 @@ const TOOLS_CATALOG = [
       mkdir -p /root/Desktop
       cp /usr/share/applications/google-chrome.desktop /usr/share/applications/xfce4-terminal.desktop /root/Desktop/ 2>/dev/null || true
       chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `,
+    uninstallScript: `
+      apt-get remove -y google-chrome-stable openjdk-17-jdk nginx certbot redis-tools postgresql-client 2>/dev/null || true
+      npm uninstall -g @anthropic-ai/claude-code @google/gemini-cli 2>/dev/null || true
+      pip3 uninstall -y aider-chat jupyterlab 2>/dev/null || true
     `
   },
   {
@@ -273,6 +285,10 @@ EOF
       mkdir -p /root/Desktop
       cp /usr/share/applications/google-chrome.desktop /usr/share/applications/firefox-esr.desktop /usr/share/applications/libreoffice-startcenter.desktop /usr/share/applications/vlc.desktop /usr/share/applications/gimp.desktop /usr/share/applications/xfce4-terminal.desktop /root/Desktop/ 2>/dev/null || true
       chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `,
+    uninstallScript: `
+      apt-get remove -y google-chrome-stable firefox-esr libreoffice vlc gimp thunar 2>/dev/null || true
+      rm -f /usr/local/bin/code-server /usr/local/bin/google-chrome* /root/Desktop/google-chrome.desktop
     `
   },
   {
@@ -290,6 +306,10 @@ EOF
       curl -fsSL https://antigravity.google/cli/install.sh | bash -s -- --dir /usr/local/bin
       ln -sf /usr/local/bin/agy /usr/local/bin/antigravity 2>/dev/null || true
       pip3 install --break-system-packages aider-chat jupyterlab ipython numpy pandas torch torchvision torchaudio transformers huggingface_hub opencv-python pillow rich
+    `,
+    uninstallScript: `
+      npm uninstall -g @anthropic-ai/claude-code 2>/dev/null || true
+      pip3 uninstall -y aider-chat jupyterlab torch torchvision transformers huggingface_hub 2>/dev/null || true
     `
   },
   {
@@ -312,6 +332,10 @@ EOF
       curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
       ln -sf /root/.cargo/bin/rustc /usr/local/bin/rustc 2>/dev/null || true
       ln -sf /root/.cargo/bin/cargo /usr/local/bin/cargo 2>/dev/null || true
+    `,
+    uninstallScript: `
+      npm uninstall -g pnpm yarn typescript ts-node nodemon 2>/dev/null || true
+      rm -rf /root/.bun /usr/local/bin/bun /root/.deno /usr/local/bin/deno
     `
   },
 
@@ -345,6 +369,10 @@ EOF
         cp /usr/share/applications/google-chrome.desktop /root/Desktop/
         chmod +x /root/Desktop/google-chrome.desktop
       fi
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y google-chrome-stable google-chrome 2>/dev/null || true
+      rm -f /usr/local/bin/google-chrome* /usr/local/bin/chrome /root/Desktop/google-chrome.desktop
     `
   },
   {
@@ -368,6 +396,10 @@ EOF
       mkdir -p /root/Desktop
       cp /usr/share/applications/chromium*.desktop /root/Desktop/ 2>/dev/null || true
       chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y chromium chromium-common chromium-browser 2>/dev/null || true
+      rm -f /usr/local/bin/chromium* /root/Desktop/chromium*.desktop
     `
   },
   {
@@ -384,6 +416,10 @@ EOF
       mkdir -p /root/Desktop
       cp /usr/share/applications/firefox*.desktop /root/Desktop/ 2>/dev/null || true
       chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y firefox-esr firefox 2>/dev/null || true
+      rm -f /root/Desktop/firefox*.desktop
     `
   },
   {
@@ -408,6 +444,10 @@ EOF
       mkdir -p /root/Desktop
       cp /usr/share/applications/brave-browser.desktop /root/Desktop/ 2>/dev/null || true
       chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y brave-browser 2>/dev/null || true
+      rm -f /usr/local/bin/brave-browser-stable /root/Desktop/brave-browser.desktop /etc/apt/sources.list.d/brave-browser*.list
     `
   },
   {
@@ -431,6 +471,10 @@ EOF
       chmod +x /usr/local/bin/microsoft-edge-stable
       cp /usr/share/applications/microsoft-edge.desktop /root/Desktop/ 2>/dev/null || true
       chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y microsoft-edge-stable 2>/dev/null || true
+      rm -f /usr/local/bin/microsoft-edge-stable /root/Desktop/microsoft-edge.desktop /etc/apt/sources.list.d/microsoft-edge*.list
     `
   },
   {
@@ -446,6 +490,10 @@ EOF
       apt-get update -y && apt-get install -y falkon || apt-get install -y midori
       cp /usr/share/applications/org.kde.falkon.desktop /root/Desktop/ 2>/dev/null || true
       chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y falkon midori 2>/dev/null || true
+      rm -f /root/Desktop/org.kde.falkon.desktop
     `
   },
 
@@ -466,6 +514,10 @@ EOF
       mkdir -p /root/Desktop
       cp /usr/share/applications/libreoffice*.desktop /root/Desktop/ 2>/dev/null || true
       chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y libreoffice libreoffice-gtk3 libreoffice-core 2>/dev/null || true
+      rm -f /root/Desktop/libreoffice*.desktop
     `
   },
   {
@@ -482,6 +534,10 @@ EOF
       sed -i 's/geteuid/getppid/' /usr/bin/vlc 2>/dev/null || true
       cp /usr/share/applications/vlc.desktop /root/Desktop/ 2>/dev/null || true
       chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y vlc vlc-bin vlc-data 2>/dev/null || true
+      rm -f /root/Desktop/vlc.desktop
     `
   },
   {
@@ -497,6 +553,10 @@ EOF
       apt-get update -y && apt-get install -y gimp
       cp /usr/share/applications/gimp.desktop /root/Desktop/ 2>/dev/null || true
       chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y gimp gimp-data 2>/dev/null || true
+      rm -f /root/Desktop/gimp.desktop
     `
   },
   {
@@ -512,6 +572,10 @@ EOF
       apt-get update -y && apt-get install -y inkscape
       cp /usr/share/applications/org.inkscape.Inkscape.desktop /root/Desktop/ 2>/dev/null || true
       chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y inkscape 2>/dev/null || true
+      rm -f /root/Desktop/org.inkscape.Inkscape.desktop
     `
   },
   {
@@ -524,6 +588,9 @@ EOF
     checkCmd: 'code-server --version || code --version',
     installScript: `
       curl -fsSL https://code-server.dev/install.sh | sh
+    `,
+    uninstallScript: `
+      rm -rf /usr/local/bin/code-server /root/.local/lib/code-server* /root/.config/code-server
     `
   },
   {
@@ -539,6 +606,10 @@ EOF
       apt-get update -y && apt-get install -y geany geany-plugins
       cp /usr/share/applications/geany.desktop /root/Desktop/ 2>/dev/null || true
       chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y geany geany-plugins 2>/dev/null || true
+      rm -f /root/Desktop/geany.desktop
     `
   },
   {
@@ -554,6 +625,10 @@ EOF
       apt-get update -y && apt-get install -y thunar thunar-archive-plugin mc doublecmd-gtk ranger
       cp /usr/share/applications/thunar.desktop /root/Desktop/ 2>/dev/null || true
       chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y thunar thunar-archive-plugin mc doublecmd-gtk ranger 2>/dev/null || true
+      rm -f /root/Desktop/thunar.desktop
     `
   },
   {
@@ -569,6 +644,10 @@ EOF
       apt-get update -y && apt-get install -y evince poppler-utils pandoc qpdf
       cp /usr/share/applications/org.gnome.Evince.desktop /root/Desktop/ 2>/dev/null || true
       chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y evince poppler-utils pandoc qpdf 2>/dev/null || true
+      rm -f /root/Desktop/org.gnome.Evince.desktop
     `
   },
   {
@@ -583,12 +662,12 @@ EOF
       export DEBIAN_FRONTEND=noninteractive
       dpkg --add-architecture i386 2>/dev/null || true
       apt-get update -y && apt-get install -y wine wine64 winetricks
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y wine wine64 winetricks 2>/dev/null || true
     `
   },
 
-  // ==========================================
-  // 3. AI & MACHINE LEARNING / AI CODING AGENTS
-  // ==========================================
   // ==========================================
   // 3. AI & MACHINE LEARNING / AI CODING AGENTS (MASTER LIST V3)
   // ==========================================
@@ -616,7 +695,7 @@ EOF
       chmod +x /root/Desktop/claude-code.desktop 2>/dev/null || true
     `,
     uninstallScript: `
-      npm uninstall -g @anthropic-ai/claude-code
+      npm uninstall -g @anthropic-ai/claude-code 2>/dev/null || true
       rm -f /root/Desktop/claude-code.desktop /usr/local/bin/claude /usr/local/bin/cl
     `
   },
@@ -645,7 +724,7 @@ EOF
       chmod +x /root/Desktop/antigravity.desktop 2>/dev/null || true
     `,
     uninstallScript: `
-      rm -f /usr/local/bin/agy /usr/local/bin/antigravity /root/.local/bin/agy /root/Desktop/antigravity.desktop
+      rm -rf /usr/local/bin/agy /usr/local/bin/antigravity /root/.gemini/antigravity-cli/bin/agy /root/.local/bin/agy /root/Desktop/antigravity.desktop
     `
   },
   {
@@ -859,7 +938,7 @@ EOF
       pip3 install --break-system-packages browser-use playwright langchain-openai 2>/dev/null || true
     `,
     uninstallScript: `
-      pip3 uninstall -y browser-use 2>/dev/null || true
+      pip3 uninstall -y browser-use playwright 2>/dev/null || true
     `
   },
   {
@@ -891,22 +970,7 @@ EOF
     `,
     uninstallScript: `
       pip3 uninstall -y openhands-ai 2>/dev/null || true
-    `
-  },
-  {
-    id: 'opencode',
-    name: 'OpenCode AI Agent',
-    icon: '💻',
-    category: 'ai_ml',
-    categoryName: 'AI & Coding Agents',
-    description: 'Open-source autonomous AI coding agent untuk terminal & repository workflow.',
-    checkCmd: 'opencode --version || which opencode',
-    installScript: `
-      npm install -g opencode-ai 2>/dev/null || npm install -g opencode 2>/dev/null || pip3 install --break-system-packages opencode 2>/dev/null || true
-    `,
-    uninstallScript: `
-      npm uninstall -g opencode-ai opencode 2>/dev/null || true
-      pip3 uninstall -y opencode 2>/dev/null || true
+      rm -f /usr/local/bin/openhands /root/.local/bin/openhands
     `
   },
   {
@@ -970,7 +1034,7 @@ EOF
     `,
     uninstallScript: `
       pkill -f ollama 2>/dev/null || true
-      rm -f /usr/local/bin/ollama
+      rm -f /usr/local/bin/ollama /usr/bin/ollama
       rm -rf /root/.ollama /usr/share/ollama
     `
   },
@@ -1055,6 +1119,10 @@ EOF
       apt-get update -y && apt-get install -y nodejs npm
       npm install -g n pnpm yarn pm2 typescript ts-node nodemon
       n lts
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y nodejs npm 2>/dev/null || true
+      npm uninstall -g n pnpm yarn pm2 typescript ts-node nodemon 2>/dev/null || true
     `
   },
   {
@@ -1070,6 +1138,9 @@ EOF
       ln -sf /root/.bun/bin/bun /usr/local/bin/bun 2>/dev/null || true
       curl -fsSL https://deno.land/install.sh | sh
       ln -sf /root/.deno/bin/deno /usr/local/bin/deno 2>/dev/null || true
+    `,
+    uninstallScript: `
+      rm -rf /root/.bun /usr/local/bin/bun /root/.deno /usr/local/bin/deno
     `
   },
   {
@@ -1084,6 +1155,9 @@ EOF
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -y && apt-get install -y python3 python3-pip python3-venv python3-dev build-essential
       pip3 install --break-system-packages poetry pipx uv requests fastapi uvicorn flask
+    `,
+    uninstallScript: `
+      pip3 uninstall -y poetry pipx uv requests fastapi uvicorn flask 2>/dev/null || true
     `
   },
   {
@@ -1099,6 +1173,9 @@ EOF
       ln -sf /root/.cargo/bin/rustc /usr/local/bin/rustc 2>/dev/null || true
       ln -sf /root/.cargo/bin/cargo /usr/local/bin/cargo 2>/dev/null || true
       ln -sf /root/.cargo/bin/rustup /usr/local/bin/rustup 2>/dev/null || true
+    `,
+    uninstallScript: `
+      rm -rf /root/.cargo /root/.rustup /usr/local/bin/rustc /usr/local/bin/cargo /usr/local/bin/rustup
     `
   },
   {
@@ -1112,6 +1189,10 @@ EOF
     installScript: `
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -y && apt-get install -y golang-go
+    `,
+    uninstallScript: `
+      rm -rf /usr/local/go /usr/local/bin/go /usr/local/bin/gofmt
+      apt-get remove --purge -y golang-go 2>/dev/null || true
     `
   },
   {
@@ -1125,6 +1206,9 @@ EOF
     installScript: `
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -y && apt-get install -y default-jdk maven gradle ant
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y default-jdk default-jre "openjdk-*" maven gradle ant 2>/dev/null || true
     `
   },
   {
@@ -1138,6 +1222,9 @@ EOF
     installScript: `
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -y && apt-get install -y php php-cli php-fpm php-curl php-gd php-mbstring php-xml php-mysql composer
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y "php*" composer 2>/dev/null || true
     `
   },
   {
@@ -1151,6 +1238,9 @@ EOF
     installScript: `
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -y && apt-get install -y gcc g++ clang llvm cmake ninja-build make gdb valgrind strace
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y clang llvm cmake ninja-build valgrind 2>/dev/null || true
     `
   },
 
@@ -1168,6 +1258,9 @@ EOF
     installScript: `
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -y && apt-get install -y ffmpeg mediainfo handbrake-cli sox lame flac opus-tools
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y ffmpeg mediainfo handbrake-cli sox lame flac opus-tools 2>/dev/null || true
     `
   },
   {
@@ -1182,6 +1275,10 @@ EOF
       curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
       chmod a+rx /usr/local/bin/yt-dlp
       pip3 install --break-system-packages gallery-dl 2>/dev/null || true
+    `,
+    uninstallScript: `
+      rm -f /usr/local/bin/yt-dlp
+      pip3 uninstall -y gallery-dl 2>/dev/null || true
     `
   },
   {
@@ -1195,6 +1292,9 @@ EOF
     installScript: `
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -y && apt-get install -y mpv
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y mpv 2>/dev/null || true
     `
   },
   {
@@ -1208,6 +1308,9 @@ EOF
     installScript: `
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -y && apt-get install -y imagemagick graphicsmagick webp optipng jpegoptim gifsicle libimage-exiftool-perl
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y imagemagick graphicsmagick webp optipng jpegoptim gifsicle libimage-exiftool-perl 2>/dev/null || true
     `
   },
 
@@ -1227,6 +1330,10 @@ EOF
       apt-get update -y && apt-get install -y sqlite3 sqlitebrowser
       cp /usr/share/applications/sqlitebrowser.desktop /root/Desktop/ 2>/dev/null || true
       chmod +x /root/Desktop/*.desktop 2>/dev/null || true
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y sqlite3 sqlitebrowser 2>/dev/null || true
+      rm -f /root/Desktop/sqlitebrowser.desktop
     `
   },
   {
@@ -1241,6 +1348,10 @@ EOF
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -y && apt-get install -y redis-server redis-tools
       service redis-server start 2>/dev/null || true
+    `,
+    uninstallScript: `
+      service redis-server stop 2>/dev/null || true
+      apt-get remove --purge -y redis-server redis-tools 2>/dev/null || true
     `
   },
   {
@@ -1254,6 +1365,9 @@ EOF
     installScript: `
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -y && apt-get install -y postgresql-client
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y postgresql-client 2>/dev/null || true
     `
   },
   {
@@ -1267,6 +1381,9 @@ EOF
     installScript: `
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -y && apt-get install -y mariadb-client || apt-get install -y mysql-client
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y mariadb-client mysql-client 2>/dev/null || true
     `
   },
   {
@@ -1281,6 +1398,10 @@ EOF
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -y && apt-get install -y nginx
       service nginx start 2>/dev/null || true
+    `,
+    uninstallScript: `
+      service nginx stop 2>/dev/null || true
+      apt-get remove --purge -y nginx 2>/dev/null || true
     `
   },
   {
@@ -1294,6 +1415,9 @@ EOF
     installScript: `
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -y && apt-get install -y docker.io docker-compose || (curl -fsSL https://get.docker.com | sh)
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y docker.io docker-compose 2>/dev/null || true
     `
   },
 
@@ -1312,6 +1436,9 @@ EOF
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -y && apt-get install -y gh git-lfs
       git lfs install 2>/dev/null || true
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y gh git-lfs 2>/dev/null || true
     `
   },
   {
@@ -1324,6 +1451,10 @@ EOF
     checkCmd: 'railway --version',
     installScript: `
       npm install -g @railway/cli || (curl -fsSL https://railway.com/install.sh | sh)
+    `,
+    uninstallScript: `
+      npm uninstall -g @railway/cli railway 2>/dev/null || true
+      rm -f /usr/local/bin/railway
     `
   },
   {
@@ -1340,6 +1471,10 @@ EOF
       curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
       echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" > /etc/apt/sources.list.d/hashicorp.list
       apt-get update -y && apt-get install -y terraform 2>/dev/null || true
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y ansible terraform 2>/dev/null || true
+      rm -f /etc/apt/sources.list.d/hashicorp.list /usr/share/keyrings/hashicorp*.gpg
     `
   },
   {
@@ -1353,6 +1488,9 @@ EOF
     installScript: `
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -y && apt-get install -y nmap tshark tcpdump iperf3 aria2 rsync rclone mtr-tiny socat dnsutils netcat-openbsd whois iftop nethogs
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y nmap tshark tcpdump iperf3 aria2 rclone mtr-tiny socat 2>/dev/null || true
     `
   },
   {
@@ -1368,6 +1506,10 @@ EOF
       apt-get update -y && apt-get install -y neofetch 2>/dev/null || true
       curl -fsSL https://raw.githubusercontent.com/dylanaraps/neofetch/master/neofetch -o /usr/local/bin/neofetch && chmod +x /usr/local/bin/neofetch
       (curl -fsSL https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.deb -o /tmp/fastfetch.deb && dpkg -i /tmp/fastfetch.deb && rm -f /tmp/fastfetch.deb) 2>/dev/null || true
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y fastfetch neofetch 2>/dev/null || true
+      rm -f /usr/local/bin/neofetch /usr/local/bin/fastfetch
     `
   },
   {
@@ -1382,16 +1524,24 @@ EOF
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -y && apt-get install -y htop btop glances ncdu tmux zsh fish fzf bat ripgrep fd-find eza zoxide tree jq 2>/dev/null || apt-get install -y htop btop ncdu tmux zsh fzf tree jq
       curl -sS https://starship.rs/install.sh | sh -s -- -y 2>/dev/null || true
+    `,
+    uninstallScript: `
+      apt-get remove --purge -y htop btop glances ncdu fish 2>/dev/null || true
+      rm -f /usr/local/bin/starship
     `
   }
 ];
 
 function getToolsList() {
+  const execEnv = {
+    ...process.env,
+    PATH: DEV_PATH,
+  };
   return TOOLS_CATALOG.map(tool => {
     let installed = false;
     let version = null;
     try {
-      const out = execSync(tool.checkCmd, { encoding: 'utf8', timeout: 3000, stdio: ['pipe', 'pipe', 'ignore'] });
+      const out = execSync(tool.checkCmd, { encoding: 'utf8', timeout: 3000, shell: '/bin/bash', env: execEnv, stdio: ['pipe', 'pipe', 'ignore'] });
       installed = true;
       const firstLine = out.trim().split('\n')[0].substring(0, 60);
       version = firstLine || 'Installed';
@@ -1415,8 +1565,11 @@ function getToolsList() {
 }
 
 function startToolUninstall(toolId, customCmd = null) {
-  if (currentInstall && currentInstall.status === 'running') {
-    throw new Error(`Operasi lain sedang berjalan: ${currentInstall.toolName}`);
+  if (activeChild && currentInstall && currentInstall.status === 'running') {
+    try {
+      activeChild.kill('SIGKILL');
+    } catch (e) {}
+    activeChild = null;
   }
 
   let commandToRun = '';
@@ -1440,9 +1593,20 @@ function startToolUninstall(toolId, customCmd = null) {
     throw new Error('Tidak ada tool atau command yang ditentukan.');
   }
 
+  const prepLocks = `
+    fuser -vki -9 /var/lib/dpkg/lock /var/lib/dpkg/lock-frontend /var/lib/apt/lists/lock 2>/dev/null || true
+    dpkg --configure -a 2>/dev/null || true
+  `;
+
+  commandToRun = prepLocks + '\n' + commandToRun;
+
+  const jobId = 'job_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+
   currentInstall = {
+    jobId,
     id: toolId || 'custom',
     toolName,
+    action: 'uninstall',
     status: 'running',
     logs: `[${new Date().toLocaleTimeString()}] Memulai proses hapus / uninstall ${toolName}...\n----------------------------------------\n`,
     startTime: Date.now(),
@@ -1454,10 +1618,15 @@ function startToolUninstall(toolId, customCmd = null) {
   const child = spawn('bash', ['-c', commandToRun], {
     env: {
       ...process.env,
+      PATH: DEV_PATH,
       DEBIAN_FRONTEND: 'noninteractive',
       TERM: 'xterm-256color',
+      HOME: '/root',
+      USER: 'root'
     }
   });
+
+  activeChild = child;
 
   child.stdout.on('data', (data) => {
     const text = data.toString();
@@ -1472,6 +1641,7 @@ function startToolUninstall(toolId, customCmd = null) {
   });
 
   child.on('close', (code) => {
+    activeChild = null;
     currentInstall.exitCode = code;
     currentInstall.status = code === 0 ? 'success' : 'failed';
     const endMsg = `\n----------------------------------------\n[${new Date().toLocaleTimeString()}] Selesai! Status: ${code === 0 ? 'BERHASIL DIHAPUS (Success ✅)' : 'SELESAI DENGAN CATATAN (Exit Code ' + code + ')'}\n`;
@@ -1480,6 +1650,7 @@ function startToolUninstall(toolId, customCmd = null) {
   });
 
   child.on('error', (err) => {
+    activeChild = null;
     currentInstall.exitCode = 1;
     currentInstall.status = 'failed';
     const errMsg = `\n[ERROR]: ${err.message}\n`;
@@ -1491,8 +1662,11 @@ function startToolUninstall(toolId, customCmd = null) {
 }
 
 function startToolInstall(toolId, customCmd = null, version = null) {
-  if (currentInstall && currentInstall.status === 'running') {
-    throw new Error(`Instalasi lain sedang berjalan: ${currentInstall.toolName}`);
+  if (activeChild && currentInstall && currentInstall.status === 'running') {
+    try {
+      activeChild.kill('SIGKILL');
+    } catch (e) {}
+    activeChild = null;
   }
 
   let commandToRun = '';
@@ -1566,9 +1740,20 @@ function startToolInstall(toolId, customCmd = null, version = null) {
     throw new Error('Tidak ada tool atau command yang ditentukan.');
   }
 
+  const prepLocks = `
+    fuser -vki -9 /var/lib/dpkg/lock /var/lib/dpkg/lock-frontend /var/lib/apt/lists/lock 2>/dev/null || true
+    dpkg --configure -a 2>/dev/null || true
+  `;
+
+  commandToRun = prepLocks + '\n' + commandToRun;
+
+  const jobId = 'job_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+
   currentInstall = {
+    jobId,
     id: toolId || 'custom',
     toolName,
+    action: 'install',
     status: 'running',
     logs: `[${new Date().toLocaleTimeString()}] Memulai instalasi ${toolName}...\n----------------------------------------\n`,
     startTime: Date.now(),
@@ -1580,10 +1765,15 @@ function startToolInstall(toolId, customCmd = null, version = null) {
   const child = spawn('bash', ['-c', commandToRun], {
     env: {
       ...process.env,
+      PATH: DEV_PATH,
       DEBIAN_FRONTEND: 'noninteractive',
       TERM: 'xterm-256color',
+      HOME: '/root',
+      USER: 'root'
     }
   });
+
+  activeChild = child;
 
   child.stdout.on('data', (data) => {
     const text = data.toString();
@@ -1598,6 +1788,7 @@ function startToolInstall(toolId, customCmd = null, version = null) {
   });
 
   child.on('close', (code) => {
+    activeChild = null;
     currentInstall.exitCode = code;
     currentInstall.status = code === 0 ? 'success' : 'failed';
     const endMsg = `\n----------------------------------------\n[${new Date().toLocaleTimeString()}] Selesai! Status: ${code === 0 ? 'BERHASIL (Success ✅)' : 'GAGAL (Exit Code ' + code + ' ❌)'}\n`;
@@ -1606,6 +1797,7 @@ function startToolInstall(toolId, customCmd = null, version = null) {
   });
 
   child.on('error', (err) => {
+    activeChild = null;
     currentInstall.exitCode = 1;
     currentInstall.status = 'failed';
     const errMsg = `\n[ERROR]: ${err.message}\n`;
@@ -1618,16 +1810,17 @@ function startToolInstall(toolId, customCmd = null, version = null) {
 
 // Check AI tools (compact)
 function getToolsStatus() {
+  const execEnv = { ...process.env, PATH: DEV_PATH };
   let claude = false;
   let agy = false;
   let hermes = false;
   let opencode = false;
   let freebuff = false;
-  try { execSync('which claude'); claude = true; } catch (e) {}
-  try { execSync('which agy || which antigravity'); agy = true; } catch (e) {}
-  try { execSync('which hermes'); hermes = true; } catch (e) {}
-  try { execSync('which opencode'); opencode = true; } catch (e) {}
-  try { execSync('which freebuff'); freebuff = true; } catch (e) {}
+  try { execSync('which claude', { env: execEnv, shell: '/bin/bash', stdio: 'ignore' }); claude = true; } catch (e) {}
+  try { execSync('which agy || which antigravity', { env: execEnv, shell: '/bin/bash', stdio: 'ignore' }); agy = true; } catch (e) {}
+  try { execSync('which hermes', { env: execEnv, shell: '/bin/bash', stdio: 'ignore' }); hermes = true; } catch (e) {}
+  try { execSync('which opencode', { env: execEnv, shell: '/bin/bash', stdio: 'ignore' }); opencode = true; } catch (e) {}
+  try { execSync('which freebuff', { env: execEnv, shell: '/bin/bash', stdio: 'ignore' }); freebuff = true; } catch (e) {}
   return { claude, agy, hermes, opencode, freebuff };
 }
 
@@ -1883,8 +2076,10 @@ const server = http.createServer((req, res) => {
       return res.end(JSON.stringify({
         tools,
         currentInstall: currentInstall ? {
+          jobId: currentInstall.jobId,
           id: currentInstall.id,
           toolName: currentInstall.toolName,
+          action: currentInstall.action,
           status: currentInstall.status,
           exitCode: currentInstall.exitCode,
           startTime: currentInstall.startTime,
@@ -1894,6 +2089,28 @@ const server = http.createServer((req, res) => {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       return res.end(JSON.stringify({ error: err.message }));
     }
+  }
+
+  // POST /api/tools/cancel: Cancel any running installation or uninstallation
+  if (url.pathname === '/api/tools/cancel' && req.method === 'POST') {
+    if (!isAuthenticated(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ error: 'Unauthorized' }));
+    }
+    if (activeChild) {
+      try {
+        activeChild.kill('SIGKILL');
+      } catch (e) {}
+      activeChild = null;
+    }
+    if (currentInstall) {
+      currentInstall.status = 'failed';
+      currentInstall.exitCode = 130;
+      currentInstall.logs += '\n[🛑 Dibatalkan oleh Pengguna / Process Terminated]\n';
+      installEmitter.emit('log', { type: 'end', install: currentInstall });
+    }
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({ success: true, message: 'Proses berhasil dihentikan / dibatalkan.' }));
   }
 
   // POST /api/tools/uninstall: Trigger uninstallation of a tool
@@ -1913,8 +2130,10 @@ const server = http.createServer((req, res) => {
           success: true,
           message: `Penghapusan ${uninstallJob.toolName} dimulai.`,
           install: {
+            jobId: uninstallJob.jobId,
             id: uninstallJob.id,
             toolName: uninstallJob.toolName,
+            action: uninstallJob.action,
             status: uninstallJob.status
           }
         }));
@@ -1943,8 +2162,10 @@ const server = http.createServer((req, res) => {
           success: true,
           message: `Instalasi ${installJob.toolName} dimulai.`,
           install: {
+            jobId: installJob.jobId,
             id: installJob.id,
             toolName: installJob.toolName,
+            action: installJob.action,
             status: installJob.status
           }
         }));
@@ -1965,8 +2186,10 @@ const server = http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     return res.end(JSON.stringify({
       install: currentInstall ? {
+        jobId: currentInstall.jobId,
         id: currentInstall.id,
         toolName: currentInstall.toolName,
+        action: currentInstall.action,
         status: currentInstall.status,
         logs: currentInstall.logs,
         exitCode: currentInstall.exitCode,
