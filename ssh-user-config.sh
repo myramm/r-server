@@ -214,6 +214,37 @@ configure_antigravity_settings() {
 configure_antigravity_settings
 
 # ---------------------------------------------------------------
+# OPTIONAL AI AGENT API KEYS / کلیدهای API برای هوش مصنوعی
+# ---------------------------------------------------------------
+: ${OPENAI_API_KEY:=""}
+: ${ANTHROPIC_API_KEY:=""}
+: ${DEEPSEEK_API_KEY:=""}
+: ${OPENCODE_TOKEN:=""}
+: ${AIDER_API_KEY:=""}
+
+configure_ai_keys() {
+    local keys_sh="/etc/profile.d/01-ai-keys.sh"
+    rm -f "$keys_sh"
+    touch "$keys_sh"
+    chmod 644 "$keys_sh"
+
+    [ -n "$OPENAI_API_KEY" ] && echo "export OPENAI_API_KEY=\"$OPENAI_API_KEY\"" >> "$keys_sh"
+    [ -n "$ANTHROPIC_API_KEY" ] && echo "export ANTHROPIC_API_KEY=\"$ANTHROPIC_API_KEY\"" >> "$keys_sh"
+    [ -n "$GEMINI_API_KEY" ] && echo "export GEMINI_API_KEY=\"$GEMINI_API_KEY\"" >> "$keys_sh"
+    [ -n "$DEEPSEEK_API_KEY" ] && echo "export DEEPSEEK_API_KEY=\"$DEEPSEEK_API_KEY\"" >> "$keys_sh"
+    [ -n "$OPENCODE_TOKEN" ] && echo "export OPENCODE_TOKEN=\"$OPENCODE_TOKEN\"" >> "$keys_sh"
+    [ -n "$AIDER_API_KEY" ] && echo "export AIDER_API_KEY=\"$AIDER_API_KEY\"" >> "$keys_sh"
+
+    # Also append to bashrc for interactive shells
+    cat "$keys_sh" >> /root/.bashrc 2>/dev/null || true
+    if [ -n "$SSH_USERNAME" ] && [ -d "/home/$SSH_USERNAME" ]; then
+        cat "$keys_sh" >> "/home/$SSH_USERNAME/.bashrc" 2>/dev/null || true
+    fi
+}
+
+configure_ai_keys
+
+# ---------------------------------------------------------------
 # SRC FOLDER ⇄ GITHUB SYNC / همگام‌سازی پوشه src با GitHub
 # ---------------------------------------------------------------
 # /root/src is auto-backed up to a PRIVATE repo (ara-tm-src-<id>) and restored
